@@ -139,15 +139,15 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         Recognition tfodObject;
         float x, y;
 
-        // Get a list of recognitions from TFOD.
+        // Get a list of recognitions from TFOD
         tfodList = tensor.getRecognitions();
         telemetry.addData("# Objects Detected", JavaUtil.listLength(tfodList));
         for (Recognition item : tfodList) {
             tfodObject = item;
             telemetry.addLine("");
-            // Display the label and confidence for the recognition.
+            // Display the label and confidence for the recognition
             telemetry.addData("Image", tfodObject.getLabel() + " (" + JavaUtil.formatNumber(tfodObject.getConfidence() * 100, 0) + " % Conf.)");
-            // Display position.
+            // Display position of the object
             x = (tfodObject.getLeft() + tfodObject.getRight()) / 2;
             y = (tfodObject.getTop() + tfodObject.getBottom()) / 2;
             // Display the position of the center of the detection boundary for the recognition
