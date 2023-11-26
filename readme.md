@@ -10,4 +10,3 @@ Code base for autonomous, teleop, and other supporting files for the FIRST Tech 
 - Roomba.java:   		test java file for X-drive drivetrain
 - RunTime.java:   	java interface with abstract methods used in Main.java
 - Tensor.java:   		sample tensorflow program
-- readme.md:   		this file  
