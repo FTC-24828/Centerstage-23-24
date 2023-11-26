@@ -2,7 +2,8 @@
 Code base for autonomous, teleop, and other supporting files for the FIRST Tech Challenge 2023 season (CENTERSTAGE)
 
 # Files:
-- AprilTag.java:		sample apriltag program  
+- AprilTag.java
+:sample apriltag program  
 - AutoMain.java:		main autonomous program  
 - EditLog.md:			log file for all commits (update accordingly)  
 - Initialize.java:   	abstract class with initialize classes and methods  
