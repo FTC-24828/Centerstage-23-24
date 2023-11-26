@@ -76,5 +76,3 @@ public class AutoMain extends LinearOpMode {
         }
     }
 }
-
-
