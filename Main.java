@@ -63,6 +63,8 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         motor[2].setDirection(DcMotorSimple.Direction.REVERSE);
         motor[3].setDirection(DcMotorSimple.Direction.FORWARD);
 
+        servo[0].setDirection(Servo.Direction.REVERSE);
+
         telemetry.addData("Initialization", "Complete");
         telemetry.update();
         runtime.reset();
@@ -92,6 +94,9 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
             servo0Pos = servo[0].getPosition();
         }
 
+        apDetection();
+        tfDetection();
+
         telemetry.addData("Status",  "Run Time: " + runtime.toString());
         telemetry.addData("servo position", servo0Pos);
         telemetry.update();
@@ -112,19 +117,19 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
     }
 
     public void apDetection () {
-        List<AprilTagDetection> currentDetections = aprilT.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
+        List<AprilTagDetection> tagList = aprilT.getDetections();
+        telemetry.addData("# AprilTags Detected", tagList.size());
 
         // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+        for (AprilTagDetection tag : tagList) {
+            if (tag.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", tag.id, tag.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", tag.ftcPose.pitch, tag.ftcPose.roll, tag.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", tag.ftcPose.range, tag.ftcPose.bearing, tag.ftcPose.elevation));
             } else {
-                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", tag.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", tag.center.x, tag.center.y));
             }
         }   // end for() loop
 
@@ -135,12 +140,10 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
     }
 
     public void tfDetection() {
-        List<Recognition> tfodList;
+        List<Recognition> tfodList = tensor.getRecognitions();
         Recognition tfodObject;
         float x, y;
 
-        // Get a list of recognitions from TFOD
-        tfodList = tensor.getRecognitions();
         telemetry.addData("# Objects Detected", JavaUtil.listLength(tfodList));
         for (Recognition item : tfodList) {
             tfodObject = item;

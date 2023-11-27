@@ -5,11 +5,16 @@ import android.util.Size;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
+import java.util.List;
 
 
 @Autonomous(name = "MainAutonomous")
@@ -39,6 +44,10 @@ public class AutoMain extends LinearOpMode {
         telemetry.update();
         waitForStart();
         while (opModeIsActive()) {
+            tfDetection();
+            int tagID = apDetection();
+
+            telemetry.addData("tag id", tagID);
             telemetry.addData("status", "runnning");
             telemetry.update();
         }
@@ -75,4 +84,59 @@ public class AutoMain extends LinearOpMode {
             throw new RuntimeException("camera name not found");
         }
     }
+
+    public int apDetection () {
+        List<AprilTagDetection> tagList = aprilT.getDetections();
+        AprilTagDetection tag;
+
+        if (tagList.size() > 1) {
+            telemetry.addData("ERR: More than one tag detected:", tagList.size() + " tags");
+            return 0;
+        }
+
+        // Step through the list of detections and display info for each one.
+        tag = tagList.get(0);
+        for (AprilTagDetection tag_ : tagList) {
+            tag = tag_;
+            if (tag.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", tag.id, tag.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", tag.ftcPose.x, tag.ftcPose.y, tag.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", tag.ftcPose.pitch, tag.ftcPose.roll, tag.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", tag.ftcPose.range, tag.ftcPose.bearing, tag.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", tag.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", tag.center.x, tag.center.y));
+            }
+        }
+
+        // Add "key" information to telemetry
+        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        telemetry.addLine("RBE = Range, Bearing & Elevation");
+
+        return tag.id;
+    }
+
+    public void tfDetection() {
+        List<Recognition> tfodList = tensor.getRecognitions();
+        Recognition tfodObject;
+        float x, y;
+
+        telemetry.addData("# Objects Detected", JavaUtil.listLength(tfodList));
+        for (Recognition item : tfodList) {
+            tfodObject = item;
+            telemetry.addLine("");
+            // Display the label and confidence for the recognition
+            telemetry.addData("Image", tfodObject.getLabel() + " (" + JavaUtil.formatNumber(tfodObject.getConfidence() * 100, 0) + " % Conf.)");
+            // Display position of the object
+            x = (tfodObject.getLeft() + tfodObject.getRight()) / 2;
+            y = (tfodObject.getTop() + tfodObject.getBottom()) / 2;
+            // Display the position of the center of the detection boundary for the recognition
+            telemetry.addData("- Position", JavaUtil.formatNumber(x, 0) + ", " + JavaUtil.formatNumber(y, 0));
+            // Display size
+            // Display the size of detection boundary for the recognition
+            telemetry.addData("- Size", JavaUtil.formatNumber(tfodObject.getWidth(), 0) + " x " + JavaUtil.formatNumber(tfodObject.getHeight(), 0));
+        }
+    }
+
 }
