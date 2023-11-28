@@ -85,12 +85,12 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         turn(rightX);
 
         if (gamepad1.a) {
-            servo[0].setPosition(servo0Pos + 0.01);
+            servo[0].setPosition(Range.clip(servo0Pos - 0.0025, 0, 0.7));
             servo0Pos = servo[0].getPosition();
         }
 
         if (gamepad1.y) {
-            servo[0].setPosition(servo0Pos - 0.01);
+            servo[0].setPosition(Range.clip(servo0Pos + 0.0025, 0, 0.7));
             servo0Pos = servo[0].getPosition();
         }
 
