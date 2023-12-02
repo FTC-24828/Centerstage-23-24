@@ -24,7 +24,7 @@ import java.util.List;
 public class Main extends Initialize implements RunTime.RunTimeMethods {
     Gyroscope imu;
     static DcMotor[] motor = new DcMotor[4];
-    static Servo[] servo = new Servo[1];
+    static Servo[] servo = new Servo[2];
     boolean USE_CAM = true;
     static VisionPortal vision;
     AprilTagProcessor aprilT = new AprilTagProcessor.Builder().
@@ -64,6 +64,7 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         motor[3].setDirection(DcMotorSimple.Direction.FORWARD);
 
         servo[0].setDirection(Servo.Direction.REVERSE);
+        servo[1].setDirection(Servo.Direction.FORWARD);
 
         telemetry.addData("Initialization", "Complete");
         telemetry.update();
@@ -78,6 +79,8 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         double rightY  =  gamepad1.right_stick_y;
 
         double servo0Pos = servo[0].getPosition();
+        double servo1Pos = servo[1].getPosition();
+
 
         telemetry.addData("Status", "Running");
 
@@ -85,20 +88,25 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         turn(rightX);
 
         if (gamepad1.a) {
-            servo[0].setPosition(Range.clip(servo0Pos - 0.0025, 0, 0.7));
+            servo[0].setPosition(Range.clip(servo0Pos - 0.005, 0, 0.65));
+            servo[1].setPosition(Range.clip(servo1Pos - 0.005, 0, 0.65));
             servo0Pos = servo[0].getPosition();
+            servo1Pos = servo[1].getPosition();
         }
 
         if (gamepad1.y) {
-            servo[0].setPosition(Range.clip(servo0Pos + 0.0025, 0, 0.7));
+            servo[0].setPosition(Range.clip(servo0Pos + 0.005, 0, 0.65));
+            servo[1].setPosition(Range.clip(servo1Pos + 0.005, 0, 0.65));
             servo0Pos = servo[0].getPosition();
+            servo1Pos = servo[1].getPosition();
         }
 
         apDetection();
         tfDetection();
 
         telemetry.addData("Status",  "Run Time: " + runtime.toString());
-        telemetry.addData("servo position", servo0Pos);
+        telemetry.addData("servo0 position", servo0Pos);
+        telemetry.addData("servo1 position", servo1Pos);
         telemetry.update();
     }
 
