@@ -23,9 +23,9 @@ import java.util.List;
 @TeleOp (name = "MainTeleOp")
 public class Main extends Initialize implements RunTime.RunTimeMethods {
     Gyroscope imu;
-    static DcMotor[] motor = new DcMotor[4];
+    static DcMotor[] motor = new DcMotor[5];
     static Servo[] servo = new Servo[2];
-    boolean USE_CAM = true;
+    boolean USE_CAM = false;
     static VisionPortal vision;
     AprilTagProcessor aprilT = new AprilTagProcessor.Builder().
                     setDrawAxes(true).          //draw 3D crosshair on tag
@@ -45,7 +45,7 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
                     build();
 
     private ElapsedTime runtime = new ElapsedTime();
-
+    static final int TPR = 1440;
 
     @Override
     public void init() {
@@ -57,12 +57,24 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
 
         initObj = null;     //dereference initObj (delete from heap)
 
-        //set motor direction for X-drive
-        motor[0].setDirection(DcMotorSimple.Direction.REVERSE);
-        motor[1].setDirection(DcMotorSimple.Direction.FORWARD);
-        motor[2].setDirection(DcMotorSimple.Direction.REVERSE);
-        motor[3].setDirection(DcMotorSimple.Direction.FORWARD);
+        //set drive train properties
+        motor[0].setDirection(DcMotorSimple.Direction.FORWARD);
+        motor[1].setDirection(DcMotorSimple.Direction.REVERSE);
+        motor[2].setDirection(DcMotorSimple.Direction.FORWARD);
+        motor[3].setDirection(DcMotorSimple.Direction.REVERSE);
 
+//        motor[0].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor[1].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor[2].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor[3].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set motor arm
+        motor[4].setTargetPosition(0);
+        motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor[4].setDirection(DcMotor.Direction.FORWARD);
+
+
+        //set servo properties
         servo[0].setDirection(Servo.Direction.REVERSE);
         servo[1].setDirection(Servo.Direction.FORWARD);
 
@@ -82,46 +94,57 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         double servo1Pos = servo[1].getPosition();
 
 
-        telemetry.addData("Status", "Running");
+
+//        motor[4].setTargetPosition(TPR);
+//        motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        motor[4].setPower(0.05);
 
         move(leftX, leftY);
         turn(rightX);
+        motor[4].setPower(0);
 
         if (gamepad1.a) {
-            servo[0].setPosition(Range.clip(servo0Pos - 0.005, 0, 0.65));
-            servo[1].setPosition(Range.clip(servo1Pos - 0.005, 0, 0.65));
-            servo0Pos = servo[0].getPosition();
-            servo1Pos = servo[1].getPosition();
+//            servo[0].setPosition(Range.clip(servo0Pos - 0.005, 0, 0.65));
+//            servo[1].setPosition(Range.clip(servo1Pos - 0.005, 0, 0.65));
+//            servo0Pos = servo[0].getPosition();
+//            servo1Pos = servo[1].getPosition();
+            motor[4].setTargetPosition(0);
+            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor[4].setPower(-0.2);
         }
 
         if (gamepad1.y) {
-            servo[0].setPosition(Range.clip(servo0Pos + 0.005, 0, 0.65));
-            servo[1].setPosition(Range.clip(servo1Pos + 0.005, 0, 0.65));
-            servo0Pos = servo[0].getPosition();
-            servo1Pos = servo[1].getPosition();
+//            servo[0].setPosition(Range.clip(servo0Pos + 0.005, 0, 0.65));
+//            servo[1].setPosition(Range.clip(servo1Pos + 0.005, 0, 0.65));
+//            servo0Pos = servo[0].getPosition();
+//            servo1Pos = servo[1].getPosition();
+            motor[4].setTargetPosition(TPR);
+            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+             motor[4].setPower(0.5);
         }
 
         apDetection();
         tfDetection();
 
         telemetry.addData("Status",  "Run Time: " + runtime.toString());
-        telemetry.addData("servo0 position", servo0Pos);
-        telemetry.addData("servo1 position", servo1Pos);
+        telemetry.addData("Motor tick", motor[4].getCurrentPosition());
+//        telemetry.addData("servo0 position", servo0Pos);
+//        telemetry.addData("servo1 position", servo1Pos);
         telemetry.update();
     }
 
     public void move(double x, double y) {
-        motor[0].setPower(Range.clip(y+x, -1.0, 1.0));
-        motor[1].setPower(Range.clip(y-x, -1.0, 1.0));
-        motor[2].setPower(Range.clip(y-x, -1.0, 1.0));
-        motor[3].setPower(Range.clip(y+x, -1.0, 1.0));
+        motor[0].setPower(Range.clip(y-x, -1.0, 1.0));
+        motor[1].setPower(Range.clip(y+x, -1.0, 1.0));
+        motor[2].setPower(Range.clip(y+x, -1.0, 1.0));
+        motor[3].setPower(Range.clip(y-x, -1.0, 1.0));
     }
 
     public void turn(double x) {
-        motor[0].setPower(x);
-        motor[1].setPower(-x);
-        motor[2].setPower(x);
-        motor[3].setPower(-x);
+        motor[0].setPower(-x);
+        motor[1].setPower(x);
+        motor[2].setPower(-x);
+        motor[3].setPower(x);
     }
 
     public void apDetection () {

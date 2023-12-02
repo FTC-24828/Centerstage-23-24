@@ -4,6 +4,7 @@ import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Autonomous(name = "MainAutonomous")
 public class AutoMain extends LinearOpMode {
-
+    static DcMotor[] motor = new DcMotor[5];
     static VisionPortal vision;
     AprilTagProcessor aprilT = new   AprilTagProcessor.Builder().
             setDrawAxes(true).          //draw 3D crosshair on tag
@@ -39,15 +40,16 @@ public class AutoMain extends LinearOpMode {
     @Override
     public void runOpMode() {
         InitObj initObj = new InitObj();
+        initObj.initList(motor, DcMotor.class, "motor");
         initObj.initCam(vision, "camera0", aprilT, tensor);
         telemetry.addData("status", "waiting for start");
         telemetry.update();
         waitForStart();
         while (opModeIsActive()) {
             tfDetection();
-            int tagID = apDetection();
+            apDetection();
+            turn(1);
 
-            telemetry.addData("tag id", tagID);
             telemetry.addData("status", "runnning");
             telemetry.update();
         }
@@ -83,6 +85,13 @@ public class AutoMain extends LinearOpMode {
         public void initCam(VisionPortal vis) throws RuntimeException {
             throw new RuntimeException("camera name not found");
         }
+    }
+
+    public void turn(double x) {
+        motor[0].setPower(-x);
+        motor[1].setPower(x);
+        motor[2].setPower(-x);
+        motor[3].setPower(x);
     }
 
     public int apDetection () {
