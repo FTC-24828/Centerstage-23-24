@@ -26,7 +26,7 @@ public class Test extends OpMode {
     VisionPortal vision;
 
     static final int TPR = 1440;
-    PIDController armControl = new PIDController(0.1, 0, 0);
+    PIDController armControl = new PIDController(0.05, 0.1, 0.001, 1);
     int targetPosition = 0;
 
     public void init() {
@@ -59,7 +59,7 @@ public class Test extends OpMode {
         motor.setPower(0);
 
         if (gamepad1.y) {
-            targetPosition = TPR;
+            targetPosition = 3*TPR;
         }
 
         if (gamepad1.a) {
@@ -67,6 +67,8 @@ public class Test extends OpMode {
         }
 
         motor.setPower(armControl.update(motor.getCurrentPosition(), targetPosition));
+//        motor.setPower(-1);
+
         armControl.printAll();
 
         telemetry.addData("Run Time: ", runTime.toString());
@@ -77,22 +79,28 @@ public class Test extends OpMode {
 
     public class PIDController {
 
-        public double Kp, Ki, Kd, lastError, lastTarget, integral = 0;
+        public double Kp, Ki, Kd, lastError, lastTarget, integral = 0, integralLim;
 
         public double currentOut;       //for debugging output
 
         // gain values for proportional, integral, and derivative
-        public PIDController (double Kp, double Ki, double Kd) {
+        public PIDController (double Kp, double Ki, double Kd, double lim) {
             this.Kp = Kp;
             this.Kd = Kd;
             this.Ki = Ki;
+            this.integralLim = lim;
         }
 
         // return and output based on the current state vs the target state
         public double update(double current, double target) {
             if (target != lastTarget) this.reset(target);
             double error = target - current;
+            if (error == 0) return 0;
+
             integral = integral + (error * timer.seconds());
+            if (integral > integralLim) integral = integralLim;
+            if (integral < -integralLim) integral = -integralLim;
+
             double output = Kp * error + Ki * integral + Kd * (error - lastError) / timer.seconds();
             lastError = error;
             currentOut = output;

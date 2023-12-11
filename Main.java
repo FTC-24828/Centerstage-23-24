@@ -63,15 +63,16 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         motor[2].setDirection(DcMotorSimple.Direction.FORWARD);
         motor[3].setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        motor[0].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor[1].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor[2].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        motor[3].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor[1].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor[2].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor[3].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //set motor arm
-        motor[4].setTargetPosition(0);
-        motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor[4].setDirection(DcMotor.Direction.FORWARD);
+//        motor[4].setTargetPosition(0);
+//        motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        motor[4].setDirection(DcMotor.Direction.FORWARD);
+        motor[4].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         //set servo properties
@@ -108,9 +109,10 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
 //            servo[1].setPosition(Range.clip(servo1Pos - 0.005, 0, 0.65));
 //            servo0Pos = servo[0].getPosition();
 //            servo1Pos = servo[1].getPosition();
-            motor[4].setTargetPosition(0);
-            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor[4].setPower(-0.2);
+
+//            motor[4].setTargetPosition(0);
+//            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            motor[4].setPower(-0.2);
         }
 
         if (gamepad1.y) {
@@ -118,9 +120,10 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
 //            servo[1].setPosition(Range.clip(servo1Pos + 0.005, 0, 0.65));
 //            servo0Pos = servo[0].getPosition();
 //            servo1Pos = servo[1].getPosition();
-            motor[4].setTargetPosition(TPR);
-            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-             motor[4].setPower(0.5);
+
+//            motor[4].setTargetPosition(TPR);
+//            motor[4].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//             motor[4].setPower(0.5);
         }
 
         apDetection();
@@ -145,6 +148,11 @@ public class Main extends Initialize implements RunTime.RunTimeMethods {
         motor[1].setPower(x);
         motor[2].setPower(-x);
         motor[3].setPower(x);
+    }
+
+    public float PID(float state, float target) {
+        float o = 0;
+        return o;
     }
 
     public void apDetection () {
