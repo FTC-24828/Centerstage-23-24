@@ -21,8 +21,9 @@ import java.util.List;
 @Autonomous(name = "MainAutonomous")
 public class AutoMain extends LinearOpMode {
     static DcMotor[] motor = new DcMotor[5];
+
     static VisionPortal vision;
-    AprilTagProcessor aprilT = new   AprilTagProcessor.Builder().
+    AprilTagProcessor aprilT = new AprilTagProcessor.Builder().
             setDrawAxes(true).          //draw 3D crosshair on tag
                     setDrawTagOutline(true).    //draw 3D cube projecting from tag
                     setDrawTagID(true).         //annotate tag detection with its ID
@@ -32,9 +33,13 @@ public class AutoMain extends LinearOpMode {
 //                    setOutputUnits().           //Set the units you want translation and rotation data provided inside any AprilTagPoseRaw or AprilTagPoseFtc objects
 //                    setTagFamily().             //Set the tag family this detector will be used to detect
 //                    setTagFamily().             //Inform the detector about known tags.
-        build();    //TODO: ADD setDecimation() VALUE
+        build();
+
+    //TODO: ADD setDecimation() VALUE
+
     TfodProcessor tensor = new TfodProcessor.Builder().
             build();
+
 
 
     @Override

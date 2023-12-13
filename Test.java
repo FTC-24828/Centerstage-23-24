@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +11,8 @@ import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.Dashboard.PIDConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -16,9 +21,8 @@ public class Test extends OpMode {
 
     // Declare OpMode members
     ElapsedTime runTime = new ElapsedTime();
-    ElapsedTime timer = new ElapsedTime();
 
-    Gyroscope imu;
+    private BNO055IMU imu;
     DcMotor motor;
     Camera camera;
     boolean USE_WEBCAM;
@@ -26,7 +30,7 @@ public class Test extends OpMode {
     VisionPortal vision;
 
     static final int TPR = 1440;
-    PIDController armControl = new PIDController(0.05, 0.1, 0.001, 1);
+
     int targetPosition = 0;
 
     public void init() {
@@ -43,10 +47,16 @@ public class Test extends OpMode {
 
 
         telemetry.addData("Status", "Initialized");
-        timer.reset();
     }
 
+    PIDController armControl = PIDController.create(0,0,0);
+
     public void loop() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        PIDConstants obj = new PIDConstants();
+        armControl.set(obj);
+
         //game stick xy
         double leftY = -gamepad1.left_stick_y;
         double leftX = gamepad1.left_stick_x;
@@ -59,64 +69,23 @@ public class Test extends OpMode {
         motor.setPower(0);
 
         if (gamepad1.y) {
-            targetPosition = 3*TPR;
+            targetPosition = 2*TPR;
         }
 
         if (gamepad1.a) {
             targetPosition = 0;
         }
 
+
         motor.setPower(armControl.update(motor.getCurrentPosition(), targetPosition));
-//        motor.setPower(-1);
 
-        armControl.printAll();
-
-        telemetry.addData("Run Time: ", runTime.toString());
         telemetry.addData("motor tick", motor.getCurrentPosition());
+        telemetry.addData("Baseline", 0);
+        telemetry.addData("PID error", targetPosition - motor.getCurrentPosition());
+        telemetry.addData("PID filter",  armControl.filter);
+        telemetry.addData("PID Output x 1000", armControl.currentOut *1000);
+        telemetry.addData("PID integral", armControl.integral);
+
         telemetry.update();
-        timer.reset();
-    }
-
-    public class PIDController {
-
-        public double Kp, Ki, Kd, lastError, lastTarget, integral = 0, integralLim;
-
-        public double currentOut;       //for debugging output
-
-        // gain values for proportional, integral, and derivative
-        public PIDController (double Kp, double Ki, double Kd, double lim) {
-            this.Kp = Kp;
-            this.Kd = Kd;
-            this.Ki = Ki;
-            this.integralLim = lim;
-        }
-
-        // return and output based on the current state vs the target state
-        public double update(double current, double target) {
-            if (target != lastTarget) this.reset(target);
-            double error = target - current;
-            if (error == 0) return 0;
-
-            integral = integral + (error * timer.seconds());
-            if (integral > integralLim) integral = integralLim;
-            if (integral < -integralLim) integral = -integralLim;
-
-            double output = Kp * error + Ki * integral + Kd * (error - lastError) / timer.seconds();
-            lastError = error;
-            currentOut = output;
-            return output;
-        }
-
-        public void reset(double target) {
-            integral = 0; lastError = 0; lastTarget = target;
-            telemetry.addLine("changing target");
-        }
-
-        public void printAll() {
-            telemetry.addData("Last error", lastError);
-            telemetry.addData("Last target", lastTarget);
-            telemetry.addData("integral", integral);
-            telemetry.addData("current output", currentOut);
-        }
     }
 }
