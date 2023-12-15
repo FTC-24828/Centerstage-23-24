@@ -20,7 +20,7 @@ public class PIDController {
     public double currentOut;       //for debugging output
 
     // gain values for proportional, integral, derivative, and noise filter
-    // lim is the integral cap and maxErr determines acceptable error
+    // lim is the integral cap and maxErr determines acceptable error range
     public PIDController (double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
         this.Kp = Kp;
         this.Kd = Kd;
@@ -46,7 +46,7 @@ public class PIDController {
         if (error <= maxErr && error >= -maxErr) return 0;
 
         //integral calculation with integral limit
-        integral = integral + (error * timer.seconds());
+        integral += (error * timer.seconds());
         if (integral > intLim) integral = intLim;
         if (integral < -intLim) integral = -intLim;
 

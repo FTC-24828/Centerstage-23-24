@@ -30,11 +30,18 @@ public class Drivetrain {
         motor[3].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    public void move(Vector v) {
+        motor[0].setPower(Range.clip(v.y - v.x, -1.0, 1.0));
+        motor[1].setPower(Range.clip(v.y + v.x, -1.0, 1.0));
+        motor[2].setPower(Range.clip(v.y + v.x, -1.0, 1.0));
+        motor[3].setPower(Range.clip(v.y - v.x, -1.0, 1.0));
+    }
+
     public void move(double x, double y) {
-        motor[0].setPower(Range.clip(y-x, -1.0, 1.0));
-        motor[1].setPower(Range.clip(y+x, -1.0, 1.0));
-        motor[2].setPower(Range.clip(y+x, -1.0, 1.0));
-        motor[3].setPower(Range.clip(y-x, -1.0, 1.0));
+        motor[0].setPower(Range.clip(y - x, -1.0, 1.0));
+        motor[1].setPower(Range.clip(y + x, -1.0, 1.0));
+        motor[2].setPower(Range.clip(y + x, -1.0, 1.0));
+        motor[3].setPower(Range.clip(y - x, -1.0, 1.0));
     }
 
     public void turn(double x) {
@@ -42,5 +49,13 @@ public class Drivetrain {
         motor[1].setPower(x);
         motor[2].setPower(-x);
         motor[3].setPower(x);
+    }
+
+    //returns x and y values relative to robot using the yaw angle and movement joystick
+    static Vector localOrientation(double x, double y, float z) {
+        Vector v = new Vector (
+                x * Math.sin(z + Math.PI/2) + y * Math.sin(z),
+                x * Math.cos(z + Math.PI/2) + y * Math.cos(z)
+        ); return v;
     }
 }

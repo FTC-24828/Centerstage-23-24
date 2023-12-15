@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Dashboard;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,14 +10,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Dashboard.PIDConstants;
+import org.firstinspires.ftc.teamcode.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@TeleOp (name = "Test")
-public class Test extends OpMode {
+@TeleOp (name = "PIDTuner")
+public class PIDTuner extends OpMode {
 
     // Declare OpMode members
     ElapsedTime runTime = new ElapsedTime();
@@ -51,8 +50,13 @@ public class Test extends OpMode {
 
     PIDController armControl = PIDController.create(0,0,0);
 
-    public void loop() {
+    @Override
+    public void start() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    }
+
+    public void loop() {
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         PIDConstants obj = new PIDConstants();
         armControl.set(obj);
