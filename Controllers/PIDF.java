@@ -12,9 +12,9 @@ public class PIDF {
 
     public double Kp, Ki, Kd, Kf, intLim, maxErr;
 
-    public double prevEst = 0, filter = 0, lastError = 0, lastTarget, integral = 0;
+    public double prev_estimate = 0, filter = 0, lastError = 0, lastTarget, integral = 0;
 
-    public double currentOut;       //for debugging output
+    public double current_output;       //for debugging output
 
     // gain values for proportional, integral, derivative, and noise filter
     // lim is the integral cap and maxErr determines acceptable error range
@@ -40,7 +40,7 @@ public class PIDF {
     public double update(double current, double target) {
         if (target != lastTarget) this.reset(target);
         double error = target - current;
-        if (error <= maxErr && error >= -maxErr) return 0;
+        if (error <= maxErr && error >= -maxErr) return 0;  //acceptable error range exit
 
         //integral calculation with integral limit
         integral += (error * timer.seconds());
@@ -48,28 +48,28 @@ public class PIDF {
         if (integral < -intLim) integral = -intLim;
 
         //noise filter for derivative
-        filter = Kf * prevEst + (1 - Kf) * (error - lastError);
-        prevEst = filter;
+        filter = Kf * prev_estimate + (1 - Kf) * (error - lastError);
+        prev_estimate = filter;
 
         double output = Kp * error + Ki * integral + Kd * filter / timer.seconds();
 
         //set error for next iteration
         lastError = error;
-        currentOut = output; //debugging purposes
+        current_output = output; //debugging purposes
         timer.reset();
         return output;
     }
 
     public void reset(double target) {
         integral = 0; lastError = 0; lastTarget = target;
-        prevEst = 0; filter = 0;
+        prev_estimate = 0; filter = 0;
     }
 
     public void printAll() {
         telemetry.addData("Last error", lastError);
         telemetry.addData("Last target", lastTarget);
         telemetry.addData("integral", integral);
-        telemetry.addData("current output", currentOut);
+        telemetry.addData("current output", current_output);
     }
 
     public static PIDF create(double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
