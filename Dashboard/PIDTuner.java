@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.PIDController;
+import org.firstinspires.ftc.teamcode.Controllers.PIDF;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -48,7 +48,7 @@ public class PIDTuner extends OpMode {
         telemetry.addData("Status", "Initialized");
     }
 
-    PIDController armControl = PIDController.create(0,0,0);
+    PIDF armControl = PIDF.create(0,0,0);
 
     @Override
     public void start() {
@@ -67,7 +67,7 @@ public class PIDTuner extends OpMode {
         double rightX  =  gamepad1.right_stick_x;
         double rightY  =  gamepad1.right_stick_y;
 
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor.setDirection(DcMotorSimple.Direction.FORWARD);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         motor.setPower(0);

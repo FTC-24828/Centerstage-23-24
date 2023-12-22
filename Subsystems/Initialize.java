@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 
 import android.util.Size;
@@ -27,8 +27,8 @@ public class Initialize {
         }
     }
 
-    public <T> void initItem (HardwareMap hmap, T item, Class<T> type, String name) {
-        item = hmap.get(type, name);
+    public <T> void initItem (HardwareMap hmap, T[] item, Class<T> type, String name) {
+        item[0] = hmap.get(type, name);
     }
 
     public void initCam(HardwareMap hmap, VisionPortal vis, String name, VisionProcessor... processor) {

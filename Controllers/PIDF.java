@@ -1,14 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Controllers;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Dashboard.PIDConstants;
 
-public class PIDController {
+public class PIDF {
     static private ElapsedTime timer = new ElapsedTime();
     TelemetryMessage telemetry = new TelemetryMessage();
 //    TelemetryMessage telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -21,7 +18,7 @@ public class PIDController {
 
     // gain values for proportional, integral, derivative, and noise filter
     // lim is the integral cap and maxErr determines acceptable error range
-    public PIDController (double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
+    public PIDF (double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
         this.Kp = Kp;
         this.Kd = Kd;
         this.Ki = Ki;
@@ -75,18 +72,18 @@ public class PIDController {
         telemetry.addData("current output", currentOut);
     }
 
-    public static PIDController create(double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
-        PIDController obj = new PIDController(Kp, Ki, Kd, Kf, lim, maxErr);
+    public static PIDF create(double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
+        PIDF obj = new PIDF(Kp, Ki, Kd, Kf, lim, maxErr);
         return obj;
     }
 
-    public static PIDController create(double Kp, double Ki, double Kd) {
-        PIDController obj = new PIDController(Kp, Ki, Kd, 100, 0, 0);
+    public static PIDF create(double Kp, double Ki, double Kd) {
+        PIDF obj = new PIDF(Kp, Ki, Kd, 100, 0, 0);
         return obj;
     }
 
-    public static PIDController create(double Kp, double Ki, double Kd, double Kf, double lim) {
-        PIDController obj = new PIDController(Kp, Ki, Kd, Kf, lim, 0);
+    public static PIDF create(double Kp, double Ki, double Kd, double Kf, double lim) {
+        PIDF obj = new PIDF(Kp, Ki, Kd, Kf, lim, 0);
         return obj;
     }
 
