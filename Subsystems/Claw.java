@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
+    enum State { OPENED, CLOSED }
     public Servo[] claw = new Servo[2];
 
     public void init (HardwareMap hmap) {

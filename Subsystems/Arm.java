@@ -26,9 +26,9 @@ public class Arm {
 
     }
 
-    void setPower(double i) { lift[0].setPower(i); }
+    public void setPower(double i) { lift[0].setPower(i); }
 
-    int getPosition() { return lift[0].getCurrentPosition(); }
+    public int getPosition() { return lift[0].getCurrentPosition(); }
 
 
 }

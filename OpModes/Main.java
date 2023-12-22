@@ -10,8 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Controllers.Feedforward;
+import org.firstinspires.ftc.teamcode.Controllers.MotionProfile;
 import org.firstinspires.ftc.teamcode.Controllers.PIDF;
+import org.firstinspires.ftc.teamcode.Other.GLOBAL;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
+import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 import com.qualcomm.robotcore.hardware.IMU;
@@ -22,14 +26,16 @@ public class Main extends OpMode {
     private IMU imu;
     Drivetrain drivetrain = new Drivetrain();
     Arm arm = new Arm();
+    Claw claw = new Claw();
 
     private ElapsedTime runtime = new ElapsedTime();
-    static final int TPR = 1440;
     int targetPosition = 0;
     public double INIT_YAW;         //TODO LINK BETWEEN THE TWO PROGRAMS
 
-    private PIDF armController = new PIDF(0.001, 0.02, 0.0001, 0.2, 1, 10);
-    @Override
+    //controllers
+    private final PIDF armController = new PIDF(0.001, 0.02, 0.0001, 0.2, 1, 5);
+    private final Feedforward armSupport = new Feedforward(0.2);
+
     public void init() {
         drivetrain.init(hardwareMap);
         arm.init(hardwareMap);
@@ -46,20 +52,19 @@ public class Main extends OpMode {
         telemetry.update();
     }
 
-    @Override
     public void start() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         imu.resetYaw();
         runtime.reset();
     }
 
-    @Override
     public void loop() {
         Orientation orientation = imu.getRobotOrientation(
                 AxesReference.INTRINSIC,
                 AxesOrder.ZYX,
                 AngleUnit.RADIANS
         );
+
 
         //yaw, roll, pitch angles
         float Z = orientation.firstAngle;
@@ -74,14 +79,16 @@ public class Main extends OpMode {
         drivetrain.move(Drivetrain.localOrientation(leftX, leftY, Z), rightX);
 
         if (gamepad1.y) {
-            targetPosition = TPR/2;
+            targetPosition = GLOBAL.TPR/2;
         }
 
         if (gamepad1.a) {
             targetPosition = 0;
         }
 
-//        arm.setPower(armController.update(arm.getPosition(), targetPosition));
+        int currentPosition = arm.getPosition();
+        arm.setPower(armController.update(currentPosition, targetPosition) +
+                armSupport.update(Math.cos(currentPosition/GLOBAL.TPR * 2 * Math.PI)));
 
         telemetry.addData("Status",  "Run Time: " + runtime.toString());
         telemetry.update();

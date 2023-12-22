@@ -16,7 +16,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @TeleOp (name = "PIDTuner")
-public class PIDTuner extends OpMode {
+public class Tuner extends OpMode {
 
     // Declare OpMode members
     ElapsedTime runTime = new ElapsedTime();
@@ -58,8 +58,7 @@ public class PIDTuner extends OpMode {
     public void loop() {
 //        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        PIDConstants obj = new PIDConstants();
-        armControl.set(obj);
+        armControl.set(new PIDConstants());
 
         //game stick xy
         double leftY = -gamepad1.left_stick_y;
@@ -87,7 +86,7 @@ public class PIDTuner extends OpMode {
         telemetry.addData("Baseline", 0);
         telemetry.addData("PID error", targetPosition - motor.getCurrentPosition());
         telemetry.addData("PID filter",  armControl.filter);
-        telemetry.addData("PID Output x 1000", armControl.currentOut *1000);
+        telemetry.addData("PID Output x 1000", armControl.current_output *1000);
         telemetry.addData("PID integral", armControl.integral);
 
         telemetry.update();

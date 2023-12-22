@@ -7,10 +7,12 @@ public class Feedforward {
         this.Kf = Kf;
     }
 
-    public double update(double input) {
-        currentOut = input * Kf;
+    public double update(double target) {
+        currentOut = target * Kf;
         return currentOut;
     }
 
     public double getOutput() { return currentOut; }
+
+    public void set(double Kf) { this.Kf = Kf; }
 }
