@@ -35,7 +35,7 @@ public class Tuner extends OpMode {
     public void init() {
         Gyroscope imu = hardwareMap.get(Gyroscope.class, "imu");
 
-        motor = hardwareMap.get(DcMotor.class, "motor0");
+        motor = hardwareMap.get(DcMotor.class, "motor4");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

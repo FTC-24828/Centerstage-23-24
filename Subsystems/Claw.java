@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
-    public enum State { OPENED, CLOSED }
-    public Servo[] claw = new Servo[2];
-    private boolean[] isOpen = {true, true};
+    public enum State {OPENED, CLOSED}
+    private Servo[] claw = new Servo[2];
+    public State[] currentState = {State.OPENED, State.OPENED};
 
     public void init (HardwareMap hmap) {
         Initialize initObj = new Initialize();
@@ -25,17 +25,22 @@ public class Claw {
 
     public void setState(int id, State state) {
         if (state == State.CLOSED) {
-            isOpen[id] = false;
+            currentState[id] = state;
             claw[id].setPosition(1);
         }
         else {
-            isOpen[id] = true;
+            currentState[id] = state;
             claw[id].setPosition(0);
         }
     }
 
-    public boolean isOpen(int id) {
-        return isOpen[id];
+    public void switchState(int id) {
+        switch (currentState[id]) {
+            case OPENED:
+                setState(id, State.CLOSED); break;
+            case CLOSED:
+                setState(id, State.OPENED); break;
+        }
     }
 
     public double getPosition(int id) {
