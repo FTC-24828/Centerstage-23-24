@@ -14,21 +14,26 @@ public class Arm {
         Initialize initObj = new Initialize();
 
         initObj.initItem(hmap, lift, DcMotor.class, "motor4");
-//        initObj.initItem(hmap, wrist, Servo.class, "wrist");
+        initObj.initItem(hmap, wrist, Servo.class, "wrist");
 
         lift[0].setDirection(DcMotorSimple.Direction.FORWARD);
-        lift[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lift[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        lift[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        wrist.setDirection(Servo.Direction.FORWARD);
-////        wrist.setPosition();
-
+        wrist[0].setDirection(Servo.Direction.REVERSE);
+//        wrist[0].scaleRange();
     }
 
     public void setPower(double i) { lift[0].setPower(i); }
 
     public int getPosition() { return lift[0].getCurrentPosition(); }
 
+    public void setWristAngle(double position) {
+        wrist[0].setPosition(position);
+    }
+
+    public double getWristAngle() {
+        return wrist[0].getPosition();
+    }
 
 }
