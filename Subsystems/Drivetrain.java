@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.Other.Vector;
 
 public class Drivetrain {
-    public DcMotor[] motor = new DcMotor[4];
+    private DcMotor[] motor = new DcMotor[4];
 
     public void init (HardwareMap hmap) {
         Initialize initObj = new Initialize();

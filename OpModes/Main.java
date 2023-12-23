@@ -10,9 +10,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Controllers.Feedforward;
+import org.firstinspires.ftc.teamcode.Controllers.MotionProfile;
 import org.firstinspires.ftc.teamcode.Controllers.PIDF;
+import org.firstinspires.ftc.teamcode.Other.GLOBAL;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
+import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Controller;
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -22,17 +27,22 @@ public class Main extends OpMode {
     private IMU imu;
     Drivetrain drivetrain = new Drivetrain();
     Arm arm = new Arm();
+    Claw claw = new Claw();
 
     private ElapsedTime runtime = new ElapsedTime();
-    static final int TPR = 1440;
-    int targetPosition = 0;
-    public double INIT_YAW;         //TODO LINK BETWEEN THE TWO PROGRAMS
+    int targetPosition = 5;
+    public double INITIAL_YAW;         //TODO LINK BETWEEN THE TWO PROGRAMS
 
-    private PIDF armController = new PIDF(0.001, 0.02, 0.0001, 0.2, 1, 10);
-    @Override
+    //controllers
+    private final PIDF armController = new PIDF(0.001, 0.02, 0.0001, 0.2, 1, 5);
+    private final Feedforward armSupport = new Feedforward(0.07);
+
     public void init() {
         drivetrain.init(hardwareMap);
         arm.init(hardwareMap);
+        claw.init(hardwareMap);
+        Controller controller = new Controller(gamepad1);
+
         imu = hardwareMap.get(IMU.class, "imu");
 
         imu.initialize(new IMU.Parameters(
@@ -46,20 +56,21 @@ public class Main extends OpMode {
         telemetry.update();
     }
 
-    @Override
     public void start() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         imu.resetYaw();
         runtime.reset();
     }
 
-    @Override
+    boolean ISPRESSED = false;
+    boolean TRACKING = false;
     public void loop() {
         Orientation orientation = imu.getRobotOrientation(
                 AxesReference.INTRINSIC,
                 AxesOrder.ZYX,
                 AngleUnit.RADIANS
         );
+
 
         //yaw, roll, pitch angles
         float Z = orientation.firstAngle;
@@ -71,17 +82,59 @@ public class Main extends OpMode {
         double rightX  =  gamepad1.right_stick_x;
         double rightY  =  gamepad1.right_stick_y;
 
-        drivetrain.move(Drivetrain.localOrientation(leftX, leftY, Z), rightX);
+        drivetrain.move(Drivetrain.localOrientation(leftX * Math.abs(leftX), leftY * Math.abs(leftY), Z), rightX * Math.abs(rightX));
+//        drivetrain.move(Drivetrain.localOrientation(leftX, leftY, Z), rightX);  //TODO ADD SHIFT MODE
+
+        //180 is theta 0
+        int currentPosition = arm.getPosition();
+        double armAngle = (double)(currentPosition - 155) / GLOBAL.TPR * Math.PI;
+        double wristAngle = (double)(Math.PI - armAngle) + 1.351;
 
         if (gamepad1.y) {
-            targetPosition = TPR/2;
+            targetPosition = 4*GLOBAL.TPR / 5;
+            TRACKING = true;
         }
 
+        //770
         if (gamepad1.a) {
-            targetPosition = 0;
+            targetPosition = 5;
+            arm.setWristAngle(0.6);
+            TRACKING = false;
         }
 
-//        arm.setPower(armController.update(arm.getPosition(), targetPosition));
+        if (TRACKING) arm.setWristAngle(0.5 + wristAngle / Math.PI);
+
+        if (gamepad1.b) {
+            claw.setState(0, Claw.State.OPENED);
+        }
+
+        if (gamepad1.x) {
+            claw.setState(1, Claw.State.OPENED);
+        }
+
+        if (gamepad1.right_bumper) { //TODO ADD A NEW GAMEPAD CLASS
+            if (!ISPRESSED) {
+                claw.switchState(0);
+                claw.switchState(1);
+            }
+            ISPRESSED = true;
+        } else {
+            ISPRESSED = false;
+        }
+
+
+        arm.setPower(armController.update(currentPosition, targetPosition) * 1 +
+                armSupport.update(Math.cos(armAngle)) * 1);
+
+
+        telemetry.addData("arm position", currentPosition);
+        telemetry.addData("arm angle", Math.toDegrees(armAngle));
+        telemetry.addData("arm support", armSupport.getOutput());
+        telemetry.addData("wrist angle", Math.toDegrees(wristAngle));
+
+
+        telemetry.addData("wrist position", arm.getWristAngle());
+
 
         telemetry.addData("Status",  "Run Time: " + runtime.toString());
         telemetry.update();
