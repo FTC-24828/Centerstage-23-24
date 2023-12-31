@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode.hardware.wrappers;
 
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.RobotHardware;
-import org.firstinspires.ftc.teamcode.controllers.PIDF;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.util.WMath;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -79,11 +75,11 @@ public class WActuator {
         int i = 0;
         for (HardwareDevice device : devices.values()) {
             if (device instanceof DcMotor) {
-//                double correction = 1.0;
-//                if (voltage != null) correction = 12.0 / voltage.getAsDouble();
+                double correction = 1.0;
+                if (voltage != null) correction = 12.0 / voltage.getAsDouble();
 //                if (!floating) ((DcMotor) device).setPower(power * correction);
 //                else ((DcMotor) device).setPower(0);
-                ((DcMotor) device).setPower(WMath.clamp(power, -1, 1));
+                ((DcMotor) device).setPower(WMath.clamp(power * correction, -1, 1));
             } else if (device instanceof Servo) {
                 ((Servo) device).setPosition(target_position);
             }
@@ -105,7 +101,7 @@ public class WActuator {
      * @param offset offset current_position by + offset
      * @return
      */
-    public WActuator setOffset(double offset) {
+    public WActuator setReadingOffset(double offset) {
         this.offset = offset;
         return this;
     }

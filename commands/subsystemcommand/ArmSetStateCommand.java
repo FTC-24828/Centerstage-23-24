@@ -5,8 +5,8 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Arm;
 
-public class ArmCommand extends InstantCommand {
-    public ArmCommand(Arm.ArmState state) {
+public class ArmSetStateCommand extends InstantCommand {
+    public ArmSetStateCommand(Arm.ArmState state) {
         super (
                 () -> Robot.getInstance().arm.setArmState(state)
         );

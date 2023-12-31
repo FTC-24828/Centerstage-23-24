@@ -4,13 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -52,7 +52,7 @@ public class Robot {
     public WServo claw_left;
 
     private IMU imu;
-    private double yaw;
+    public double yaw;
     public List<LynxModule> hubs;
 
     private ElapsedTime timer = new ElapsedTime();
@@ -62,7 +62,7 @@ public class Robot {
     private Telemetry telemetry;
 
     //subsystems
-    private ArrayList<WSubsystem> subsystems;
+    private ArrayList<WSubsystem> subsystems = new ArrayList<>();
 
     public Drivetrain drivetrain;
     public Arm arm;
@@ -97,40 +97,45 @@ public class Robot {
 
         Initialize initObj = new Initialize();
         //drivetrain
-        initObj.initList(hardware_map, motor, DcMotorEx.class, "motor");
+//        initObj.initList(hardware_map, motor, DcMotorEx.class, "motor");
+        motor[0] = hardware_map.get(DcMotorEx.class, "motorFrontRight");
+        motor[1] = hardware_map.get(DcMotorEx.class, "motorRearRight");
+        motor[2] = hardware_map.get(DcMotorEx.class, "motorRearLeft");
+        motor[3] = hardware_map.get(DcMotorEx.class, "motorFrontLeft");
+        motor_encoder[0] = new WEncoder(new MotorEx(hardware_map, "motorFrontRight").encoder);
+        motor_encoder[1] = new WEncoder(new MotorEx(hardware_map, "motorRearRight").encoder);
+        motor_encoder[2] = new WEncoder(new MotorEx(hardware_map, "motorRearLeft").encoder);
+        motor_encoder[3] = new WEncoder(new MotorEx(hardware_map, "motorFrontLeft").encoder);
         drivetrain.init(motor);
-        motor_encoder[0] = new WEncoder(new MotorEx(hardware_map, "motor0").encoder);
-        motor_encoder[1] = new WEncoder(new MotorEx(hardware_map, "motor1").encoder);
-        motor_encoder[2] = new WEncoder(new MotorEx(hardware_map, "motor2").encoder);
-        motor_encoder[3] = new WEncoder(new MotorEx(hardware_map, "motor3").encoder);
 
 
         //arm
         lift = hardware_map.get(DcMotorEx.class, "lift");
-        arm.init(lift);
 
         arm_encoder = new WEncoder(new MotorEx(hardware_map, "lift").encoder);
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, 0);
         arm_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.ARM_ENCODER), lift)
-                .setOffset(-150);
+                .setReadingOffset(-150);
+        arm.init(lift);
+
 
         //intake
-        wrist = hardware_map.get(WServo.class, "wrist").setOffset(0.5);
-        claw_right = hardware_map.get(WServo.class, "servo0");
-        claw_left = hardware_map.get(WServo.class, "servo1");
-        intake.init(wrist, claw_left, claw_right);
+        wrist = new WServo(hardware_map.get(Servo.class, "wrist")).setWritingOffset(0.3);
+        claw_right = new WServo(hardware_map.get(Servo.class, "servo0"));
+        claw_left = new WServo(hardware_map.get(Servo.class, "servo1"));
         wrist_actuator = new WActuator(wrist::getPosition, wrist);
+        intake.init(wrist, claw_left, claw_right);
 
         //subsystems
-        subsystems = new ArrayList<>();
-        drivetrain = new Drivetrain();
-        arm = new Arm();
-        intake = new Intake();
+//        drivetrain = new Drivetrain();
+//        arm = new Arm();
+//        intake = new Intake();
 //        addSubsystem(drivetrain, arm, intake);      //TODO MOVE THIS FUNC OUTSIDE INTO OPMODES FOR TESTING
 
         hubs = hardware_map.getAll(LynxModule.class);
         hubs.get(0).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         hubs.get(1).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        clearBulkCache(Global.Hub.BOTH);
 
         voltage = hardware_map.voltageSensor.iterator().next().getVoltage();
     }
@@ -178,6 +183,13 @@ public class Robot {
             encoder_readings.put(Sensors.Encoder.RIGHT_REAR, motor_encoder[3].getPosition());
         }
 
+//        if (Global.USING_IMU) getYaw();
+        Orientation orientation = imu.getRobotOrientation(
+                AxesReference.INTRINSIC,
+                AxesOrder.ZYX,
+                AngleUnit.RADIANS
+        ); yaw = orientation.firstAngle;
+
         for (WSubsystem subsystem : subsystems) {
             subsystem.read();
         }
@@ -193,13 +205,14 @@ public class Robot {
         for (WSubsystem subsystem : subsystems) {
             subsystem.reset();
         }
+//        robot = new Robot();
     }
 
     public double getVoltage() {
         return voltage;
     }
 
-    public double getYaw() {
+    private double getYaw() {
         Orientation orientation = imu.getRobotOrientation(
                 AxesReference.INTRINSIC,
                 AxesOrder.ZYX,
@@ -227,15 +240,12 @@ public class Robot {
                 break;
 
             case BOTH:
-                clearBulkCache();
+                hubs.get(0).clearBulkCache();
+                hubs.get(1).clearBulkCache();
                 break;
         }
     }
 
-    private void clearBulkCache() {
-        hubs.get(0).clearBulkCache();
-        hubs.get(1).clearBulkCache();
-    }
 
     public double doubleSubscriber(Sensors.Encoder topic) {
         Object value = encoder_readings.getOrDefault(topic, 0.0);
@@ -260,7 +270,7 @@ public class Robot {
     }
 
     public int intSubscriber(Sensors.Encoder topic) {
-        Object value = encoder_readings.getOrDefault(topic, 0.0);
+        Object value = encoder_readings.getOrDefault(topic, 0);
         if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Double) {
@@ -271,7 +281,7 @@ public class Robot {
     }
 
     public int intSubscriber(Sensors.Sensor topic) {
-        Object value = sensor_readings.getOrDefault(topic, 0.0);
+        Object value = sensor_readings.getOrDefault(topic, 0);
         if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Double) {
@@ -279,5 +289,13 @@ public class Robot {
         } else {
             throw new ClassCastException();
         }
+    }
+
+    public boolean boolSubscriber(Sensors.Encoder topic) {
+        return (boolean) encoder_readings.getOrDefault(topic, false);
+    }
+
+    public boolean boolSubscriber(Sensors.Sensor topic) {
+        return (boolean) sensor_readings.getOrDefault(topic, false);
     }
 }

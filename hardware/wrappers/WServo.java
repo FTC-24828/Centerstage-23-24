@@ -12,7 +12,7 @@ public class WServo implements Servo {
         this.servo = servo;
     }
 
-    public WServo setOffset(double offset) {
+    public WServo setWritingOffset(double offset) {
         this.offset = offset;
         return this;
     }

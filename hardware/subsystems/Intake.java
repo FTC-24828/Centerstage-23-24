@@ -25,11 +25,10 @@ public class Intake extends WSubsystem {
     private WristState wrist_state = WristState.FOLD;
 
     public Intake() {
-        wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI / 2 ;
     }
 
     public void init(WServo wrist, WServo claw0, WServo claw1) {
-        wrist.setDirection(Servo.Direction.FORWARD);
+        wrist.setDirection(Servo.Direction.REVERSE);
         angle_offset = robot.wrist.getOffset();
 
         claw0.setDirection(Servo.Direction.REVERSE);
@@ -38,7 +37,9 @@ public class Intake extends WSubsystem {
         claw0.scaleRange(0.7, 0.9);
         claw1.scaleRange(0.7, 0.9);
 
-        setClawState(ClawSide.BOTH, ClawState.OPEN);
+        setClawState(ClawSide.BOTH, ClawState.CLOSED);
+
+        wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI / 2 ;
     }
 
     public void periodic() {
@@ -50,11 +51,11 @@ public class Intake extends WSubsystem {
                 break;
 
             case FOLD:
-                target_position = 1;
+                target_position = 1.2;
                 break;
 
             case SCORING:
-                target_position = (2 * Math.PI / 3 - robot.arm.arm_angle.getAsDouble()) - angle_offset;
+                target_position = (2 * Math.PI / 3 - robot.arm.arm_angle.getAsDouble());
                 break;
 
             default:
@@ -76,7 +77,7 @@ public class Intake extends WSubsystem {
     }
 
     public void setClawState(@NonNull ClawSide side, @NonNull ClawState state) {
-        double position = (state == ClawState.OPEN) ? 1 : 0;    //NOTE: CHANGE IF CLAW IS INVERTED
+        double position = (state == ClawState.OPEN) ? 0 : 1;    //NOTE: CHANGE IF CLAW IS INVERTED
         switch (side) {
             case BOTH:
                 claw_left_state = state;

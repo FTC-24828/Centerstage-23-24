@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.controllers.dashboard;
+package org.firstinspires.ftc.teamcode.opmode.tests.dashboard;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -35,7 +35,7 @@ public class Tuner extends OpMode {
     public void init() {
         Gyroscope imu = hardwareMap.get(Gyroscope.class, "imu");
 
-        motor = hardwareMap.get(DcMotor.class, "motor4");
+        motor = hardwareMap.get(DcMotor.class, "lift");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -52,19 +52,12 @@ public class Tuner extends OpMode {
 
     @Override
     public void start() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     public void loop() {
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         armControl.set(new PIDConstants());
-
-        //game stick xy
-        double leftY = -gamepad1.left_stick_y;
-        double leftX = gamepad1.left_stick_x;
-        double rightX  =  gamepad1.right_stick_x;
-        double rightY  =  gamepad1.right_stick_y;
 
         motor.setDirection(DcMotorSimple.Direction.FORWARD);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -72,7 +65,7 @@ public class Tuner extends OpMode {
         motor.setPower(0);
 
         if (gamepad1.y) {
-            targetPosition = 2*TPR;
+            targetPosition = 6 * TPR / 5;
         }
 
         if (gamepad1.a) {
@@ -86,7 +79,7 @@ public class Tuner extends OpMode {
         telemetry.addData("Baseline", 0);
         telemetry.addData("PID error", targetPosition - motor.getCurrentPosition());
         telemetry.addData("PID filter",  armControl.filter);
-        telemetry.addData("PID Output x 1000", armControl.current_output *1000);
+        telemetry.addData("PID Output x 1000", armControl.current_output * 1000);
         telemetry.addData("PID integral", armControl.integral);
 
         telemetry.update();
