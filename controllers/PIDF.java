@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.controllers;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
-import org.firstinspires.ftc.teamcode.controllers.dashboard.PIDConstants;
+import org.firstinspires.ftc.teamcode.opmode.tests.dashboard.PIDConstants;
 
 public class PIDF {
     static private ElapsedTime timer = new ElapsedTime();
@@ -77,6 +77,7 @@ public class PIDF {
         telemetry.addData("Last error", lastError);
         telemetry.addData("Last target", lastTarget);
         telemetry.addData("integral", integral);
+        telemetry.addData("filter", filter);
         telemetry.addData("current output", current_output);
     }
 

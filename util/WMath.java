@@ -8,4 +8,8 @@ public class WMath {
         if (max < min) throw new IllegalArgumentException("tried to call WMath.clamp with illegal arguments");
         return Math.min(max, Math.max(value, min));
     }
+
+
+
+
 }

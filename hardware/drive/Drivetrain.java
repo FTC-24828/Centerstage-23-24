@@ -18,8 +18,8 @@ public class Drivetrain extends WSubsystem {
     public void init (DcMotorEx[] motor) {
 //      set drivetrain properties
         motor[0].setDirection(DcMotorSimple.Direction.FORWARD);
-        motor[1].setDirection(DcMotorSimple.Direction.REVERSE);
-        motor[2].setDirection(DcMotorSimple.Direction.FORWARD);
+        motor[1].setDirection(DcMotorSimple.Direction.FORWARD);
+        motor[2].setDirection(DcMotorSimple.Direction.REVERSE);
         motor[3].setDirection(DcMotorSimple.Direction.REVERSE);
 
         motor[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -67,14 +67,14 @@ public class Drivetrain extends WSubsystem {
         };
 
         wheel_speed[0] = (WMath.clamp(speed[1] - z, -1.0, 1.0));
-        wheel_speed[1] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
-        wheel_speed[2] = (WMath.clamp(speed[0] - z, -1.0, 1.0));
-        wheel_speed[3] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
+        wheel_speed[1] = (WMath.clamp(speed[0] - z, -1.0, 1.0));
+        wheel_speed[2] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
+        wheel_speed[3] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
     }
 
     public void move(double x, double y, double z) {
-        double angle = Math.atan2(y, -x);
-        double power = Math.hypot(-x, y);
+        double angle = Math.atan2(y, x);
+        double power = Math.hypot(x, y);
 
         double cos = Math.cos(angle - Math.PI/4);
         double sin = Math.sin(angle - Math.PI/4);
@@ -85,10 +85,10 @@ public class Drivetrain extends WSubsystem {
                 power * cos / max,
         };
 
-        wheel_speed[0] = (Range.clip(speed[1] - z, -1.0, 1.0));
-        wheel_speed[1] = (Range.clip(speed[0] + z, -1.0, 1.0));
-        wheel_speed[2] = (Range.clip(speed[0] - z, -1.0, 1.0));
-        wheel_speed[3] = (Range.clip(speed[1] + z, -1.0, 1.0));
+        wheel_speed[0] = (WMath.clamp(speed[0] - z, -1.0, 1.0));
+        wheel_speed[1] = (WMath.clamp(speed[1] - z, -1.0, 1.0));
+        wheel_speed[2] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
+        wheel_speed[3] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
     }
 
     //TODO ADD A FAILSAFE FOR REORIENTING YAW AFTER AUTONOMOUS

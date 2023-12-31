@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.controllers.PIDF;
 import org.firstinspires.ftc.teamcode.hardware.Global;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.WSubsystem;
+import org.firstinspires.ftc.teamcode.opmode.tests.dashboard.PIDConstants;
 import org.firstinspires.ftc.teamcode.util.WMath;
 
 import java.util.function.DoubleSupplier;
-
 
 public class Arm extends WSubsystem {
     private final Robot robot = Robot.getInstance();
@@ -22,36 +22,43 @@ public class Arm extends WSubsystem {
 
     public DoubleSupplier arm_angle;
     public double target_position;
-    private double increment;
+    public double increment;
+    public double power = 0.0;
 
     //controllers
-    private final PIDF armController = new PIDF(0.001, 0.02, 0.0001, 0.2, 1, 3);
-    private final Feedforward armSupport = new Feedforward(0.07);
+    private final PIDF arm_controller = new PIDF(0.0015, 0.0001, 0.0005, 0.8, 1000.0, 10.0);
+    private final Feedforward arm_support = new Feedforward(0.07);
 
     public Arm() {
-        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / Global.MOTOR_TPR * Math.PI;
-        target_position = robot.arm_actuator.getCurrentPosition();
+
     }
 
     public void init (DcMotorEx lift) {
         lift.setDirection(DcMotorSimple.Direction.FORWARD);
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / (3 * Global.MOTOR_TPR) * 2 * Math.PI;
+        target_position = robot.arm_actuator.getCurrentPosition();
     }
 
     public void periodic() {
-        switch (arm_state) {
-            case FLAT:
-                target_position = 0;
-                break;
+        if (Global.IS_AUTO) {
 
-            case SCORING:
-                target_position = (double) 4 * Global.MOTOR_TPR / 5 + increment;
+        } else {
+            switch (arm_state) {
+                case FLAT:
+                    target_position = robot.arm_actuator.getOffset() + increment;
+                    break;
+
+                case SCORING:
+                    target_position = (double) 6 * Global.MOTOR_TPR / 5 + increment;
+            }
         }
 
-        double power = armController.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
-                armSupport.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1);
+        power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
+                (arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1));
         robot.arm_actuator.setPower(power);
     }
 
@@ -75,8 +82,12 @@ public class Arm extends WSubsystem {
         arm_state = state;
     }
 
+    public void setTargetPosition (double target_position){
+        this.target_position = target_position;
+    }
+
     public void incrementHeight(double increment) {
         this.increment -= increment;
-        this.increment = WMath.clamp(this.increment, -20, 10);
+        this.increment = WMath.clamp(this.increment, -500, 200);
     }
 }
