@@ -8,9 +8,9 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmSetStateCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
-import org.firstinspires.ftc.teamcode.hardware.Global;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.Arm;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class IntermediateSequence extends ParallelCommandGroup {
     public IntermediateSequence() {

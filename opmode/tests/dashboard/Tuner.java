@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Gyroscope;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.controllers.PIDF;
+import org.firstinspires.ftc.teamcode.common.controllers.PIDF;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -78,7 +78,7 @@ public class Tuner extends OpMode {
         telemetry.addData("motor tick", motor.getCurrentPosition());
         telemetry.addData("Baseline", 0);
         telemetry.addData("PID error", targetPosition - motor.getCurrentPosition());
-        telemetry.addData("PID filter",  armControl.filter);
+        telemetry.addData("PID filter",  armControl.derivative);
         telemetry.addData("PID Output x 1000", armControl.current_output * 1000);
         telemetry.addData("PID integral", armControl.integral);
 

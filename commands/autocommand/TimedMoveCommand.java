@@ -4,13 +4,13 @@ import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
 public class TimedMoveCommand extends ParallelDeadlineGroup {
     public TimedMoveCommand(double x, double y, double z, int milliseconds) {
         super(
                 new WaitCommand(milliseconds),
-                new RunCommand(() -> Robot.getInstance().drivetrain.move(x, y, z))
+                new RunCommand(() -> WRobot.getInstance().drivetrain.move(x, y, z))
         );
     }
 }
