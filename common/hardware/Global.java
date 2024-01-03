@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.hardware;
 
-import android.graphics.Color;
-
 public class Global {
     public enum Hub {CONTROL_HUB, EXPANSION_HUB, BOTH}
     public enum Side {BLUE, RED}
@@ -15,7 +13,7 @@ public class Global {
     public static boolean USING_IMU;
     public static boolean USING_WEBCAM;
     public static boolean DEBUG;
-    public static Side COLOR;
+    public static Side SIDE;
 
     public static boolean IS_SCORING = false;
     public static boolean IS_INTAKING = false;

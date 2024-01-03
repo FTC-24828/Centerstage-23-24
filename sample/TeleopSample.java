@@ -1,26 +1,17 @@
 package org.firstinspires.ftc.teamcode.sample;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
-import org.firstinspires.ftc.teamcode.commands.telecommand.ArmAdjustCommand;
-import org.firstinspires.ftc.teamcode.commands.telecommand.ClawToggleCommand;
-import org.firstinspires.ftc.teamcode.commands.telecommand.DepositSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.IntakeSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.IntermediateSequence;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.common.util.Vector2D;
 
 @Disabled
 @TeleOp(name = "opmode name")

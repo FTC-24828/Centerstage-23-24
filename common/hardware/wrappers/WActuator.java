@@ -77,8 +77,6 @@ public class WActuator {
             if (device instanceof DcMotor) {
                 double correction = 1.0;
                 if (voltage != null) correction = 12.0 / voltage.getAsDouble();
-//                if (!floating) ((DcMotor) device).setPower(power * correction);
-//                else ((DcMotor) device).setPower(0);
                 ((DcMotor) device).setPower(WMath.clamp(power * correction, -1, 1));
             } else if (device instanceof Servo) {
                 ((Servo) device).setPosition(target_position);
