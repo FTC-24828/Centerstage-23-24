@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
-import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
@@ -35,7 +34,7 @@ public class RedAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = true;
         Global.USING_DASHBOARD = true;
-        Global.COLOR = Global.Side.RED;
+        Global.SIDE = Global.Side.RED;
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);

@@ -19,28 +19,25 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Drone;
+import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Hang;
+import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WActuator;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WEncoder;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
-import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
-import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Hang;
-import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class WRobot {
-    private static WRobot WRobot = null;
+    private static WRobot robot = null;
 
     //drivetrain
     public DcMotorEx[] motor = new DcMotorEx[4];
@@ -63,7 +60,7 @@ public class WRobot {
 
     public VisionPortal vision_portal;
 
-    private ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
     private double voltage = 12.0;
 
     private HardwareMap hardware_map;
@@ -83,13 +80,13 @@ public class WRobot {
 
     //singleton declaration
     public static WRobot getInstance() {
-        if (WRobot == null) WRobot = new WRobot();
-        return WRobot;
+        if (robot == null) robot = new WRobot();
+        return robot;
     }
 
 
     //mapping and initializing hardware
-    public void init(final HardwareMap hmap, Telemetry telemetry) {
+    public void init(final HardwareMap hmap, Telemetry telemetry, VisionProcessor... processor) {
         this.hardware_map = hmap;
         this.telemetry = (Global.USING_DASHBOARD) ? new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry()) : telemetry;
 
@@ -109,6 +106,7 @@ public class WRobot {
                     .setCameraResolution(new Size(1280, 720))
                     .setCamera(BuiltinCameraDirection.BACK)
                     .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                    .addProcessors(processor)
                     .enableLiveView(Global.DEBUG)
                     .setAutoStopLiveView(true)
                     .build();
@@ -193,6 +191,7 @@ public class WRobot {
         if (Global.USING_IMU) new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-get-yaw-thread").start();
 
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
+
         if (Global.IS_AUTO) {
             encoder_readings.put(Sensors.Encoder.LEFT_FRONT, motor_encoder[0].getPosition());
             encoder_readings.put(Sensors.Encoder.RIGHT_FRONT, motor_encoder[1].getPosition());
@@ -294,7 +293,7 @@ public class WRobot {
     }
 
     public int intSubscriber(Sensors.Encoder topic) {
-        Object value = encoder_readings.getOrDefault(topic, 0);
+        Object value = encoder_readings.getOrDefault(topic, 0.0);
         if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Double) {
@@ -305,7 +304,7 @@ public class WRobot {
     }
 
     public int intSubscriber(Sensors.Sensor topic) {
-        Object value = sensor_readings.getOrDefault(topic, 0);
+        Object value = sensor_readings.getOrDefault(topic, 0.0);
         if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Double) {

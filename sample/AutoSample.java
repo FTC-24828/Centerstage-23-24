@@ -30,7 +30,7 @@ public class AutoSample extends CommandOpMode {
         CommandScheduler.getInstance().reset();
 
         Global.IS_AUTO = true;
-        Global.COLOR = Global.Side.RED;
+        Global.SIDE = Global.Side.RED;
         //additional global flags eg. USING_IMU, USING_DASHBOARD, DEBUG are placed here
         //if is auto, must declare color
 

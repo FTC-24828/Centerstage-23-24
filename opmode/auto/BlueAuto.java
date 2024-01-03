@@ -16,8 +16,6 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 
 @Config
 @Autonomous(name = "Blue Auto")
@@ -40,10 +38,10 @@ public class BlueAuto extends CommandOpMode {
         Global.USING_DASHBOARD = true;
         Global.USING_WEBCAM = true;
         Global.DEBUG = false;
-        Global.COLOR = Global.Side.RED;
+        Global.SIDE = Global.Side.RED;
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
-        robot.init(hardwareMap, telemetry);
+        robot.init(hardwareMap, telemetry, pipeline);
 
         if (Global.USING_DASHBOARD) {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
