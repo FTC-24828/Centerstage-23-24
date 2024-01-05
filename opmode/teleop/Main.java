@@ -39,11 +39,11 @@ public class Main extends CommandOpMode {
         Global.IS_AUTO = false;
         Global.USING_DASHBOARD = false;
         Global.USING_IMU = true;
+        Global.USING_WEBCAM = false;
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);
         telemetry.addLine("robot reset");   //FIXME
-        robot.resetYaw();       //TODO LINK
 
         controller = new GamepadEx(gamepad1);
 
@@ -69,7 +69,6 @@ public class Main extends CommandOpMode {
                 .whenPressed(new ConditionalCommand(
                         new IntermediateSequence(),
                         new ParallelCommandGroup(
-                                new WristCommand(Intake.WristState.FLAT),
                                 new DepositSequence()
                         ),
                         () -> Global.IS_SCORING && !Global.IS_INTAKING
@@ -99,10 +98,10 @@ public class Main extends CommandOpMode {
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-            super.schedule(new ArmAdjustCommand(-10));
+            super.schedule(new ArmAdjustCommand(-5));
         }
         else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            super.schedule(new ArmAdjustCommand(10));
+            super.schedule(new ArmAdjustCommand(5));
         }
 
         super.run();
@@ -112,19 +111,21 @@ public class Main extends CommandOpMode {
         telemetry.addData("Frequency", 1000000000 / (loop - loop_time) + "hz");
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("arm angle", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
+        telemetry.addData("arm target position", robot.arm.target_position);
+        telemetry.addData("arm error", robot.arm.target_position - robot.arm_actuator.getCurrentPosition());
         telemetry.addData("wrist angle", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
         telemetry.addData("Yaw", robot.yaw);
-        telemetry.addData("increment", robot.arm.increment);
         telemetry.update();
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
+        robot.clearBulkCache(Global.Hub.BOTH);
     }
 
     @Override
     public void reset() {
         super.reset();
         robot.reset();
+        Global.resetGlobals();
     }
 }

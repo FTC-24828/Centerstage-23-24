@@ -98,4 +98,11 @@ public class BlueAuto extends CommandOpMode {
         robot.write();
         robot.clearBulkCache(Global.Hub.BOTH);
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        robot.reset();
+        Global.resetGlobals();
+    }
 }

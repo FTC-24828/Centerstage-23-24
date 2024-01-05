@@ -15,6 +15,7 @@ public class IntakeSequence extends SequentialCommandGroup {
     public IntakeSequence() {
         super(
             new InstantCommand(Global::startIntaking),
+            new InstantCommand(Global::stopScoring),
             new ArmSetStateCommand(Arm.ArmState.FLAT),
             new WristCommand(Intake.WristState.FLAT),
             new WaitCommand(200),

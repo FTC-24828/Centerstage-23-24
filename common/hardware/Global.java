@@ -18,6 +18,11 @@ public class Global {
     public static boolean IS_SCORING = false;
     public static boolean IS_INTAKING = false;
 
+    public static void resetGlobals() {
+        IS_SCORING = false; IS_INTAKING = false;
+        USING_DASHBOARD = false; IS_AUTO = false; USING_IMU = false; USING_WEBCAM = false; DEBUG = false; SIDE = null;
+    }
+
     public static void startScoring() {
         IS_SCORING = true;
     }

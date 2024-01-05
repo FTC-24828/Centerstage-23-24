@@ -6,6 +6,8 @@ import static org.firstinspires.ftc.teamcode.common.hardware.Global.Side;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 import com.acmerobotics.dashboard.config.Config;
 
@@ -18,6 +20,7 @@ import static org.firstinspires.ftc.teamcode.common.hardware.Global.*;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
 import org.firstinspires.ftc.vision.VisionProcessor;
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -40,21 +43,19 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     private final AtomicReference<Bitmap> frame = new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
     public Global.PropLocation location;
 
-    public List<Integer> blue_range =  Arrays.asList(0, 12, 127, 17, 255, 255);
-    public List<Integer> red_range = Arrays.asList(106, 52, 0, 128, 255, 255);
-    public List<Integer> filter_range;
+    public int[] blue_range =  {6, 29, 74, 32, 255, 255};
+    public int[] red_range = {106, 52, 0, 128, 255, 255};
+    public static int[] filter_range = new int[6];
 
     public double red_threshold = 0.2;
-    public double blue_threshold = 2.5;
+    public double blue_threshold = 1.7;
     public double threshold = 0;
 
-    double left_white;
-    double center_white;
-    double right_white;
+    public double left_white;
+    public double center_white;
 
     Mat mask = new Mat();
     Mat final_mat = new Mat();
-    Mat submat = new Mat();
 
     ArrayList<Rect> bounding_box = new ArrayList<>();
 
@@ -66,13 +67,13 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
-        frame.set(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888));
+        frame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
         if (SIDE == Side.BLUE) {
             threshold = blue_threshold;
-            filter_range = blue_range;
+            filter_range = blue_range.clone();
         } else if (SIDE == Side.RED) {
             threshold = red_threshold;
-            filter_range = red_range;
+            filter_range = red_range.clone();
         } else {
             throw new EnumConstantNotPresentException(Global.Side.class, "Global.SIDE not initialized");
         }
@@ -81,27 +82,28 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
         mask = frame.clone();
-        final_mat = frame.clone();
 
         Imgproc.GaussianBlur(mask, mask, new Size(11, 11), 0.0);
         mask = filterColor(mask);
 
         //clean up image
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7, 7));
-        Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_OPEN, kernel);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 7));
         Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_CLOSE, kernel);
+        Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_OPEN, kernel);
 
         //get bounding box of contours
         processContours(mask);
+        final_mat = mask.clone();
 
-        //sort left to right by x value
-        bounding_box.sort(Comparator.comparingInt(a -> a.x));
-        //get the
-        left_white = getWhiteSum(mask, bounding_box.get(0)) / 1000000;
-        center_white = getWhiteSum(mask, bounding_box.get(1)) / 1000000;
-        right_white = getWhiteSum(mask, bounding_box.get(2)) / 1000000;
+        if (bounding_box.size() > 1) {
+            //sort left to right by x value
+            bounding_box.sort(Comparator.comparingInt(a -> a.x));
+            //get the total amount of pixel in threshold
+            left_white = getWhiteSum(mask, bounding_box.get(0)) / 1000000;
+            center_white = getWhiteSum(mask, bounding_box.get(1)) / 1000000;
+        }
 
-        setPropLocation(left_white, center_white, right_white);
+        setPropLocation(left_white, center_white);
 
         return null;
     }
@@ -109,15 +111,36 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
         if (DEBUG) {
+            Bitmap bitmap = Bitmap.createBitmap(final_mat.width(), final_mat.height(), Bitmap.Config.RGB_565);
+            Utils.matToBitmap(final_mat, bitmap);
+            android.graphics.Rect ROI = new android.graphics.Rect(0, 0, onscreenWidth, onscreenHeight);
+            canvas.drawBitmap(bitmap, null, ROI, null);
 
+            Paint rectPaint = new Paint();
+            rectPaint.setColor(Color.RED);
+            rectPaint.setStyle(Paint.Style.STROKE);
+            rectPaint.setStrokeWidth(scaleCanvasDensity * 4);
+            for (Rect rect : bounding_box) {
+                canvas.drawRect(makeGraphicsRect(rect, scaleBmpPxToCanvasPx), rectPaint);
+                canvas.drawText("box", rect.x, rect.y, new Paint(Color.GREEN));
+            }
         }
     }
 
+    private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
+        int left = Math.round(rect.x * scaleBmpPxToCanvasPx);
+        int top = Math.round(rect.y * scaleBmpPxToCanvasPx);
+        int right = left + Math.round(rect.width * scaleBmpPxToCanvasPx);
+        int bottom = top + Math.round(rect.height * scaleBmpPxToCanvasPx);
+        return new android.graphics.Rect(left, top, right, bottom);
+     }
+
+
     public Mat filterColor(Mat src) {
         Mat HSV = new Mat();
-        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_RGB2HSV);
-        Scalar lower = new Scalar(filter_range.get(0), filter_range.get(1), filter_range.get(2));
-        Scalar upper = new Scalar(filter_range.get(3), filter_range.get(4), filter_range.get(5));
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_BGR2HSV);
+        Scalar lower = new Scalar(filter_range[0], filter_range[1], filter_range[2]);
+        Scalar upper = new Scalar(filter_range[3], filter_range[4], filter_range[5]);
         Core.inRange(HSV, lower, upper, HSV);
         return HSV;
     }
@@ -130,30 +153,23 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
         bounding_box.clear();
 
         for (int i = 0; i < contours.size(); i++) {
-            if (Imgproc.contourArea(contours.get(i)) > 5000) {
+            if (Imgproc.contourArea(contours.get(i)) > 1000) {
                 bounding_box.add(Imgproc.boundingRect(contours.get(i)));
             }
         }
     }
 
     private double getWhiteSum(Mat src, Rect box) {
+        Mat submat;
         submat = src.submat(box);
         Scalar color =  Core.sumElems(submat);
         return color.val[0];
     }
 
-    private void setPropLocation(double left, double center, double right) {
-//        if (left > threshold) {
-//            location = PropLocation.LEFT;
-//        } else if (center > threshold) {
-//            location = PropLocation.CENTER;
-//        } else {
-//            location = PropLocation.RIGHT
-//        }
-        double highest = WMath.max(left, center, right);
-        if (highest - left < 0.1) {
+    private void setPropLocation(double left, double center) {
+        if (left > threshold) {
             location = PropLocation.LEFT;
-        } else if (highest - center < 0.1) {
+        } else if (center > threshold) {
             location = PropLocation.CENTER;
         } else {
             location = PropLocation.RIGHT;

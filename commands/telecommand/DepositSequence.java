@@ -13,6 +13,7 @@ public class DepositSequence extends ParallelCommandGroup {
     public DepositSequence() {
         super(
                 new InstantCommand(Global::startScoring),
+                new InstantCommand(Global::stopIntaking),
                 new ArmSetStateCommand(Arm.ArmState.SCORING),
                 new WristCommand(Intake.WristState.SCORING)
         );

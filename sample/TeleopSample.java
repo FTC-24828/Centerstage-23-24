@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 @Disabled
-@TeleOp(name = "opmode name")
+@TeleOp(name = "tele opmode name")
 public class TeleopSample extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
     private final WRobot robot = WRobot.getInstance();
@@ -84,7 +84,8 @@ public class TeleopSample extends CommandOpMode {
     //reset function, called when the opmode is stopped
     @Override
     public void reset() {
-        super.reset();
+        super.reset(); //flush the command scheduler
         robot.reset();
+        Global.resetGlobals();
     }
 }

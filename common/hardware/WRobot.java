@@ -98,6 +98,7 @@ public class WRobot {
                             RevHubOrientationOnRobot.UsbFacingDirection.UP
                     )
             ));
+            imu.resetYaw();
         }
 
         if (Global.USING_WEBCAM) {
@@ -137,7 +138,7 @@ public class WRobot {
 
 
         //intake
-        wrist = new WServo(hardware_map.get(Servo.class, "wrist")).setWritingOffset(0.3);
+        wrist = new WServo(hardware_map.get(Servo.class, "wrist")).setWritingOffset(0.2);
         claw_right = new WServo(hardware_map.get(Servo.class, "servo0"));
         claw_left = new WServo(hardware_map.get(Servo.class, "servo1"));
         wrist_actuator = new WActuator(wrist::getPosition, wrist);
@@ -188,7 +189,8 @@ public class WRobot {
 
     //read encoder values
     public void read () {
-        if (Global.USING_IMU) new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-get-yaw-thread").start();
+        Thread imu_thread = new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-get-yaw-thread");
+        imu_thread.start();
 
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
 
@@ -201,6 +203,14 @@ public class WRobot {
 
         for (WSubsystem subsystem : subsystems) {
             subsystem.read();
+        }
+
+        if (Global.USING_IMU) {
+            try {
+                imu_thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -231,7 +241,7 @@ public class WRobot {
             try {
                 yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             } catch (Exception e) {
-                telemetry.addLine(e.toString());
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -242,8 +252,8 @@ public class WRobot {
         public void run() {
             try {
                 imu.resetYaw();
-            } catch (Exception e) {
-                telemetry.addLine(e.toString());
+            } catch (Exception e){
+                Thread.currentThread().interrupt();
             }
         }
     }

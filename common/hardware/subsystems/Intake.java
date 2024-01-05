@@ -22,7 +22,7 @@ public class Intake implements WSubsystem {
     public enum WristState {SCORING, FOLD, FLAT}
     public DoubleSupplier wrist_angle;
     private double angle_offset;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
-    private WristState wrist_state = WristState.FOLD;
+    public WristState wrist_state = WristState.FOLD;
 
     public Intake() {
     }

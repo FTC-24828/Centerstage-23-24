@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 @Disabled
-@Autonomous(name = "opmode name")
+@Autonomous(name = "auto opmode name")
 public class AutoSample extends CommandOpMode {
     private final WRobot robot = WRobot.getInstance();
 
@@ -27,7 +27,7 @@ public class AutoSample extends CommandOpMode {
     //called when the "init" button is pressed
     @Override
     public void initialize() {
-        CommandScheduler.getInstance().reset();
+        CommandScheduler.getInstance().reset(); //flush the command scheduler
 
         Global.IS_AUTO = true;
         Global.SIDE = Global.Side.RED;
@@ -72,5 +72,13 @@ public class AutoSample extends CommandOpMode {
 
         robot.write(); //write power to actuators (setting power to motors/servos)
         robot.clearBulkCache(Global.Hub.BOTH); //clear cache if needed
+    }
+
+    //reset function, called when the opmode is stopped
+    @Override
+    public void reset() {
+        super.reset(); //flush the command scheduler
+        robot.reset();
+        Global.resetGlobals();
     }
 }
