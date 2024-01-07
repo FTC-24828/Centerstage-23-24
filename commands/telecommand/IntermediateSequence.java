@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmResetIncrementCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmSetStateCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
@@ -15,9 +16,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 public class IntermediateSequence extends ParallelCommandGroup {
     public IntermediateSequence() {
         super(
-                new InstantCommand(Global::stopScoring),
-                new InstantCommand(Global::stopIntaking),
+                new InstantCommand(() -> Global.setState(Global.State.INTERMEDIATE)),
                 new ArmSetStateCommand(Arm.ArmState.FLAT),
+                new ArmResetIncrementCommand(),
                 new WristCommand(Intake.WristState.FOLD),
                 new SequentialCommandGroup(
                         new WaitCommand(300),

@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Localizer;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Drone;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Hang;
@@ -28,6 +29,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WActuator;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WEncoder;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
+import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 
@@ -42,6 +45,7 @@ public class WRobot {
     //drivetrain
     public DcMotorEx[] motor = new DcMotorEx[4];
     public WEncoder[] motor_encoder = new WEncoder[4];
+    public Localizer localizer;
 
     //arm
     public DcMotorEx lift;
@@ -55,10 +59,12 @@ public class WRobot {
     public WServo claw_left;
 
     private IMU imu;
+    public Thread imu_thread;
     public volatile double yaw;
     public List<LynxModule> hubs;
 
     public VisionPortal vision_portal;
+    public PropPipeline pipeline;
 
     private final ElapsedTime timer = new ElapsedTime();
     private double voltage = 12.0;
@@ -68,15 +74,14 @@ public class WRobot {
 
     //subsystems
     private ArrayList<WSubsystem> subsystems;
-
     public Drivetrain drivetrain;
     public Arm arm;
     public Intake intake;
     public Hang hang;
     public Drone drone;
 
-    private HashMap<Sensors.Encoder, Object> encoder_readings;
-    private HashMap<Sensors.Encoder, Object> sensor_readings;
+    public  HashMap<Sensors.Encoder, Object> encoder_readings;
+    public HashMap<Sensors.Sensor, Object> sensor_readings;
 
     //singleton declaration
     public static WRobot getInstance() {
@@ -86,7 +91,7 @@ public class WRobot {
 
 
     //mapping and initializing hardware
-    public void init(final HardwareMap hmap, Telemetry telemetry, VisionProcessor... processor) {
+    public void init(final HardwareMap hmap, Telemetry telemetry) {
         this.hardware_map = hmap;
         this.telemetry = (Global.USING_DASHBOARD) ? new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry()) : telemetry;
 
@@ -104,16 +109,16 @@ public class WRobot {
         if (Global.USING_WEBCAM) {
             vision_portal = new VisionPortal.Builder()
                     .setCamera(hardware_map.get(WebcamName.class, "Webcam"))
-                    .setCameraResolution(new Size(1280, 720))
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                    .addProcessors(processor)
-                    .enableLiveView(Global.DEBUG)
+                    .setCameraResolution(new Size(640, 480))
+                    .addProcessors(pipeline)
+                    .enableLiveView(true)
                     .setAutoStopLiveView(true)
                     .build();
         }
 
-        this.encoder_readings = new HashMap<>();
+        localizer = new Localizer(new Pose());
+
+        encoder_readings = new HashMap<>();
 
         //drivetrain
         motor[0] = hardware_map.get(DcMotorEx.class, "motorFrontRight");
@@ -124,7 +129,12 @@ public class WRobot {
         motor_encoder[1] = new WEncoder(new MotorEx(hardware_map, "motorRearRight").encoder);
         motor_encoder[2] = new WEncoder(new MotorEx(hardware_map, "motorRearLeft").encoder);
         motor_encoder[3] = new WEncoder(new MotorEx(hardware_map, "motorFrontLeft").encoder);
+        encoder_readings.put(Sensors.Encoder.LEFT_FRONT, 0);
+        encoder_readings.put(Sensors.Encoder.RIGHT_FRONT, 0);
+        encoder_readings.put(Sensors.Encoder.LEFT_REAR, 0);
+        encoder_readings.put(Sensors.Encoder.RIGHT_REAR, 0);
         drivetrain.init(motor);
+        localizer.init();
 
 
         //arm
@@ -181,16 +191,15 @@ public class WRobot {
             voltage = hardware_map.voltageSensor.iterator().next().getVoltage();
         }
 
-        for (WSubsystem subsystem : subsystems) {
-            subsystem.periodic();
-        }
-//        if (Global.IS_AUTO) localizer.periodic();
+        for (WSubsystem subsystem : subsystems) { subsystem.periodic(); }
     }
 
     //read encoder values
     public void read () {
-        Thread imu_thread = new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-get-yaw-thread");
-        imu_thread.start();
+        if (Global.USING_IMU) {
+            imu_thread = new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-yaw-thread");
+            imu_thread.start();
+        }
 
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
 
@@ -199,6 +208,7 @@ public class WRobot {
             encoder_readings.put(Sensors.Encoder.RIGHT_FRONT, motor_encoder[1].getPosition());
             encoder_readings.put(Sensors.Encoder.LEFT_REAR, motor_encoder[2].getPosition());
             encoder_readings.put(Sensors.Encoder.RIGHT_REAR, motor_encoder[3].getPosition());
+            localizer.update();
         }
 
         for (WSubsystem subsystem : subsystems) {
@@ -258,7 +268,7 @@ public class WRobot {
         }
     }
 
-    public void resetYaw() {
+    public void resetYaw() {        //TODO THREAD SAFETY
         new Thread(new IMU_RESET_YAW_RUNNABLE(), "IMU-reset-yaw-thread").start();
     }
 

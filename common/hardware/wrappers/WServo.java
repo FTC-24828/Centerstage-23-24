@@ -17,7 +17,7 @@ public class WServo implements Servo {
         return this;
     }
 
-    public double getOffset() {
+    public double getWritingOffset() {
         return this.offset;
     }
 

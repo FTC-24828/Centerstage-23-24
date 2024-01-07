@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Config
 public class PropPipeline implements VisionProcessor, CameraStreamSource {
-    private final AtomicReference<Bitmap> frame = new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
+    private final AtomicReference<Bitmap> last_frame = new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
     public Global.PropLocation location;
 
     public int[] blue_range =  {6, 29, 74, 32, 255, 255};
@@ -62,12 +62,12 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     //for displaying with ftc dashboard
     @Override
     public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-        continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(frame.get()));
+        continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(last_frame.get()));
     }
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
-        frame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
+        last_frame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
         if (SIDE == Side.BLUE) {
             threshold = blue_threshold;
             filter_range = blue_range.clone();
@@ -105,6 +105,10 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
 
         setPropLocation(left_white, center_white);
 
+        Bitmap b = Bitmap.createBitmap(final_mat.width(), final_mat.height(), Bitmap.Config.RGB_565);
+        Utils.matToBitmap(final_mat, b);
+        last_frame.set(b);
+
         return null;
     }
 
@@ -138,7 +142,7 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
 
     public Mat filterColor(Mat src) {
         Mat HSV = new Mat();
-        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(src, HSV, Imgproc.COLOR_BGR2HSV);      //NOTE: BGR2HSV not RGB2HSV
         Scalar lower = new Scalar(filter_range[0], filter_range[1], filter_range[2]);
         Scalar upper = new Scalar(filter_range[3], filter_range[4], filter_range[5]);
         Core.inRange(HSV, lower, upper, HSV);
@@ -152,9 +156,9 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
         Imgproc.findContours(src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         bounding_box.clear();
 
-        for (int i = 0; i < contours.size(); i++) {
-            if (Imgproc.contourArea(contours.get(i)) > 1000) {
-                bounding_box.add(Imgproc.boundingRect(contours.get(i)));
+        for (MatOfPoint contour : contours) {
+            if (Imgproc.contourArea(contour) > 1000) {
+                bounding_box.add(Imgproc.boundingRect(contour));
             }
         }
     }

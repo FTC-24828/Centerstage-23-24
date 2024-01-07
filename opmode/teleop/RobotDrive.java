@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.tests;
+package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -21,9 +21,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
 
-@TeleOp(name = "MainTeleOp - robot centric")
-public class RobotDrive extends CommandOpMode{
-
+@TeleOp (name = "MainTeleOp - robot drive")
+public class RobotDrive extends CommandOpMode {
     private final WRobot robot = WRobot.getInstance();
 
     private GamepadEx controller;
@@ -39,12 +38,12 @@ public class RobotDrive extends CommandOpMode{
 
         Global.IS_AUTO = false;
         Global.USING_DASHBOARD = false;
-        Global.USING_IMU = true;
+        Global.USING_IMU = false;
+        Global.USING_WEBCAM = false;
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);
-        telemetry.addLine("robot reset");
-        robot.resetYaw();
+        telemetry.addLine("robot reset");   //FIXME
 
         controller = new GamepadEx(gamepad1);
 
@@ -52,33 +51,42 @@ public class RobotDrive extends CommandOpMode{
         controller.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.BOTH));
 
-        controller.getGamepadButton(GamepadKeys.Button.B)
+        controller.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.LEFT));
 
-        controller.getGamepadButton(GamepadKeys.Button.X)
+        controller.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.RIGHT));
 
         //arm controls
         controller.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new ConditionalCommand(
-                        new IntermediateSequence(),
-                        new IntakeSequence(),
-                        () -> Global.IS_INTAKING && !Global.IS_SCORING
+                        new ConditionalCommand(
+                                new IntakeSequence(),
+                                new IntermediateSequence(),
+                                () -> Global.STATE == Global.State.INTERMEDIATE
+                        ),
+                        new InstantCommand(),
+                        () -> Global.STATE != Global.State.INTAKING
                 ));
 
         controller.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ConditionalCommand(
-                        new IntermediateSequence(),
-                        new ParallelCommandGroup(
-                                new WristCommand(Intake.WristState.FLAT),
-                                new DepositSequence()
+                        new ConditionalCommand(
+                                new DepositSequence(),
+                                new IntermediateSequence(),
+                                () -> Global.STATE == Global.State.INTERMEDIATE
                         ),
-                        () -> Global.IS_SCORING && !Global.IS_INTAKING
+                        new InstantCommand(),
+                        () -> Global.STATE != Global.State.SCORING
                 ));
 
         //slow mode
         controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
+
+        //yaw failsafe
+        controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(robot::resetYaw));
 
         while (opModeInInit()) {
             telemetry.addLine("Initialization complete.");
@@ -90,38 +98,41 @@ public class RobotDrive extends CommandOpMode{
     @Override
     public void run() {
         robot.read();
-        super.run();
 
-        local_vector = Vector2D.toLocalOrientation(controller.getLeftX(), controller.getLeftY(), robot.yaw);
+        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), 0);
         robot.drivetrain.move(local_vector, controller.getRightX());
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-            super.schedule(new ArmAdjustCommand(-10));
+            super.schedule(new ArmAdjustCommand(-5));
         }
         else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            super.schedule(new ArmAdjustCommand(10));
+            super.schedule(new ArmAdjustCommand(5));
         }
 
+        super.run();
         robot.periodic();
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", 1000000000 / (loop - loop_time) + "hz");
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("arm angle", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
+        telemetry.addData("arm target position", robot.arm.target_position);
+        telemetry.addData("arm error", robot.arm.target_position - robot.arm_actuator.getCurrentPosition());
         telemetry.addData("wrist angle", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
         telemetry.addData("Yaw", robot.yaw);
-        telemetry.addData("increment", robot.arm.increment);
+        telemetry.addData("State", Global.STATE);
         telemetry.update();
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
+        robot.clearBulkCache(Global.Hub.BOTH);
     }
 
     @Override
     public void reset() {
         super.reset();
         robot.reset();
+        Global.resetGlobals();
     }
 }

@@ -104,7 +104,7 @@ public class WActuator {
         return this;
     }
 
-    public double getOffset() {
+    public double getReadingOffset() {
         return offset;
     }
 

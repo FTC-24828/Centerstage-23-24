@@ -7,6 +7,12 @@ public class WMath {
         return Math.min(max, Math.max(value, min));
     }
 
+    public static double wrapAngle(double theta) {
+        final double twoPI = 2 * Math.PI;
+        theta %= twoPI;
+        return (theta + twoPI) % twoPI;
+    }
+
     public static double max(double a, double b, double c) {
         return Math.max(Math.max(a, b), c);
     }

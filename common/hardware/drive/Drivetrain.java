@@ -7,8 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
+import org.firstinspires.ftc.teamcode.common.util.Pose;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
+
+import java.util.Arrays;
 
 public class Drivetrain implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();
@@ -21,9 +24,16 @@ public class Drivetrain implements WSubsystem {
         motor[2].setDirection(DcMotorSimple.Direction.REVERSE);
         motor[3].setDirection(DcMotorSimple.Direction.REVERSE);
 
+        motor[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motor[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor[1].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motor[2].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor[2].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motor[3].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor[3].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motor[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -52,23 +62,12 @@ public class Drivetrain implements WSubsystem {
 
     }
 
+    public void move(Pose pose) {
+        move(pose.x, pose.y, pose.z) ;
+    }
+
     public void move(Vector2D v, double z) {
-        double angle = Math.atan2(v.y, v.x);
-        double power = Math.hypot(v.x, v.y);
-
-        double cos = Math.cos(angle - Math.PI/4);
-        double sin = Math.sin(angle - Math.PI/4);
-        double max = Math.max(Math.abs(sin), Math.abs(cos));
-
-        double[] speed = {
-                power * sin / max,
-                power * cos / max,
-        };
-
-        wheel_speed[0] = (WMath.clamp(speed[1] - z, -1.0, 1.0));
-        wheel_speed[1] = (WMath.clamp(speed[0] - z, -1.0, 1.0));
-        wheel_speed[2] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
-        wheel_speed[3] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
+        move(v.x, v.y, z);
     }
 
     public void move(double x, double y, double z) {
@@ -88,9 +87,12 @@ public class Drivetrain implements WSubsystem {
         wheel_speed[1] = (WMath.clamp(speed[1] - z, -1.0, 1.0));
         wheel_speed[2] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
         wheel_speed[3] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
+
+        if (Global.IS_AUTO) {
+            double correction = 12 / robot.getVoltage();
+            wheel_speed = Arrays.stream(wheel_speed)
+                    .map(e -> Math.abs(e) < 0.01 ? e * correction : ((e + Math.signum(e) * 0.01)) * correction)
+                    .toArray();
+        }
     }
-
-    //TODO ADD A FAILSAFE FOR REORIENTING YAW AFTER AUTONOMOUS
-
-
 }

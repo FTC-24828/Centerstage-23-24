@@ -14,8 +14,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 public class IntakeSequence extends SequentialCommandGroup {
     public IntakeSequence() {
         super(
-            new InstantCommand(Global::startIntaking),
-            new InstantCommand(Global::stopScoring),
+            new InstantCommand(() -> Global.setState(Global.State.INTAKING)),
             new ArmSetStateCommand(Arm.ArmState.FLAT),
             new WristCommand(Intake.WristState.FLAT),
             new WaitCommand(200),

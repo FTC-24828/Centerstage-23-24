@@ -21,11 +21,11 @@ public class Arm implements WSubsystem {
 
     public DoubleSupplier arm_angle;
     public double target_position;
-    public double increment;
+    public double increment = 0;
     public double power = 0.0;
 
     //controllers
-    private final PIDF arm_controller = new PIDF(0.0012, 0.0001, 0.0005, 0.65, 2000.0, 10.0);
+    private final PIDF arm_controller = new PIDF(0.0012, 0.0001, 0.0002, 0.65, 2000.0, 10.0);
     private final Feedforward arm_support = new Feedforward(0.07);
 
     public Arm() {
@@ -38,7 +38,7 @@ public class Arm implements WSubsystem {
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / (3 * Global.MOTOR_TPR) * 2 * Math.PI;
+        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / (3 * Global.TETRIX_MOTOR_TPR) * 2 * Math.PI;
         target_position = robot.arm_actuator.getCurrentPosition();
     }
 
@@ -48,11 +48,11 @@ public class Arm implements WSubsystem {
         } else {
             switch (arm_state) {
                 case FLAT:
-                    target_position = robot.arm_actuator.getOffset() + increment;
+                    target_position = robot.arm_actuator.getReadingOffset() + increment;
                     break;
 
                 case SCORING:
-                    target_position = (double) 6 * Global.MOTOR_TPR / 5 + increment;
+                    target_position = (double) Global.TETRIX_MOTOR_TPR + increment;
             }
         }
 
@@ -70,7 +70,8 @@ public class Arm implements WSubsystem {
     }
 
     public void reset() {
-
+        arm_controller.reset(0);
+        setArmState(ArmState.FLAT);
     }
 
     public ArmState getArmState() {
@@ -87,6 +88,10 @@ public class Arm implements WSubsystem {
 
     public void incrementHeight(double increment) {
         this.increment -= increment;
-        this.increment = WMath.clamp(this.increment, -500, 200);
+        this.increment = WMath.clamp(this.increment, 0, 800);
+    }
+
+    public void resetIncrement() {
+        this.increment = 0;
     }
 }

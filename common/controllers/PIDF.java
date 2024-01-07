@@ -1,20 +1,18 @@
 package org.firstinspires.ftc.teamcode.common.controllers;
 
 import com.qualcomm.robotcore.robocol.TelemetryMessage;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.opmode.tests.dashboard.PIDConstants;
 
-public class PIDF extends WController {
-    TelemetryMessage telemetry = new TelemetryMessage();
-//    TelemetryMessage telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+public class PIDF {
+    private ElapsedTime timer = new ElapsedTime();
 
     public double Kp, Ki, Kd, Kf, intLim, tolerance;
 
     public double prev_estimate = 0, derivative = 0, last_error = 0, last_target, integral = 0;
 
     public double current_output;       //for debugging output
-
-
 
     /**
         @param Kp           proportional gain
@@ -33,6 +31,10 @@ public class PIDF extends WController {
         this.tolerance = tolerance;
     }
 
+    public PIDF (double Kp, double Ki, double Kd) {
+        this(Kp, Ki, Kd, 0, 0, 0);
+    }
+
     public void set(double Kp, double Ki, double Kd, double Kf, double lim, double maxErr) {
         this.Kp = Kp;
         this.Kd = Kd;
@@ -41,7 +43,6 @@ public class PIDF extends WController {
         this.intLim = lim;
         this.tolerance = maxErr;
     }
-
 
     // return and output based on the current state vs the target state
     public double calculate(double current, double target) {

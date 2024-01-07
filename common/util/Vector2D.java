@@ -7,18 +7,19 @@ public class Vector2D {
                 this.x = x; this.y = y;
         }
 
-
-        //returns x and y values relative to robot using the yaw angle and movement joystick
-        public static Vector2D toLocalOrientation(double x, double y, double z) {
-                return new Vector2D(
-                        -x * Math.sin(z + Math.PI / 2) - y * Math.sin(z),
-                        x * Math.cos(z + Math.PI / 2) + y * Math.cos(z)
-                );
+        /**returns x and y values relative to the robot offset by a forward z angle*/
+        public Vector2D(double x, double y, double z) {
+                this.x = x * Math.cos(z) + y * Math.sin(z);
+                this.y = x * -Math.sin(z) + y * Math.cos(z);
         }
 
-        public void scale(double value) {
-                this.x *= value;
-                this.y *= value;
+        public double magnitude() {
+                return Math.hypot(x, y);
+        }
+
+        public void scale(double scalar) {
+                this.x *= scalar;
+                this.y *= scalar;
         }
 
 }

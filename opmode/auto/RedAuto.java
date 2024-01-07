@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 
 @Config
 @Autonomous(name = "Red Auto")
@@ -22,6 +23,7 @@ public class RedAuto extends CommandOpMode {
 
     private final WRobot robot  = WRobot.getInstance();
 
+    private PropPipeline pipeline;
 
     private double loop_time = 0.0;
     private final ElapsedTime timer = new ElapsedTime();
@@ -39,8 +41,10 @@ public class RedAuto extends CommandOpMode {
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);
 
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
+        if (Global.USING_DASHBOARD) {
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+            FtcDashboard.getInstance().startCameraStream(pipeline, 0);
+        }
         robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
 
         robot.read();
