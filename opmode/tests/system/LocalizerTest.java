@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.sample;
+package org.firstinspires.ftc.teamcode.opmode.tests.system;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 @Disabled
-@TeleOp(name = "tele opmode name")
-public class TeleopSample extends CommandOpMode {
+@TeleOp(name = "localizer test", group = "Utility")
+public class LocalizerTest extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
     private final WRobot robot = WRobot.getInstance();
 
@@ -27,23 +27,16 @@ public class TeleopSample extends CommandOpMode {
     public void initialize() {
         super.reset(); //reset the command scheduler (flushing out old commands from last opmode)
 
-        Global.IS_AUTO = false;
+        Global.IS_AUTO = true;
         //additional global flags eg. USING_IMU, USING_DASHBOARD, DEBUG are placed here
         //if is auto, must declare color
 
         //initialize robot
-        robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
+        robot.addSubsystem(new Drivetrain());
         robot.init(hardwareMap, telemetry);
 
         //get controller
         controller = new GamepadEx(gamepad1);
-
-        //initialize controller buttons mappings here (during initialize())
-        //maps right bumper to a command
-        controller.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(
-                        // -> your command here <-
-                ));
 
         //display that initialization is complete
         while (opModeInInit()) {
@@ -61,20 +54,10 @@ public class TeleopSample extends CommandOpMode {
         //set the drivetrain's motor speed according to controller stick input
         robot.drivetrain.move(controller.getLeftX(), controller.getLeftY(), controller.getRightX());
 
-        if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-            super.schedule(
-                    // command(s) to be run when left trigger is pressed more than halfway
-            );
-        }
-        else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            super.schedule(
-                    // command(s) to be run when left trigger is pressed more than halfway
-            );
-        }
-
         robot.periodic(); //calculations/writing data to actuators
 
         telemetry.addData("Voltage", robot.getVoltage());
+        telemetry.addData("Pose", robot.localizer.getPose().toString());
         telemetry.update();
 
         robot.write(); //write power to actuators (setting power to motors/servos)
@@ -89,3 +72,4 @@ public class TeleopSample extends CommandOpMode {
         Global.resetGlobals();
     }
 }
+

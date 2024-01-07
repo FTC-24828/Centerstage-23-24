@@ -7,6 +7,7 @@ public class WMath {
         return Math.min(max, Math.max(value, min));
     }
 
+    /**Wraps angle and return a coterminal angles between 0 to, but not including, 2pi*/
     public static double wrapAngle(double theta) {
         final double twoPI = 2 * Math.PI;
         theta %= twoPI;

@@ -50,9 +50,9 @@ public class Localizer {
         double d_br = ticksToCm(p_br.getAsDouble() - _br);
         double d_bl = ticksToCm(p_bl.getAsDouble() - _bl);
 
-        this.pose.x += Math.cos(WHEEL_TOE) * (d_tr + d_tl + d_br + d_bl) / 4;
-        this.pose.y += Math.sin(WHEEL_TOE) * (d_tr - d_tl - d_br + d_bl) / 4;
-        this.pose.z = WMath.wrapAngle(pose.z + (d_tr - d_tl + d_br - d_bl) / (8 * Math.PI * TRACK_WIDTH));
+        this.pose.x += Math.cos(WHEEL_TOE) * (d_tr + d_tl + d_br + d_bl) / 4.0;
+        this.pose.y += Math.sin(WHEEL_TOE) * (d_tr - d_tl - d_br + d_bl) / 4.0;
+        this.pose.z = WMath.wrapAngle(pose.z + (d_tr - d_tl + d_br - d_bl) / (8.0 * Math.PI * TRACK_WIDTH));
         read();
     }
 

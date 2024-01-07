@@ -7,10 +7,10 @@ public class Vector2D {
                 this.x = x; this.y = y;
         }
 
-        /**returns x and y values relative to the robot offset by a forward z angle*/
+        /**rotates a 2D vector with coordinate (x, y) by z radians*/
         public Vector2D(double x, double y, double z) {
-                this.x = x * Math.cos(z) + y * Math.sin(z);
-                this.y = x * -Math.sin(z) + y * Math.cos(z);
+                this.x = x * Math.cos(z) + y * -Math.sin(z);
+                this.y = x * Math.sin(z) + y * Math.cos(z);
         }
 
         public double magnitude() {

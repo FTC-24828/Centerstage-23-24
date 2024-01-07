@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Localizer;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.util.Vector2D;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 
 public class PositionCommand extends CommandBase {
     private final WRobot robot = WRobot.getInstance();
@@ -40,20 +42,25 @@ public class PositionCommand extends CommandBase {
     private ElapsedTime stable;
 
     public static double DEAD_MS = 5000;
-    public static double STABLE_MS = 200;
+    public static double STABLE_MS = 400;
 
     public PositionCommand(Pose pose) {
         target_pose = pose;
+
+        xController.reset();
+        yController.reset();
+        zController.reset();
     }
 
+    @Override
     public void execute() {
         if (timer == null) timer = new ElapsedTime();
         if (stable == null) stable = new ElapsedTime();
 
         Pose robot_pose = localizer.getPose();
 
-        Pose powers = getPower(robot_pose);
-        drivetrain.move(powers);
+        Pose power_matrix = calculatePower(robot_pose);
+        drivetrain.move(power_matrix);
     }
 
     @Override
@@ -69,20 +76,15 @@ public class PositionCommand extends CommandBase {
         return timer.milliseconds() > DEAD_MS || stable.milliseconds() > STABLE_MS;
     }
 
-    public Pose getPower(Pose robot_pose) {
-        if(target_pose.z - robot_pose.z > Math.PI) target_pose.z -= 2 * Math.PI;
-        if(target_pose.z - robot_pose.z < -Math.PI) target_pose.z += 2 * Math.PI;
-
+    public Pose calculatePower(Pose robot_pose) {
         double xPower = xController.calculate(robot_pose.x, target_pose.x);
         double yPower = yController.calculate(robot_pose.y, target_pose.y);
-        double hPower = -zController.calculate(robot_pose.z, target_pose.z);
+        double zPower = -zController.calculate(robot_pose.z, target_pose.z);
 
-        double x_rotated = xPower * Math.cos(-robot_pose.z) - yPower * Math.sin(-robot_pose.z);
-        double y_rotated = xPower * Math.sin(-robot_pose.z) + yPower * Math.cos(-robot_pose.z);
+        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z);
+        zPower = WMath.clamp(zPower, -1.0, 1.0);        //TODO: tune this
 
-        hPower = Range.clip(hPower, -0.7, 0.7);
-
-        return new Pose(x_rotated * 1.41, y_rotated, hPower);
+        return new Pose(translation_vector, zPower);
     }
 
     @Override

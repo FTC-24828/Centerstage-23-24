@@ -64,7 +64,7 @@ public class BlueAuto extends CommandOpMode {
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        new PositionCommand(new Pose(25, 0, Math.PI / 2)),
+                        new PositionCommand(new Pose(-10, 25, Math.PI / 2)),
                         // go to yellow pixel scoring pos
 //                        new PositionCommand(new Pose(25, 0, 0))
 //                                .alongWith(new PurplePixelExtendCommand()),
@@ -93,7 +93,8 @@ public class BlueAuto extends CommandOpMode {
         robot.periodic();
 
         double loop = System.nanoTime();
-        telemetry.addData("hz ", 1000000000 / (loop - loop_time));
+        telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
+        telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
         loop_time = loop;

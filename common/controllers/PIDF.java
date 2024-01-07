@@ -73,6 +73,10 @@ public class PIDF {
         prev_estimate = 0; derivative = 0;
     }
 
+    public void reset() {
+        reset(0);
+    }
+
     public String toString() {
         return "last error: " + last_error + "/n" +
                 "last error: " + last_target + "/n" +

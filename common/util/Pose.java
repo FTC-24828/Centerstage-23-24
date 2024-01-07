@@ -7,11 +7,12 @@ public class Pose {
         this(0, 0, 0);
     }
 
-    /**
-     * @param
-     */
-    public Pose(double y, double x, double z) {
-        this.x = x; this.y = y; this.z = z;
+    public Pose(Vector2D v, double z) {
+        this(v.x, v.y, z);
+    }
+
+    public Pose(double x, double y, double z) {
+        this.x = x; this.y = y; this.z = WMath.wrapAngle(z);
     }
 
     public Pose add(Pose p) {
@@ -31,7 +32,7 @@ public class Pose {
     }
 
     public Vector2D toVector2D() {
-        return new Vector2D(x, y, z);
+        return new Vector2D(x, y);
     }
 
     public String toString() {

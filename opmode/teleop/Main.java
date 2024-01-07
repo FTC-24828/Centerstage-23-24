@@ -43,7 +43,6 @@ public class Main extends CommandOpMode {
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);
-        telemetry.addLine("robot reset");   //FIXME
 
         controller = new GamepadEx(gamepad1);
 
@@ -101,7 +100,6 @@ public class Main extends CommandOpMode {
         robot.read();
 
         local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.yaw + INITIAL_YAW);
-        robot.drivetrain.move(local_vector, controller.getRightX());
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -113,6 +111,8 @@ public class Main extends CommandOpMode {
 
         super.run();
         robot.periodic();
+
+        robot.drivetrain.move(local_vector, controller.getRightX());
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));

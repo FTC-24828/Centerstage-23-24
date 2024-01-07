@@ -70,7 +70,7 @@ public class Arm implements WSubsystem {
     }
 
     public void reset() {
-        arm_controller.reset(0);
+        arm_controller.reset();
         setArmState(ArmState.FLAT);
     }
 
