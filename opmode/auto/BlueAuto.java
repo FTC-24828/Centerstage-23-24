@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 
 @Config
@@ -42,7 +43,7 @@ public class BlueAuto extends CommandOpMode {
         Global.DEBUG = false;
         Global.SIDE = Global.Side.RED;
 
-        robot.addSubsystem(new Drivetrain());
+        robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
 
         if (Global.USING_DASHBOARD) {
@@ -51,7 +52,7 @@ public class BlueAuto extends CommandOpMode {
         }
 
         robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
-        robot.localizer.reset();
+        robot.localizer.reset(new Pose(0, 0, Math.PI));
 
         robot.read();
 
@@ -64,7 +65,9 @@ public class BlueAuto extends CommandOpMode {
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        new PositionCommand(new Pose(-10, 25, Math.PI / 2)),
+                        new PositionCommand(new Pose(-24, 27, Math.PI / 2)),
+                        //new PositionCommand(new Pose(0, 27, Math.PI / 2)),
+
                         // go to yellow pixel scoring pos
 //                        new PositionCommand(new Pose(25, 0, 0))
 //                                .alongWith(new PurplePixelExtendCommand()),
@@ -96,6 +99,7 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
+        telemetry.addData("z err", WMath.wrapAngle(Math.PI / 2 - robot.localizer.getPose().z));
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
         loop_time = loop;
         telemetry.update();

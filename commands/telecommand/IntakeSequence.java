@@ -17,7 +17,7 @@ public class IntakeSequence extends SequentialCommandGroup {
             new InstantCommand(() -> Global.setState(Global.State.INTAKING)),
             new ArmSetStateCommand(Arm.ArmState.FLAT),
             new WristCommand(Intake.WristState.FLAT),
-            new WaitCommand(200),
+            new WaitCommand(100),
             new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.OPEN)
         );
     }

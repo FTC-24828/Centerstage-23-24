@@ -25,8 +25,8 @@ public class Arm implements WSubsystem {
     public double power = 0.0;
 
     //controllers
-    private final PIDF arm_controller = new PIDF(0.0012, 0.0001, 0.0002, 0.65, 2000.0, 10.0);
-    private final Feedforward arm_support = new Feedforward(0.07);
+    public final PIDF arm_controller = new PIDF(0.0012, 0.0001, 0.0002, 0.65, 2000.0, 10.0);
+    public final Feedforward arm_support = new Feedforward(0.07);
 
     public Arm() {
 
@@ -44,7 +44,7 @@ public class Arm implements WSubsystem {
 
     public void periodic() {
         if (Global.IS_AUTO) {
-
+            power = 0;
         } else {
             switch (arm_state) {
                 case FLAT:
@@ -54,10 +54,11 @@ public class Arm implements WSubsystem {
                 case SCORING:
                     target_position = (double) Global.TETRIX_MOTOR_TPR + increment;
             }
+
+            power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
+                    (arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1));
         }
 
-        power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
-                (arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1));
         robot.arm_actuator.setPower(power);
     }
 

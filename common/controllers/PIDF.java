@@ -44,6 +44,27 @@ public class PIDF {
         this.tolerance = maxErr;
     }
 
+    public double calculate(double error) {
+        if (error <= tolerance && error >= -tolerance) return 0;  //acceptable error range exit
+
+        //integral calculation with integral limit
+        integral += (error * timer.seconds());
+        if (integral > intLim) integral = intLim;
+        if (integral < -intLim) integral = -intLim;
+
+        //noise filter for derivative
+        derivative = Kf * prev_estimate + (1 - Kf) * (error - last_error);
+        prev_estimate = derivative;
+
+        double output = Kp * error + Ki * integral + Kd * derivative / timer.seconds();
+
+        //set error for next iteration
+        last_error = error;
+        current_output = output; //debugging purposes
+        timer.reset();
+        return output;
+    }
+
     // return and output based on the current state vs the target state
     public double calculate(double current, double target) {
         if (target != last_target) this.reset(target);

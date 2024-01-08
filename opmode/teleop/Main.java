@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 
 @TeleOp (name = "MainTeleOp")
 public class Main extends CommandOpMode {
@@ -80,8 +81,8 @@ public class Main extends CommandOpMode {
                 ));
 
         //slow mode
-        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
+//        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+//                .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
 
         //yaw manual reset
         controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
@@ -99,7 +100,7 @@ public class Main extends CommandOpMode {
     public void run() {
         robot.read();
 
-        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.yaw + INITIAL_YAW);
+        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.yaw + INITIAL_YAW));
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -119,8 +120,13 @@ public class Main extends CommandOpMode {
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("Yaw", "%.2f", robot.yaw);
+        telemetry.addData("Yaw", "%.2f", WMath.wrapAngle(robot.yaw + INITIAL_YAW));
+        telemetry.addData("INITIAL YAW", "%.2f", INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
+
+        telemetry.addData("ARM err", robot.arm.arm_controller.last_error);
+        telemetry.addData("ARM err", robot.arm.arm_controller.last_target);
+
         telemetry.update();
 
         loop_time = loop;

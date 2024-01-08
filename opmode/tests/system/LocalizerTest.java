@@ -12,8 +12,11 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.util.Vector2D;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 
-@Disabled
+
 @TeleOp(name = "localizer test", group = "Utility")
 public class LocalizerTest extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
@@ -28,15 +31,23 @@ public class LocalizerTest extends CommandOpMode {
         super.reset(); //reset the command scheduler (flushing out old commands from last opmode)
 
         Global.IS_AUTO = true;
+        Global.USING_DASHBOARD = false;
+        Global.USING_IMU = true;
+        Global.USING_WEBCAM = false;
         //additional global flags eg. USING_IMU, USING_DASHBOARD, DEBUG are placed here
         //if is auto, must declare color
 
         //initialize robot
-        robot.addSubsystem(new Drivetrain());
+        robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
+        robot.localizer.reset(new Pose());
 
         //get controller
         controller = new GamepadEx(gamepad1);
+
+        controller.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(() -> robot.localizer.reset(new Pose()))
+                        .alongWith( new InstantCommand(robot::resetYaw)));
 
         //display that initialization is complete
         while (opModeInInit()) {
@@ -52,12 +63,21 @@ public class LocalizerTest extends CommandOpMode {
         super.run(); //runs commands scheduled above
 
         //set the drivetrain's motor speed according to controller stick input
-        robot.drivetrain.move(controller.getLeftX(), controller.getLeftY(), controller.getRightX());
+        Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.yaw);
 
         robot.periodic(); //calculations/writing data to actuators
 
+        robot.drivetrain.move(local_vector, controller.getRightX());
+
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
+        telemetry.addData("yaw diff", WMath.wrapAngle(robot.yaw) - robot.localizer.getPose().z);
+        telemetry.addData("", robot.localizer.d_tr);
+        telemetry.addData("", robot.localizer.d_tl);
+        telemetry.addData("", robot.localizer.d_br);
+        telemetry.addData("", robot.localizer.d_bl);
+
+
         telemetry.update();
 
         robot.write(); //write power to actuators (setting power to motors/servos)

@@ -107,6 +107,7 @@ public class WRobot {
         }
 
         if (Global.USING_WEBCAM) {
+            pipeline = new PropPipeline();
             vision_portal = new VisionPortal.Builder()
                     .setCamera(hardware_map.get(WebcamName.class, "Webcam"))
                     .setCameraResolution(new Size(640, 480))

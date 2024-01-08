@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.common.controllers.PIDF;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@TeleOp (name = "PIDTuner")
+@TeleOp (name = "PIDTuner", group = "Utility")
 public class Tuner extends OpMode {
 
     // Declare OpMode members
