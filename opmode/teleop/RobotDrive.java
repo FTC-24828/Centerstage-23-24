@@ -84,10 +84,6 @@ public class RobotDrive extends CommandOpMode {
         controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
 
-        //yaw failsafe
-        controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(robot::resetYaw));
-
         while (opModeInInit()) {
             telemetry.addLine("Initialization complete.");
             telemetry.update();
@@ -120,7 +116,6 @@ public class RobotDrive extends CommandOpMode {
         telemetry.addData("arm target position", robot.arm.target_position);
         telemetry.addData("arm error", robot.arm.target_position - robot.arm_actuator.getCurrentPosition());
         telemetry.addData("wrist angle", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("Yaw", robot.yaw);
         telemetry.addData("State", Global.STATE);
         telemetry.update();
 

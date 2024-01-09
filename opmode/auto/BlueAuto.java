@@ -42,7 +42,7 @@ public class BlueAuto extends CommandOpMode {
         CommandScheduler.getInstance().reset();
 
         Global.IS_AUTO = true;
-        Global.USING_IMU = true;
+        Global.USING_IMU = false;
         Global.USING_DASHBOARD = true;
         Global.USING_WEBCAM = true;
         Global.DEBUG = false;
@@ -52,7 +52,7 @@ public class BlueAuto extends CommandOpMode {
         robot.init(hardwareMap, telemetry);
 
         robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
-        
+
         if (Global.USING_DASHBOARD) {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             FtcDashboard.getInstance().startCameraStream(robot.pipeline, 0);
@@ -133,6 +133,6 @@ public class BlueAuto extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        Global.YAW_OFFSET = robot.yaw;
+        Global.YAW_OFFSET = robot.getYaw();
     }
 }

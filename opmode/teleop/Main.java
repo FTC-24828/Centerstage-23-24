@@ -86,8 +86,7 @@ public class Main extends CommandOpMode {
 
         //yaw manual reset
         controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(robot::resetYaw)
-                        .alongWith((new InstantCommand(() -> INITIAL_YAW = 0))));
+                .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw()));
 
         while (opModeInInit()) {
             telemetry.addLine("Initialization complete.");
@@ -98,9 +97,10 @@ public class Main extends CommandOpMode {
 
     @Override
     public void run() {
+        robot.startIMUThread(this);
         robot.read();
 
-        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.yaw + INITIAL_YAW));
+        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -120,7 +120,7 @@ public class Main extends CommandOpMode {
         telemetry.addData("Voltage", "%.2f", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("Yaw", "%.2f", WMath.wrapAngle(robot.yaw + INITIAL_YAW));
+        telemetry.addData("Yaw", "%.2f", WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
         telemetry.addData("INITIAL YAW", "%.2f", INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
 
@@ -128,7 +128,7 @@ public class Main extends CommandOpMode {
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.BOTH);
+        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
     }
 
     @Override

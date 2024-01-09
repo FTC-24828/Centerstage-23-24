@@ -22,6 +22,8 @@ public class LocalizerTest extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
     private final WRobot robot = WRobot.getInstance();
 
+    private double offset = 0;
+
     //declare controller variables but not initializing them (currently NULL)
     private GamepadEx controller;
 
@@ -47,7 +49,7 @@ public class LocalizerTest extends CommandOpMode {
 
         controller.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new InstantCommand(() -> robot.localizer.reset(new Pose()))
-                        .alongWith( new InstantCommand(robot::resetYaw)));
+                        .alongWith( new InstantCommand(() -> offset = robot.getYaw())));
 
         //display that initialization is complete
         while (opModeInInit()) {
@@ -59,11 +61,12 @@ public class LocalizerTest extends CommandOpMode {
     //called when the play button is pressed
     @Override
     public void run() {
+        robot.startIMUThread(this);
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled above
 
         //set the drivetrain's motor speed according to controller stick input
-        Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.yaw);
+        Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.getYaw() - offset);
 
         robot.periodic(); //calculations/writing data to actuators
 
@@ -71,7 +74,7 @@ public class LocalizerTest extends CommandOpMode {
 
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("yaw diff", "&.5f", robot.yaw - robot.localizer.getPose().z);
+        telemetry.addData("yaw diff", "&.5f", robot.getYaw() - robot.localizer.getPose().z);
         telemetry.addData("", robot.localizer.d_tr);
         telemetry.addData("", robot.localizer.d_tl);
         telemetry.addData("", robot.localizer.d_br);

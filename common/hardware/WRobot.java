@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.common.hardware;
 
+import android.util.Log;
 import android.util.Size;
 
+import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -9,6 +11,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -60,7 +63,9 @@ public class WRobot {
 
     private IMU imu;
     public Thread imu_thread;
-    public volatile double yaw;
+    private final Object imu_lock = new Object();
+    @GuardedBy("imu_lock")
+    private volatile double yaw;
     public List<LynxModule> hubs;
 
     public VisionPortal vision_portal;
@@ -96,14 +101,16 @@ public class WRobot {
         this.telemetry = (Global.USING_DASHBOARD) ? new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry()) : telemetry;
 
         if (Global.USING_IMU) {
-            imu = hardware_map.get(IMU.class, "imu");
-            imu.initialize(new IMU.Parameters(
-                    new RevHubOrientationOnRobot(
-                            RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                            RevHubOrientationOnRobot.UsbFacingDirection.UP
-                    )
-            ));
-            imu.resetYaw();
+            synchronized (imu_lock) {
+                imu = hardware_map.get(IMU.class, "imu");
+                imu.initialize(new IMU.Parameters(
+                        new RevHubOrientationOnRobot(
+                                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                                RevHubOrientationOnRobot.UsbFacingDirection.UP
+                        )
+                ));
+                imu.resetYaw();
+            }
         }
 
         if (Global.USING_WEBCAM) {
@@ -197,11 +204,6 @@ public class WRobot {
 
     //read encoder values
     public void read () {
-        if (Global.USING_IMU) {
-            imu_thread = new Thread(new IMU_GET_YAW_RUNNABLE(), "IMU-yaw-thread");
-            imu_thread.start();
-        }
-
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
 
         if (Global.IS_AUTO) {
@@ -214,14 +216,6 @@ public class WRobot {
 
         for (WSubsystem subsystem : subsystems) {
             subsystem.read();
-        }
-
-        if (Global.USING_IMU) {
-            try {
-                imu_thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -246,31 +240,25 @@ public class WRobot {
         return voltage;
     }
 
-    private class IMU_GET_YAW_RUNNABLE implements Runnable {
-        @Override
-        public void run() {
-            try {
-                yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
+    public void startIMUThread(LinearOpMode op_mode) {
+        if (Global.USING_IMU) {
+            imu_thread = new Thread(() -> {
+                while (!op_mode.isStopRequested() && op_mode.opModeIsActive()) {
+                    synchronized (imu_lock) {
+                        try {
+                            yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                        } catch (Exception e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            });
+            imu_thread.start();
         }
     }
 
-
-    private class IMU_RESET_YAW_RUNNABLE implements Runnable {
-        @Override
-        public void run() {
-            try {
-                imu.resetYaw();
-            } catch (Exception e){
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    public void resetYaw() {        //TODO THREAD SAFETY
-        new Thread(new IMU_RESET_YAW_RUNNABLE(), "IMU-reset-yaw-thread").start();
+    public double getYaw() {
+        return yaw;
     }
 
     public void clearBulkCache(@NonNull Global.Hub hub) {

@@ -30,6 +30,8 @@ public class Localizer {
     public double d_br;
     public double d_bl;
 
+    double local_dx, local_dy;
+
     public Localizer(Pose pose) {
         start = pose;
         this.pose = start;
@@ -57,8 +59,8 @@ public class Localizer {
          d_bl = ticksToInches(p_bl.getAsDouble() - _bl);
 
         this.pose.z = WMath.wrapAngle(pose.z + (d_tr + d_tl - d_br - d_bl) / (4.0 * Math.PI * TRACK_WIDTH));
-        double local_dx = Math.sin(WHEEL_TOE) * (d_tr - d_tl + d_br - d_bl) / 4.0;  //TODO ADD CONSTANT FOR TRIG
-        double local_dy = Math.cos(WHEEL_TOE) * (d_tr + d_tl + d_br + d_bl) / 4.0; //TODO ADD CONSTANT FOR TRIG
+        local_dx = Math.sin(WHEEL_TOE) * (d_tr - d_tl + d_br - d_bl) / 4.0;  //TODO ADD CONSTANT FOR TRIG
+        local_dy = Math.cos(WHEEL_TOE) * (d_tr + d_tl + d_br + d_bl) / 4.0; //TODO ADD CONSTANT FOR TRIG
         Vector2D translated = new Vector2D(local_dx, local_dy, -pose.z);
         pose.x += translated.x;
         pose.y += translated.y;
