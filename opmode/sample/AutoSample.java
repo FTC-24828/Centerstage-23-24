@@ -52,7 +52,7 @@ public class AutoSample extends CommandOpMode {
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
 
-                        // -> commands to run during autonomous here <-
+                        // -> schedule commands to run during autonomous here <-
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
@@ -64,7 +64,7 @@ public class AutoSample extends CommandOpMode {
     @Override
     public void run() {
         robot.read(); //read values from encodes/sensors
-        super.run(); //runs commands scheduled above
+        super.run(); //runs commands scheduled in initialize()
         robot.periodic(); //calculations/writing data to actuators
 
         //display data

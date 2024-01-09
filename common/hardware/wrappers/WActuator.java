@@ -20,9 +20,11 @@ public class WActuator {
     private WRobot robot = WRobot.getInstance();
 
     private double target_position = 0.0;
+    private double prev_target = 0.0;
     private double current_position = 0.0;
     private double offset = 0.0;
     private double power = 0.0;
+    private double prev_power = 0.0;
 
     private Supplier<Object> topic;
 
@@ -72,16 +74,19 @@ public class WActuator {
     }
 
     public void write() {
-        int i = 0;
-        for (HardwareDevice device : devices.values()) {
-            if (device instanceof DcMotor) {
-                double correction = 1.0;
-                if (voltage != null) correction = 12.0 / voltage.getAsDouble();
-                ((DcMotor) device).setPower(WMath.clamp(power * correction, -1, 1));
-            } else if (device instanceof Servo) {
-                ((Servo) device).setPosition(target_position);
+        if (Math.abs(power - prev_power) > 0.005 || Math.abs(target_position - prev_target) > 0.005) {
+            for (HardwareDevice device : devices.values()) {
+                if (device instanceof DcMotor) {
+                    double correction = 1.0;
+                    if (voltage != null) correction = 12.0 / voltage.getAsDouble();
+                    ((DcMotor) device).setPower(WMath.clamp(power * correction, -1, 1));
+                } else if (device instanceof Servo) {
+                    ((Servo) device).setPosition(target_position);
+                }
             }
         }
+        prev_power = power;
+        prev_target = target_position;
     }
 
     public void reset() {}

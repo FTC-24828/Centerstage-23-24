@@ -19,13 +19,17 @@ public class Vector2D {
                 return this;
         }
 
+        public Vector2D Add(Vector2D v) {
+                return new Vector2D(x + v.x, y + v.y);
+        }
+
         public double magnitude() {
                 return Math.hypot(x, y);
         }
 
         public Vector2D scale(double scalar) {
-                this.x *= scalar;
-                this.y *= scalar;
+                x *= scalar;
+                y *= scalar;
                 return this;
         }
 

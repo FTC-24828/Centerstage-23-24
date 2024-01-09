@@ -56,7 +56,7 @@ public class TeleopSample extends CommandOpMode {
     @Override
     public void run() {
         robot.read(); //read values from encodes/sensors
-        super.run(); //runs commands scheduled above
+        super.run(); //runs commands scheduled in initialize()
 
         //set the drivetrain's motor speed according to controller stick input
         robot.drivetrain.move(controller.getLeftX(), controller.getLeftY(), controller.getRightX());

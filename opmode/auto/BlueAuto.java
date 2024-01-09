@@ -12,7 +12,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
+import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelDeposit;
+import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.TimedMoveCommand;
+import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelDeposit;
+import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmResetPosition;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
@@ -41,23 +46,24 @@ public class BlueAuto extends CommandOpMode {
         Global.USING_DASHBOARD = true;
         Global.USING_WEBCAM = true;
         Global.DEBUG = false;
-        Global.SIDE = Global.Side.RED;
+        Global.SIDE = Global.Side.BLUE;
 
         robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
 
+        robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
+        
         if (Global.USING_DASHBOARD) {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             FtcDashboard.getInstance().startCameraStream(robot.pipeline, 0);
         }
 
-        robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
-        robot.localizer.reset(new Pose(0, 0, Math.PI));
+        robot.localizer.reset(new Pose(0, 0, Math.PI)); //ANY WAY TO OFFSET ANGLE?
 
         robot.read();
 
         while (!isStarted()) {
-            telemetry.addData("Path", robot.pipeline.getPropLocation());
+            telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addLine("Autonomous initializing...");
             telemetry.update();
         }
@@ -65,7 +71,16 @@ public class BlueAuto extends CommandOpMode {
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        new PositionCommand(new Pose(-24, 27, Math.PI / 2)),
+                        //purple deposit
+                        new PositionCommand(new Pose(-24, 27, Math.PI / 2))
+                                .alongWith(new PurplePixelSequence())
+                                .andThen(new PurplePixelDeposit()),
+
+                        //yellow deposit
+                        new PositionCommand(new Pose(-35, 23, Math.PI / 2))
+                                .alongWith(new YellowPixelSequence())
+                                .andThen(new YellowPixelDeposit()),
+
                         //new PositionCommand(new Pose(0, 27, Math.PI / 2)),
 
                         // go to yellow pixel scoring pos
@@ -81,11 +96,15 @@ public class BlueAuto extends CommandOpMode {
 //
 //                        new PositionCommand(new Pose(27, -68.25, -Math.PI / 2))
 //                                .alongWith(new AutoDepositCommand()),
+                        new ArmResetPosition(),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
                 )
         );
+
+        robot.vision_portal.close();
+        //robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
     }
 
 
@@ -99,7 +118,8 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("z err", WMath.wrapAngle(Math.PI / 2 - robot.localizer.getPose().z));
+        telemetry.addData("z err", "%.2f", WMath.wrapAngle(Math.PI / 2 - robot.localizer.getPose().z));
+        telemetry.addData("stable", PositionCommand.stable);
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
         loop_time = loop;
         telemetry.update();
@@ -113,6 +133,6 @@ public class BlueAuto extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        Global.YAW_OFFSET = robot.yaw + Math.PI;
+        Global.YAW_OFFSET = robot.yaw;
     }
 }

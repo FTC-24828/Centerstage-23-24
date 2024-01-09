@@ -112,7 +112,7 @@ public class WRobot {
                     .setCamera(hardware_map.get(WebcamName.class, "Webcam"))
                     .setCameraResolution(new Size(640, 480))
                     .addProcessors(pipeline)
-                    .enableLiveView(true)
+                    .enableLiveView(Global.DEBUG)
                     .setAutoStopLiveView(true)
                     .build();
         }

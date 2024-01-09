@@ -81,8 +81,8 @@ public class Main extends CommandOpMode {
                 ));
 
         //slow mode
-//        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-//                .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
+        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
 
         //yaw manual reset
         controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
@@ -117,15 +117,12 @@ public class Main extends CommandOpMode {
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
-        telemetry.addData("Voltage", robot.getVoltage());
+        telemetry.addData("Voltage", "%.2f", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
         telemetry.addData("Yaw", "%.2f", WMath.wrapAngle(robot.yaw + INITIAL_YAW));
         telemetry.addData("INITIAL YAW", "%.2f", INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
-
-        telemetry.addData("ARM err", robot.arm.arm_controller.last_error);
-        telemetry.addData("ARM err", robot.arm.arm_controller.last_target);
 
         telemetry.update();
 

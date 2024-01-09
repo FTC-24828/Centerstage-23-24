@@ -4,10 +4,10 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
-public class ArmSetTargetCommand extends InstantCommand {
-    public ArmSetTargetCommand(double target) {
-        super(
-                () -> WRobot.getInstance().arm.setTargetPosition(target)
+public class ArmResetPosition extends InstantCommand {
+    public ArmResetPosition() {
+        super (
+                () -> new ArmSetTargetCommand(WRobot.getInstance().arm_actuator.getReadingOffset())
         );
     }
 }

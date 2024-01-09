@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.common.util;
 
+import android.annotation.SuppressLint;
+
+import org.checkerframework.framework.qual.ImplicitFor;
+
 public class Pose {
     public double x, y, z;
 
@@ -35,6 +39,7 @@ public class Pose {
         return new Vector2D(x, y);
     }
 
+    @SuppressLint("DefaultLocale")
     public String toString() {
         return String.format("x: %.2f, y: %.2f, z: %.2f", x, y, z);
     }

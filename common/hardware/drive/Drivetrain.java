@@ -16,6 +16,7 @@ import java.util.Arrays;
 public class Drivetrain implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();
     public double[] wheel_speed = new double[4];
+    private double[] prev_speed = new double[4];
 
     public void init (DcMotorEx[] motor) {
 //      set drivetrain properties
@@ -40,6 +41,10 @@ public class Drivetrain implements WSubsystem {
         motor[1].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor[2].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor[3].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        for (int i=0; i<4; i++) {
+            prev_speed[i] = 0;
+        }
     }
 
     public void periodic() {
@@ -54,7 +59,12 @@ public class Drivetrain implements WSubsystem {
 
     public void write() {
         for (int i = 0; i < 4; i++) {
-            robot.motor[i].setPower(wheel_speed[i]);
+            if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.005)
+                robot.motor[i].setPower(wheel_speed[i]);
+        }
+
+        for (int i=0; i<4; i++) {
+            prev_speed[i] = wheel_speed[i];
         }
     }
 
@@ -94,5 +104,9 @@ public class Drivetrain implements WSubsystem {
                     .map(e -> Math.abs(e) < 0.01 ? e * correction : ((e + Math.signum(e) * 0.01)) * correction)
                     .toArray();
         }
+    }
+
+    public String toString() {
+        return "W0: " + wheel_speed[0] + "W1: " + wheel_speed[1] + "W2: " + wheel_speed[2] + "W3: " + wheel_speed[3];
     }
 }

@@ -44,7 +44,9 @@ public class Arm implements WSubsystem {
 
     public void periodic() {
         if (Global.IS_AUTO) {
-            power = 0;
+            power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
+                    arm_support.calculate(Math.cos(arm_angle.getAsDouble()));
+
         } else {
             switch (arm_state) {
                 case FLAT:

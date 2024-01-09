@@ -71,7 +71,7 @@ public class LocalizerTest extends CommandOpMode {
 
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("yaw diff", WMath.wrapAngle(robot.yaw) - robot.localizer.getPose().z);
+        telemetry.addData("yaw diff", "&.5f", robot.yaw - robot.localizer.getPose().z);
         telemetry.addData("", robot.localizer.d_tr);
         telemetry.addData("", robot.localizer.d_tl);
         telemetry.addData("", robot.localizer.d_br);
