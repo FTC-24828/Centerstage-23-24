@@ -68,18 +68,22 @@ public class BlueAuto extends CommandOpMode {
             telemetry.update();
         }
 
+        robot.resetYaw();
+
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
+
+                        new PositionCommand(new Pose(0, 0, 0)),
                         //purple deposit
-                        new PositionCommand(new Pose(-24, 27, Math.PI / 2))
-                                .alongWith(new PurplePixelSequence())
-                                .andThen(new PurplePixelDeposit()),
+                        //new PositionCommand(new Pose(-24, 27, Math.PI / 2)),
+//                                .alongWith(new PurplePixelSequence())
+//                                .andThen(new PurplePixelDeposit())
 
                         //yellow deposit
-                        new PositionCommand(new Pose(-35, 23, Math.PI / 2))
-                                .alongWith(new YellowPixelSequence())
-                                .andThen(new YellowPixelDeposit()),
+                        //new PositionCommand(new Pose(-35, 23, Math.PI / 2))
+//                                .alongWith(new YellowPixelSequence())
+//                                .andThen(new YellowPixelDeposit()),
 
                         //new PositionCommand(new Pose(0, 27, Math.PI / 2)),
 
@@ -103,8 +107,8 @@ public class BlueAuto extends CommandOpMode {
                 )
         );
 
+        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
         robot.vision_portal.close();
-        //robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
     }
 
 
@@ -118,9 +122,14 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("z err", "%.2f", WMath.wrapAngle(Math.PI / 2 - robot.localizer.getPose().z));
-        telemetry.addData("stable", PositionCommand.stable);
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
+
+        telemetry.addLine("-------------------------------");
+        telemetry.addData("z err", "%.2f", PositionCommand.zController.last_error);
+        telemetry.addData("z output", "%.2f", PositionCommand.zController.current_output);
+        telemetry.addData("y output", "%.2f", PositionCommand.yController.current_output);
+        telemetry.addData("stable", PositionCommand.stable);
+        telemetry.addData("Baseline", 0);
         loop_time = loop;
         telemetry.update();
 

@@ -80,13 +80,13 @@ public class WActuator {
                     double correction = 1.0;
                     if (voltage != null) correction = 12.0 / voltage.getAsDouble();
                     ((DcMotor) device).setPower(WMath.clamp(power * correction, -1, 1));
+                    prev_power = power;
                 } else if (device instanceof Servo) {
                     ((Servo) device).setPosition(target_position);
+                    prev_target = target_position;
                 }
             }
         }
-        prev_power = power;
-        prev_target = target_position;
     }
 
     public void reset() {}

@@ -28,8 +28,8 @@ public class Vector2D {
         }
 
         public Vector2D scale(double scalar) {
-                x *= scalar;
-                y *= scalar;
+                this.x *= scalar;
+                this.y *= scalar;
                 return this;
         }
 

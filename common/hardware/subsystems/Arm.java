@@ -38,7 +38,7 @@ public class Arm implements WSubsystem {
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / (3 * Global.TETRIX_MOTOR_TPR) * 2 * Math.PI;
+        arm_angle = () -> robot.arm_actuator.getCurrentPosition() / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI;
         target_position = robot.arm_actuator.getCurrentPosition();
     }
 

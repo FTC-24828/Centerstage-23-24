@@ -61,12 +61,13 @@ public class LocalizerTest extends CommandOpMode {
     //called when the play button is pressed
     @Override
     public void run() {
-        robot.startIMUThread(this);
+        robot.startIMUThread();
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled above
 
         //set the drivetrain's motor speed according to controller stick input
         Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.getYaw() - offset);
+        local_vector.scale(0.5);
 
         robot.periodic(); //calculations/writing data to actuators
 
@@ -75,10 +76,9 @@ public class LocalizerTest extends CommandOpMode {
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
         telemetry.addData("yaw diff", "&.5f", robot.getYaw() - robot.localizer.getPose().z);
-        telemetry.addData("", robot.localizer.d_tr);
-        telemetry.addData("", robot.localizer.d_tl);
-        telemetry.addData("", robot.localizer.d_br);
-        telemetry.addData("", robot.localizer.d_bl);
+        telemetry.addData("delta distance", "%.2f, %.2f, %.2f, %.2f",
+                robot.localizer.d_tr, robot.localizer.d_tl, robot.localizer.d_br, robot.localizer.d_bl);
+        telemetry.addData("powers:", robot.drivetrain.toString());
 
 
         telemetry.update();

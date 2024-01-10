@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.common.hardware;
 import android.util.Log;
 import android.util.Size;
 
-import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.concurrent.GuardedBy;
+
 public class WRobot {
     private static WRobot robot = null;
 
@@ -61,10 +63,10 @@ public class WRobot {
     public WServo claw_right;
     public WServo claw_left;
 
-    private IMU imu;
-    public Thread imu_thread;
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
+    private IMU imu;
+    private Thread imu_thread;
     private volatile double yaw;
     public List<LynxModule> hubs;
 
@@ -240,17 +242,20 @@ public class WRobot {
         return voltage;
     }
 
-    public void startIMUThread(LinearOpMode op_mode) {
+    public void startIMUThread() {
+        imu_thread = new Thread(() -> {
+            synchronized (imu) {
+                yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            }
+        });
+        imu_thread.start();
+    }
+
+    public void resetYaw() {
         if (Global.USING_IMU) {
             imu_thread = new Thread(() -> {
-                while (!op_mode.isStopRequested() && op_mode.opModeIsActive()) {
-                    synchronized (imu_lock) {
-                        try {
-                            yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-                        } catch (Exception e) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }
+                synchronized (imu_lock) {
+                        imu.resetYaw();
                 }
             });
             imu_thread.start();

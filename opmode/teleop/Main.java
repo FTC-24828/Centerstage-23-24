@@ -97,7 +97,7 @@ public class Main extends CommandOpMode {
 
     @Override
     public void run() {
-        robot.startIMUThread(this);
+        robot.startIMUThread();
         robot.read();
 
         local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
@@ -120,7 +120,6 @@ public class Main extends CommandOpMode {
         telemetry.addData("Voltage", "%.2f", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("Yaw", "%.2f", WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
         telemetry.addData("INITIAL YAW", "%.2f", INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
 
@@ -128,7 +127,7 @@ public class Main extends CommandOpMode {
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
+        robot.clearBulkCache(Global.Hub.BOTH);
     }
 
     @Override

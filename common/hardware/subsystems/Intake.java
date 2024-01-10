@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 
 import java.util.function.DoubleSupplier;
 
@@ -56,7 +57,7 @@ public class Intake implements WSubsystem {
                 break;
 
             case SCORING:
-                target_position = (2 * Math.PI / 3 - arm_angle);
+                target_position = (WMath.twoPI / 3 - arm_angle);
                 break;
 
             default:
