@@ -18,9 +18,9 @@ public class Localizer {
     private Pose start;
     private Pose pose;
 
-    public static double WHEEL_RADIUS = 3.704;
-    public static double WHEEL_TOE = 0.820304;
-    public static double TRACK_WIDTH = 5.861;
+    public static double WHEEL_RADIUS = 3.96;
+    public static double WHEEL_TOE = 0.7784;
+    public static double TRACK_WIDTH = 6.255;
 
     private DoubleSupplier p_tr, p_tl, p_br, p_bl;
     private double _tr, _tl, _br, _bl;

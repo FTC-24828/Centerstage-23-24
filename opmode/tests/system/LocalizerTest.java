@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
@@ -26,6 +27,8 @@ public class LocalizerTest extends CommandOpMode {
 
     //declare controller variables but not initializing them (currently NULL)
     private GamepadEx controller;
+
+    private ElapsedTime timer;
 
     //called when the "init" button is pressed
     @Override
@@ -61,7 +64,10 @@ public class LocalizerTest extends CommandOpMode {
     //called when the play button is pressed
     @Override
     public void run() {
-        robot.startIMUThread();
+        if (timer == null) {
+            timer = new ElapsedTime();
+            robot.startIMUThread();
+        }
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled above
 
@@ -71,7 +77,7 @@ public class LocalizerTest extends CommandOpMode {
 
         robot.periodic(); //calculations/writing data to actuators
 
-        robot.drivetrain.move(local_vector, controller.getRightX());
+        robot.drivetrain.move(local_vector, controller.getRightX() * 0.5);
 
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());

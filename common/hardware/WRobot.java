@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WEncoder;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -65,9 +66,10 @@ public class WRobot {
 
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
-    private IMU imu;
-    private Thread imu_thread;
-    private volatile double yaw;
+    private BNO055IMU imu;
+    public Thread imu_thread;
+    public double imu_offset = 0;
+    private volatile double yaw = 0;
     public List<LynxModule> hubs;
 
     public VisionPortal vision_portal;
@@ -104,15 +106,12 @@ public class WRobot {
 
         if (Global.USING_IMU) {
             synchronized (imu_lock) {
-                imu = hardware_map.get(IMU.class, "imu");
-                imu.initialize(new IMU.Parameters(
-                        new RevHubOrientationOnRobot(
-                                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                                RevHubOrientationOnRobot.UsbFacingDirection.UP
-                        )
-                ));
-                imu.resetYaw();
+                imu = hardware_map.get(BNO055IMU.class, "imu");
+                BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+                parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+                imu.initialize(parameters);
             }
+            resetYaw();
         }
 
         if (Global.USING_WEBCAM) {
@@ -243,23 +242,18 @@ public class WRobot {
     }
 
     public void startIMUThread() {
-        imu_thread = new Thread(() -> {
-            synchronized (imu) {
-                yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            }
-        });
-        imu_thread.start();
-    }
-
-    public void resetYaw() {
         if (Global.USING_IMU) {
             imu_thread = new Thread(() -> {
-                synchronized (imu_lock) {
-                        imu.resetYaw();
-                }
+                    synchronized (imu_lock) {
+                        yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
+                    }
             });
             imu_thread.start();
         }
+    }
+
+    public void resetYaw() {
+        if (Global.USING_IMU) imu_offset = yaw;
     }
 
     public double getYaw() {

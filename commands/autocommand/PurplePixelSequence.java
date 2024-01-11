@@ -11,8 +11,12 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 public class PurplePixelSequence extends SequentialCommandGroup {
     public PurplePixelSequence() {
         super (
-                new WaitCommand(300),
-                new WristCommand(Intake.WristState.FLAT)
-        );
+                new WristCommand(Intake.WristState.FLAT),
+                new WaitCommand(500),
+                new ClawCommand(Intake.ClawSide.RIGHT, Intake.ClawState.OPEN),
+                new WaitCommand(200),
+                new WristCommand(Intake.WristState.FOLD),
+                new WaitCommand(200)
+            );
     }
 }

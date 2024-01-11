@@ -57,27 +57,27 @@ public class Drivetrain implements WSubsystem {
     }
 
     public void write() {
-//        if (Math.abs(wheel_speed[0] - prev_speed[0]) > 0.005) {
-//            robot.motor[0].setPower(wheel_speed[0]);
-//            prev_speed[0] = wheel_speed[0];
-//        }
-//        if (Math.abs(wheel_speed[1] - prev_speed[1]) > 0.005) {
-//            robot.motor[1].setPower(wheel_speed[1]);
-//            prev_speed[1] = wheel_speed[1];
-//        }
-//        if (Math.abs(wheel_speed[2]) < 0.005) {
-//            robot.motor[2].setPower(wheel_speed[2]);
-//            prev_speed[2] = wheel_speed[2];
-//        }
-//        if (Math.abs(wheel_speed[3] - prev_speed[3]) > 0.005) {
-//            robot.motor[3].setPower(wheel_speed[3]);
-//            prev_speed[3] = wheel_speed[3];
-//        }
+        if (Math.abs(wheel_speed[0] - prev_speed[0]) > 0.005) {
+            robot.motor[0].setPower(wheel_speed[0]);
+            prev_speed[0] = wheel_speed[0];
+        }
+        if (Math.abs(wheel_speed[1] - prev_speed[1]) > 0.005) {
+            robot.motor[1].setPower(wheel_speed[1]);
+            prev_speed[1] = wheel_speed[1];
+        }
+        if (Math.abs(wheel_speed[2] - prev_speed[2]) > 0.005) {
+            robot.motor[2].setPower(wheel_speed[2]);
+            prev_speed[2] = wheel_speed[2];
+        }
+        if (Math.abs(wheel_speed[3] - prev_speed[3]) > 0.005) {
+            robot.motor[3].setPower(wheel_speed[3]);
+            prev_speed[3] = wheel_speed[3];
+        }
 
-        robot.motor[0].setPower(wheel_speed[0]);
-        robot.motor[1].setPower(wheel_speed[1]);
-        robot.motor[2].setPower(wheel_speed[2]);
-        robot.motor[3].setPower(wheel_speed[3]);
+//        robot.motor[0].setPower(wheel_speed[0]);
+//        robot.motor[1].setPower(wheel_speed[1]);
+//        robot.motor[2].setPower(wheel_speed[2]);
+//        robot.motor[3].setPower(wheel_speed[3]);
     }
 
     public void reset() {

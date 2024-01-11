@@ -43,7 +43,7 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     private final AtomicReference<Bitmap> last_frame = new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
     public Global.PropLocation location;
 
-    public int[] blue_range =  {6, 29, 74, 32, 255, 255};
+    public int[] blue_range =  {0, 25, 74, 32, 255, 255};
     public int[] red_range = {106, 52, 0, 128, 255, 255};
     public static int[] filter_range = new int[6];
 

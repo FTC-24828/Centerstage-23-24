@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 public class ArmResetPosition extends InstantCommand {
     public ArmResetPosition() {
         super (
-                () -> new ArmSetTargetCommand(WRobot.getInstance().arm_actuator.getReadingOffset())
+                () -> new ArmSetTargetCommand((double) WRobot.getInstance().arm_actuator.getReadingOffset())
         );
     }
 }

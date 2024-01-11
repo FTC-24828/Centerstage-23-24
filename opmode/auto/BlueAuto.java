@@ -7,15 +7,12 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
-import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelDeposit;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
-import org.firstinspires.ftc.teamcode.commands.autocommand.TimedMoveCommand;
-import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelDeposit;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmResetPosition;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
@@ -24,8 +21,6 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
-import org.firstinspires.ftc.teamcode.common.util.WMath;
-import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 
 @Config
 @Autonomous(name = "Blue Auto")
@@ -44,13 +39,14 @@ public class BlueAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = false;
         Global.USING_DASHBOARD = true;
-        Global.USING_WEBCAM = true;
+        Global.USING_WEBCAM = false;
         Global.DEBUG = false;
         Global.SIDE = Global.Side.BLUE;
 
         robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
 
+        robot.arm.setArmState(Arm.ArmState.FLAT);
         robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
 
         if (Global.USING_DASHBOARD) {
@@ -63,7 +59,7 @@ public class BlueAuto extends CommandOpMode {
         robot.read();
 
         while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+            //telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addLine("Autonomous initializing...");
             telemetry.update();
         }
@@ -74,18 +70,14 @@ public class BlueAuto extends CommandOpMode {
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
 
-                        new PositionCommand(new Pose(0, 0, 0)),
                         //purple deposit
-                        //new PositionCommand(new Pose(-24, 27, Math.PI / 2)),
-//                                .alongWith(new PurplePixelSequence())
-//                                .andThen(new PurplePixelDeposit())
+                        new PositionCommand(new Pose(-22.5, 28, -Math.PI / 2))
+                                .andThen(new PurplePixelSequence()),
 
                         //yellow deposit
-                        //new PositionCommand(new Pose(-35, 23, Math.PI / 2))
-//                                .alongWith(new YellowPixelSequence())
-//                                .andThen(new YellowPixelDeposit()),
+                        new PositionCommand(new Pose(-30.5, 24.5, -Math.PI / 2))
+                                .andThen(new YellowPixelSequence()),
 
-                        //new PositionCommand(new Pose(0, 27, Math.PI / 2)),
 
                         // go to yellow pixel scoring pos
 //                        new PositionCommand(new Pose(25, 0, 0))
@@ -100,15 +92,14 @@ public class BlueAuto extends CommandOpMode {
 //
 //                        new PositionCommand(new Pose(27, -68.25, -Math.PI / 2))
 //                                .alongWith(new AutoDepositCommand()),
-                        new ArmResetPosition(),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
                 )
         );
 
-        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-        robot.vision_portal.close();
+//        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+//        robot.vision_portal.close();
     }
 
 
@@ -122,14 +113,15 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
+        telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
 
-        telemetry.addLine("-------------------------------");
-        telemetry.addData("z err", "%.2f", PositionCommand.zController.last_error);
-        telemetry.addData("z output", "%.2f", PositionCommand.zController.current_output);
-        telemetry.addData("y output", "%.2f", PositionCommand.yController.current_output);
-        telemetry.addData("stable", PositionCommand.stable);
-        telemetry.addData("Baseline", 0);
+//        telemetry.addLine("-------------------------------");
+//        telemetry.addData("z err", "%.2f", PositionCommand.zController.last_error);
+//        telemetry.addData("z pose", "%.2f", robot.localizer.getPose().z);
+//        telemetry.addData("z output", "%.2f", PositionCommand.zController.current_output);
+//        telemetry.addData("y output", "%.2f", PositionCommand.yController.current_output);
+//        telemetry.addData("Baseline", 0);
         loop_time = loop;
         telemetry.update();
 
@@ -142,6 +134,12 @@ public class BlueAuto extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
+//        robot.startIMUThread();
+//        try {
+//            robot.imu_thread.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         Global.YAW_OFFSET = robot.getYaw();
     }
 }

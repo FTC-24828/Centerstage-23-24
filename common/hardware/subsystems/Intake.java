@@ -22,6 +22,7 @@ public class Intake implements WSubsystem {
 
     public enum WristState {SCORING, FOLD, FLAT}
     public DoubleSupplier wrist_angle;
+    public double increment = 0;
     private double angle_offset;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
     public WristState wrist_state = WristState.FOLD;
     public double arm_angle;
@@ -57,7 +58,7 @@ public class Intake implements WSubsystem {
                 break;
 
             case SCORING:
-                target_position = (WMath.twoPI / 3 - arm_angle);
+                target_position = (WMath.twoPI / 3 - arm_angle) + increment;
                 break;
 
             default:
@@ -81,7 +82,7 @@ public class Intake implements WSubsystem {
     }
 
     public void setClawState(@NonNull ClawSide side, @NonNull ClawState state) {
-        double position = (state == ClawState.OPEN) ? 0 : 1;    //NOTE: CHANGE IF CLAW IS INVERTED
+        double position = (state == ClawState.OPEN) ? 0.15 : 1;    //NOTE: CHANGE IF CLAW IS INVERTED
         switch (side) {
             case BOTH:
                 claw_left_state = state;

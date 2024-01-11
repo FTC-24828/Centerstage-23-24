@@ -44,9 +44,9 @@ public class Arm implements WSubsystem {
 
     public void periodic() {
         if (Global.IS_AUTO) {
+            if (arm_state == ArmState.FLAT) target_position = robot.arm_actuator.getReadingOffset();
             power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
                     arm_support.calculate(Math.cos(arm_angle.getAsDouble()));
-
         } else {
             switch (arm_state) {
                 case FLAT:

@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.ArmAdjustCommand;
@@ -30,8 +31,11 @@ public class Main extends CommandOpMode {
 
     private double loop_time = 0.0;
 
-    public double INITIAL_YAW = Global.YAW_OFFSET;          //TODO LINK BETWEEN THE TWO PROGRAMS
-    public Vector2D local_vector;
+    private double INITIAL_YAW = Global.YAW_OFFSET;  //TODO LINK BETWEEN THE TWO PROGRAMS
+    private boolean SLOW_MODE = false;
+    private Vector2D local_vector;
+
+    private ElapsedTime timer;
 
     @Override
     public void initialize() {
@@ -82,7 +86,8 @@ public class Main extends CommandOpMode {
 
         //slow mode
         controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> local_vector.scale(0.5)));
+                .whenPressed(new InstantCommand(() -> SLOW_MODE = true))
+                .whenReleased(new InstantCommand(() -> SLOW_MODE = false));
 
         //yaw manual reset
         controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
@@ -97,10 +102,14 @@ public class Main extends CommandOpMode {
 
     @Override
     public void run() {
-        robot.startIMUThread();
+        if (timer == null) {
+            timer = new ElapsedTime();
+            robot.startIMUThread();
+        }
         robot.read();
 
         local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
+        if (SLOW_MODE) local_vector.scale(0.5);
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -113,7 +122,7 @@ public class Main extends CommandOpMode {
         super.run();
         robot.periodic();
 
-        robot.drivetrain.move(local_vector, controller.getRightX());
+        robot.drivetrain.move(local_vector, controller.getRightX() * (SLOW_MODE ? 0.5 : 1));
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
@@ -127,7 +136,7 @@ public class Main extends CommandOpMode {
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.BOTH);
+        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
     }
 
     @Override
