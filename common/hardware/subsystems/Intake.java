@@ -82,7 +82,7 @@ public class Intake implements WSubsystem {
     }
 
     public void setClawState(@NonNull ClawSide side, @NonNull ClawState state) {
-        double position = (state == ClawState.OPEN) ? 0.15 : 1;    //NOTE: CHANGE IF CLAW IS INVERTED
+        double position = (state == ClawState.OPEN) ? 0 : 1;    //NOTE: CHANGE IF CLAW IS INVERTED
         switch (side) {
             case BOTH:
                 claw_left_state = state;

@@ -30,12 +30,12 @@ public class PositionCommand extends CommandBase {
     public static double zP = 2;
     public static double zD = 0.4;
 
-    public static double TRANSLATIONAL_TOLERANCE = 0.1;
-    public static double YAW_TOLERANCE = 0.007;
+    public static double TRANSLATIONAL_TOLERANCE = 0.5;
+    public static double YAW_TOLERANCE = 0.01;
 
-    public static PIDF xController = new PIDF(xP, 0.0, xD);
-    public static PIDF yController = new PIDF(yP, 0.0, yD);
-    public static PIDF zController = new PIDF(zP, 0.0, zD);
+    public static PIDF xController = new PIDF(xP, 0.0, xD, 0, 0, TRANSLATIONAL_TOLERANCE);
+    public static PIDF yController = new PIDF(yP, 0.0, yD, 0, 0, TRANSLATIONAL_TOLERANCE);
+    public static PIDF zController = new PIDF(zP, 0.0, zD, 0, 0, YAW_TOLERANCE);
 
     private ElapsedTime timer;
     private ElapsedTime stable;

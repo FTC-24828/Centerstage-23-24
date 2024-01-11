@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackSetup;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
@@ -75,18 +76,13 @@ public class BlueAuto extends CommandOpMode {
                                 .andThen(new PurplePixelSequence()),
 
                         //yellow deposit
-                        new PositionCommand(new Pose(-30.5, 24.5, -Math.PI / 2))
+                        new PositionCommand(new Pose(-30, 27.5, -Math.PI / 2))
                                 .andThen(new YellowPixelSequence()),
 
-
-                        // go to yellow pixel scoring pos
-//                        new PositionCommand(new Pose(25, 0, 0))
-//                                .alongWith(new PurplePixelExtendCommand()),
-//
-//                        new PurplePixelDepositCommand(),
-//
-//                        new PositionCommand(new Pose(25, -0.25, -Math.PI / 2))
-//                                .alongWith(new FirstStackSetupCommand()),
+                        //go to first stack
+                        new PositionCommand(new Pose(-20, 50, -Math.PI / 2), 2000),
+                        new PositionCommand(new Pose(60, 57, -Math.PI / 2))
+                                .alongWith(new FirstStackSetup()),
 //
 //                        new FirstStackGrabCommand(),
 //
@@ -113,7 +109,6 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
 
 //        telemetry.addLine("-------------------------------");
