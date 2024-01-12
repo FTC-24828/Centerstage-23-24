@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.tests.auto.blue;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
 
 @Config
-@Autonomous(name = "Blue Auto center")
+@Autonomous(name = "Blue Auto center", group = "auto path")
 public class center extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();

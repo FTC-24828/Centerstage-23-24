@@ -21,11 +21,11 @@ public class PositionCommand extends CommandBase {
     private final Localizer localizer = robot.localizer;
     private final Pose target_pose;
 
-    public static double xP = 0.4;
-    public static double xD = 0.1;
+    public static double xP = 0.5;
+    public static double xD = 0.2;
 
-    public static double yP = 0.4;
-    public static double yD = 0.1;
+    public static double yP = 0.5;
+    public static double yD = 0.2;
 
     public static double zP = 1.5;
     public static double zD = 0.2;

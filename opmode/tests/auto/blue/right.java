@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.tests.auto.blue;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -28,8 +27,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
 
 @Config
-@Autonomous(name = "Blue Auto")
-public class BlueAuto extends CommandOpMode {
+@Autonomous(name = "Blue Auto right", group = "auto path")
+public class right extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -44,7 +43,7 @@ public class BlueAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = false;
         Global.USING_DASHBOARD = true;
-        Global.USING_WEBCAM = true;
+        Global.USING_WEBCAM = false;
         Global.DEBUG = false;
         Global.SIDE = Global.Side.BLUE;
 
@@ -64,28 +63,20 @@ public class BlueAuto extends CommandOpMode {
         robot.read();
 
         while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+            //telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addLine("Autonomous initializing...");
             telemetry.update();
         }
 
         robot.resetYaw();
 
-        Command selected = new PathRight();
-        switch (robot.pipeline.getPropLocation()) {
-            case LEFT:
-                selected = new PathLeft();
-                break;
-            case CENTER:
-                selected = new PathCenter();
-                break;
-        }
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        selected,
+
+//                        new PathLeft(),
 //                        new PathCenter(),
-//                        new PathRight(),
+                        new PathRight(),
 
                         //go to first stack
 //                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2000),
@@ -99,8 +90,8 @@ public class BlueAuto extends CommandOpMode {
                 )
         );
 
-        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-        robot.vision_portal.close();
+//        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+//        robot.vision_portal.close();
     }
 
 
@@ -143,3 +134,4 @@ public class BlueAuto extends CommandOpMode {
         Global.YAW_OFFSET = robot.getYaw();
     }
 }
+
