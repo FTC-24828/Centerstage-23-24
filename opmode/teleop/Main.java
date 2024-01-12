@@ -49,6 +49,9 @@ public class Main extends CommandOpMode {
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
         robot.init(hardwareMap, telemetry);
 
+        robot.arm.setArmState(Arm.ArmState.FLAT);
+        robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
+
         controller = new GamepadEx(gamepad1);
 
         //toggle claw states
@@ -104,7 +107,7 @@ public class Main extends CommandOpMode {
     public void run() {
         if (timer == null) {
             timer = new ElapsedTime();
-            robot.startIMUThread();
+            robot.startIMUThread(this);
         }
         robot.read();
 
@@ -113,10 +116,10 @@ public class Main extends CommandOpMode {
 
         //left trigger gets precedent
         if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(-5));
+            super.schedule(new ArmAdjustCommand(-1));
         }
         else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(5));
+            super.schedule(new ArmAdjustCommand(1));
         }
 
         super.run();
@@ -129,14 +132,21 @@ public class Main extends CommandOpMode {
         telemetry.addData("Voltage", "%.2f", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("INITIAL YAW", "%.2f", INITIAL_YAW);
+        telemetry.addData("yaw", "%.2f", robot.getYaw() - INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
+
+        telemetry.addLine("---------------------------------------------");
+        telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
+        telemetry.addData("arm power", "%.2f", robot.arm.power);
+        telemetry.addData("arm target", "%.2f", robot.arm.target_position);
+        telemetry.addData("arm increment", "%.2f", robot.arm.increment);
+
 
         telemetry.update();
 
         loop_time = loop;
         robot.write();
-        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
+        robot.clearBulkCache(Global.Hub.BOTH);
     }
 
     @Override

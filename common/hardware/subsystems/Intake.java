@@ -40,8 +40,6 @@ public class Intake implements WSubsystem {
         claw0.scaleRange(0.7, 0.9);
         claw1.scaleRange(0.7, 0.9);
 
-        setClawState(ClawSide.BOTH, ClawState.CLOSED);
-
         wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI / 2 ;
     }
 

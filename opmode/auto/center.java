@@ -27,8 +27,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
 
 @Config
-@Autonomous(name = "Blue Auto left")
-public class BlueAuto extends CommandOpMode {
+@Autonomous(name = "Blue Auto center")
+public class center extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -74,8 +74,8 @@ public class BlueAuto extends CommandOpMode {
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
 
-                        new PathLeft(),
-//                        new PathCenter(),
+//                        new PathLeft(),
+                        new PathCenter(),
 //                        new PathRight(),
 
                         //go to first stack
@@ -134,3 +134,5 @@ public class BlueAuto extends CommandOpMode {
         Global.YAW_OFFSET = robot.getYaw();
     }
 }
+
+

@@ -66,7 +66,7 @@ public class LocalizerTest extends CommandOpMode {
     public void run() {
         if (timer == null) {
             timer = new ElapsedTime();
-            robot.startIMUThread();
+            robot.startIMUThread(this);
         }
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled above

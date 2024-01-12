@@ -241,12 +241,14 @@ public class WRobot {
         return voltage;
     }
 
-    public void startIMUThread() {
+    public void startIMUThread(LinearOpMode op_mode) {
         if (Global.USING_IMU) {
             imu_thread = new Thread(() -> {
+                while (!op_mode.isStopRequested() && op_mode.opModeIsActive()) {
                     synchronized (imu_lock) {
                         yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
                     }
+                }
             });
             imu_thread.start();
         }

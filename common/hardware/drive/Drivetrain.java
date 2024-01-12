@@ -116,7 +116,7 @@ public class Drivetrain implements WSubsystem {
             for (int i=0; i<wheel_speed.length; i++) {
                 wheel_speed[i] = Math.abs(wheel_speed[i]) < 0.01 ?
                         wheel_speed[i] * correction :
-                        (wheel_speed[i] + Math.signum(wheel_speed[i]) * 0.05) * correction;
+                        (wheel_speed[i] + Math.signum(wheel_speed[i]) * 0.03) * correction;
             }
         }
     }

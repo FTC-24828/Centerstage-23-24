@@ -17,15 +17,16 @@ public class YellowPixelSequence extends SequentialCommandGroup {
     public YellowPixelSequence() {
         super(
                 new ArmSetStateCommand(Arm.ArmState.SCORING),
-                new ArmSetTargetCommand((double) 6 * Global.TETRIX_MOTOR_TPR / 5)
+                new ArmSetTargetCommand((double) 5 * Global.TETRIX_MOTOR_TPR / 4)
                         .alongWith(new WristCommand(Intake.WristState.FLAT)),
                 new WaitCommand(700),
                 new WristCommand(Intake.WristState.SCORING),
-                new WristSetIncrement(-0.2),
-                new WaitCommand(1000),
+                new WristSetIncrement(-0.3),
+                new WaitCommand(1700),
                 new ClawCommand(Intake.ClawSide.LEFT, Intake.ClawState.OPEN),
                 new WaitCommand(500),
                 new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED),
+                new WristSetIncrement(0),
                 new ArmSetStateCommand(Arm.ArmState.FLAT)
                         .alongWith(new WristCommand(Intake.WristState.FOLD)),
                 new WaitCommand(500)

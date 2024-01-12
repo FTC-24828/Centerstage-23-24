@@ -20,7 +20,7 @@ public class Arm implements WSubsystem {
     private ArmState arm_state = ArmState.FLAT;
 
     public DoubleSupplier arm_angle;
-    public double target_position;
+    public double target_position = 0;
     public double increment = 0;
     public double power = 0.0;
 
@@ -46,7 +46,7 @@ public class Arm implements WSubsystem {
         if (Global.IS_AUTO) {
             if (arm_state == ArmState.FLAT) target_position = robot.arm_actuator.getReadingOffset();
             power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
-                    arm_support.calculate(Math.cos(arm_angle.getAsDouble()));
+                    arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1);
         } else {
             switch (arm_state) {
                 case FLAT:
