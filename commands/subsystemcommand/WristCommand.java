@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class WristCommand extends InstantCommand {
-    public WristCommand(Intake.WristState state) {
+    public WristCommand(WRobot robot, Intake.WristState state) {
         super (
-                () -> WRobot.getInstance().intake.setWristState(state)
+                () -> robot.intake.setWristState(state)
         );
     }
 }

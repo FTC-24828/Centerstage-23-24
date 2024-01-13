@@ -7,10 +7,10 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class ClawToggleCommand extends ConditionalCommand {
-    public ClawToggleCommand (Intake.ClawSide side) {
+    public ClawToggleCommand (WRobot robot, Intake.ClawSide side) {
         super (
-            new ClawCommand(side, Intake.ClawState.OPEN),
-            new ClawCommand(side, Intake.ClawState.CLOSED),
+            new ClawCommand(robot, side, Intake.ClawState.OPEN),
+            new ClawCommand(robot, side, Intake.ClawState.CLOSED),
                 () -> WRobot.getInstance().intake.getClawState(side) == Intake.ClawState.CLOSED
         );
     }

@@ -3,13 +3,13 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.DroneResetCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.LaunchDroneCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.ArmAdjustCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.ClawToggleCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.DepositSequence;
@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Drone;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
@@ -27,7 +28,8 @@ import org.firstinspires.ftc.teamcode.common.util.WMath;
 public class Main extends CommandOpMode {
     private final WRobot robot = WRobot.getInstance();
 
-    private GamepadEx controller;
+    private GamepadEx controller1;
+    private GamepadEx controller2;
 
     private double loop_time = 0.0;
 
@@ -46,41 +48,42 @@ public class Main extends CommandOpMode {
         Global.USING_IMU = true;
         Global.USING_WEBCAM = false;
 
-        robot.addSubsystem(new Drivetrain(), new Intake(), new Arm());
+        robot.addSubsystem(new Drivetrain(), new Intake(), new Arm(), new Drone());
         robot.init(hardwareMap, telemetry);
 
         robot.arm.setArmState(Arm.ArmState.FLAT);
         robot.intake.setClawState(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED);
 
-        controller = new GamepadEx(gamepad1);
+        controller1 = new GamepadEx(gamepad1);
+        controller2 = new GamepadEx(gamepad2);
 
         //toggle claw states
-        controller.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new ClawToggleCommand(Intake.ClawSide.BOTH));
+        controller1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(new ClawToggleCommand(robot, Intake.ClawSide.BOTH));
 
-        controller.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new ClawToggleCommand(Intake.ClawSide.LEFT));
+        controller1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new ClawToggleCommand(robot, Intake.ClawSide.LEFT));
 
-        controller.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new ClawToggleCommand(Intake.ClawSide.RIGHT));
+        controller1.getGamepadButton(GamepadKeys.Button.B)
+                .whenPressed(new ClawToggleCommand(robot, Intake.ClawSide.RIGHT));
 
         //arm controls
-        controller.getGamepadButton(GamepadKeys.Button.A)
+        controller1.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new ConditionalCommand(
                         new ConditionalCommand(
-                                new IntakeSequence(),
-                                new IntermediateSequence(),
+                                new IntakeSequence(robot),
+                                new IntermediateSequence(robot),
                                 () -> Global.STATE == Global.State.INTERMEDIATE
                         ),
                         new InstantCommand(),
                         () -> Global.STATE != Global.State.INTAKING
                 ));
 
-        controller.getGamepadButton(GamepadKeys.Button.Y)
+        controller1.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ConditionalCommand(
                         new ConditionalCommand(
-                                new DepositSequence(),
-                                new IntermediateSequence(),
+                                new DepositSequence(robot),
+                                new IntermediateSequence(robot),
                                 () -> Global.STATE == Global.State.INTERMEDIATE
                         ),
                         new InstantCommand(),
@@ -88,12 +91,18 @@ public class Main extends CommandOpMode {
                 ));
 
         //slow mode
-        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        controller1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(() -> SLOW_MODE = true))
                 .whenReleased(new InstantCommand(() -> SLOW_MODE = false));
 
+        controller1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new LaunchDroneCommand(robot));
+
+        controller1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                        .whenPressed(new DroneResetCommand(robot));
+
         //yaw manual reset
-        controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+        controller1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw()));
 
         while (opModeInInit()) {
@@ -111,21 +120,23 @@ public class Main extends CommandOpMode {
         }
         robot.read();
 
-        local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
+        local_vector = new Vector2D(controller1.getLeftX(), controller1.getLeftY(), WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
         if (SLOW_MODE) local_vector.scale(0.5);
 
         //left trigger gets precedent
-        if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(-1));
+        if (controller1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
+            super.schedule(new ArmAdjustCommand(robot, -3));
         }
-        else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(1));
+        else if (controller1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
+            super.schedule(new ArmAdjustCommand(robot, 3));
         }
 
         super.run();
         robot.periodic();
 
-        robot.drivetrain.move(local_vector, controller.getRightX() * (SLOW_MODE ? 0.5 : 1));
+        robot.drivetrain.move(local_vector, controller1.getRightX() * (SLOW_MODE ? 0.5 : 1));
+        robot.write();
+        robot.clearBulkCache(Global.Hub.BOTH);
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
@@ -134,19 +145,8 @@ public class Main extends CommandOpMode {
         telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
         telemetry.addData("yaw", "%.2f", robot.getYaw() - INITIAL_YAW);
         telemetry.addData("State", Global.STATE);
-
-        telemetry.addLine("---------------------------------------------");
-        telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
-        telemetry.addData("arm power", "%.2f", robot.arm.power);
-        telemetry.addData("arm target", "%.2f", robot.arm.target_position);
-        telemetry.addData("arm increment", "%.2f", robot.arm.increment);
-
-
         telemetry.update();
-
         loop_time = loop;
-        robot.write();
-        robot.clearBulkCache(Global.Hub.BOTH);
     }
 
     @Override

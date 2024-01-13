@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class ClawCommand extends InstantCommand {
-    public ClawCommand (Intake.ClawSide side, Intake.ClawState state) {
+    public ClawCommand (WRobot robot, Intake.ClawSide side, Intake.ClawState state) {
         super(
-                () -> WRobot.getInstance().intake.setClawState(side, state)
+                () -> robot.intake.setClawState(side, state)
         );
     }
 }

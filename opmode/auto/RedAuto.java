@@ -59,22 +59,8 @@ public class RedAuto extends CommandOpMode {
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        // go to yellow pixel scoring pos
-//                        new PositionCommand(new Pose(25, 0, 0))
-//                                .alongWith(new PurplePixelExtendCommand()),
-//
-//                        new PurplePixelDepositCommand(),
-//
-//                        new PositionCommand(new Pose(25, -0.25, -Math.PI / 2))
-//                                .alongWith(new FirstStackSetupCommand()),
-//
-//                        new FirstStackGrabCommand(),
-//
-//                        new PositionCommand(new Pose(27, -68.25, -Math.PI / 2))
-//                                .alongWith(new AutoDepositCommand()),
 
                         new InstantCommand(() -> end_time = timer.seconds())
-
                 )
         );
     }

@@ -31,7 +31,7 @@ public class Intake implements WSubsystem {
     }
 
     public void init(WServo wrist, WServo claw0, WServo claw1) {
-        wrist.setDirection(Servo.Direction.REVERSE);
+        wrist.setDirection(Servo.Direction.FORWARD);
         angle_offset = robot.wrist.getWritingOffset();
 
         claw0.setDirection(Servo.Direction.REVERSE);

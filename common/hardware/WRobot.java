@@ -64,6 +64,10 @@ public class WRobot {
     public WServo claw_right;
     public WServo claw_left;
 
+    //drone
+    public WServo trigger;
+    public WActuator trigger_actuator;
+
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
     private BNO055IMU imu;
@@ -111,6 +115,7 @@ public class WRobot {
                 parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
                 imu.initialize(parameters);
             }
+            //imu_thread.setDaemon(true);
             resetYaw();
         }
 
@@ -148,7 +153,6 @@ public class WRobot {
 
         //arm
         lift = hardware_map.get(DcMotorEx.class, "lift");
-
         arm_encoder = new WEncoder(new MotorEx(hardware_map, "lift").encoder);
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, 0);
         arm_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.ARM_ENCODER), lift)
@@ -163,6 +167,17 @@ public class WRobot {
         wrist_actuator = new WActuator(wrist::getPosition, wrist);
         intake.init(wrist, claw_left, claw_right);
 
+        //endgame subsystems
+        if (!Global.IS_AUTO) {
+            //drone
+            if (drone != null) {
+                trigger = new WServo(hardware_map.get(Servo.class, "trigger"));
+                trigger_actuator = new WActuator(trigger::getPosition, trigger);
+                drone.init(trigger);
+            }
+
+            //hang
+        }
         //lynx hubs
         hubs = hardware_map.getAll(LynxModule.class);
         hubs.get(0).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -205,7 +220,7 @@ public class WRobot {
 
     //read encoder values
     public void read () {
-        encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
+        if (arm != null) encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
 
         if (Global.IS_AUTO) {
             encoder_readings.put(Sensors.Encoder.LEFT_FRONT, motor_encoder[0].getPosition());

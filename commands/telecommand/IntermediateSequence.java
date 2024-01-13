@@ -10,19 +10,20 @@ import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmSetStateComma
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class IntermediateSequence extends ParallelCommandGroup {
-    public IntermediateSequence() {
+    public IntermediateSequence(WRobot robot) {
         super(
                 new InstantCommand(() -> Global.setState(Global.State.INTERMEDIATE)),
-                new ArmSetStateCommand(Arm.ArmState.FLAT),
-                new ArmResetIncrementCommand(),
-                new WristCommand(Intake.WristState.FOLD),
+                new ArmSetStateCommand(robot, Arm.ArmState.FLAT),
+                new ArmResetIncrementCommand(robot),
+                new WristCommand(robot, Intake.WristState.FOLD),
                 new SequentialCommandGroup(
                         new WaitCommand(300),
-                        new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED)
+                        new ClawCommand(robot, Intake.ClawSide.BOTH, Intake.ClawState.CLOSED)
                 )
         );
     }

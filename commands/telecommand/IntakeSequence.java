@@ -8,17 +8,18 @@ import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmSetStateComma
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class IntakeSequence extends SequentialCommandGroup {
-    public IntakeSequence() {
+    public IntakeSequence(WRobot robot) {
         super(
             new InstantCommand(() -> Global.setState(Global.State.INTAKING)),
-            new ArmSetStateCommand(Arm.ArmState.FLAT),
-            new WristCommand(Intake.WristState.FLAT),
+            new ArmSetStateCommand(robot, Arm.ArmState.FLAT),
+            new WristCommand(robot, Intake.WristState.FLAT),
             new WaitCommand(100),
-            new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.OPEN)
+            new ClawCommand(robot, Intake.ClawSide.BOTH, Intake.ClawState.OPEN)
         );
     }
 }

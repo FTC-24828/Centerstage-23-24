@@ -15,15 +15,15 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class FirstStackSetup extends SequentialCommandGroup {
-    public FirstStackSetup() {
+    public FirstStackSetup(WRobot robot) {
         super (
                 new WaitCommand(3000),
-                new ArmSetStateCommand(Arm.ArmState.SCORING),
-                new ArmSetTargetCommand(0),
+                new ArmSetStateCommand(robot, Arm.ArmState.SCORING),
+                new ArmSetTargetCommand(robot, 0),
                 new WaitCommand(500),
-                new WristSetIncrement(0.2),
-                new WristCommand(Intake.WristState.FLAT),
-                new ClawCommand(Intake.ClawSide.RIGHT, Intake.ClawState.OPEN)
+                new WristSetIncrement(robot, 0.2),
+                new WristCommand(robot, Intake.WristState.FLAT),
+                new ClawCommand(robot, Intake.ClawSide.RIGHT, Intake.ClawState.OPEN)
         );
     }
 }

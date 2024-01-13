@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 
 public class ArmResetIncrementCommand extends InstantCommand {
-    public ArmResetIncrementCommand() {
+    public ArmResetIncrementCommand(WRobot robot) {
         super (
-                WRobot.getInstance().arm::resetIncrement
+                robot.arm::resetIncrement
         );
     }
 }

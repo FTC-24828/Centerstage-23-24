@@ -13,9 +13,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackSetup;
-import org.firstinspires.ftc.teamcode.commands.autocommand.Path.PathCenter;
-import org.firstinspires.ftc.teamcode.commands.autocommand.Path.PathLeft;
-import org.firstinspires.ftc.teamcode.commands.autocommand.Path.PathRight;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
@@ -26,6 +23,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 @Config
 @Autonomous(name = "Blue Auto")
@@ -63,36 +61,57 @@ public class BlueAuto extends CommandOpMode {
 
         robot.read();
 
+        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addLine("Autonomous initializing...");
+            telemetry.update();
+        }
+
         while (!isStarted()) {
             telemetry.addData("Path:", robot.pipeline.getPropLocation());
-            telemetry.addLine("Autonomous initializing...");
+            telemetry.addLine("Ready");
             telemetry.update();
         }
 
         robot.resetYaw();
 
-        Command selected = new PathRight();
+        Pose purple_pose = new Pose();
+        Pose yellow_pose = new Pose();
+
         switch (robot.pipeline.getPropLocation()) {
             case LEFT:
-                selected = new PathLeft();
+                purple_pose = new Pose(-21, 25, -Math.PI / 2);
+                yellow_pose = new Pose(-28, 25, -Math.PI / 2);
                 break;
             case CENTER:
-                selected = new PathCenter();
+                purple_pose = new Pose(-14, 37, -Math.PI / 2);
+                yellow_pose = new Pose(-28, 28.5, -Math.PI / 2);
+                break;
+            default:
+                purple_pose = new Pose(2, 28, -Math.PI / 2);
+                yellow_pose = new Pose(-28, 37, -Math.PI / 2);
                 break;
         }
+
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
-                        selected,
-//                        new PathCenter(),
-//                        new PathRight(),
+
+                        //purple deposit
+                        new PositionCommand(purple_pose)
+                                .andThen(new PurplePixelSequence(robot)),
+
+                        //yellow deposit
+                        new PositionCommand(yellow_pose)
+                                .andThen(new YellowPixelSequence(robot)),
 
                         //go to first stack
-//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2000),
-//                        new PositionCommand(new Pose(70, 57, -Math.PI / 2 - 0.1))
+                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2000),
+                        new PositionCommand(new Pose(75, 57, -Math.PI / 2)),
 //                                .alongWith(new FirstStackSetup()),
 //
 //                        new FirstStackGrabCommand(),
+
+//                        new PositionCommand(new Pose(-32, 3, 0)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
@@ -109,24 +128,16 @@ public class BlueAuto extends CommandOpMode {
         robot.read();
         super.run();
         robot.periodic();
-
-        double loop = System.nanoTime();
-        telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
-        telemetry.addData("Voltage", robot.getVoltage());
-        telemetry.addData("Pose", robot.localizer.getPose().toString());
-        telemetry.addData("Runtime: %.2f", end_time == 0 ? timer.seconds() : end_time);
-
-//        telemetry.addLine("-------------------------------");
-//        telemetry.addData("z err", "%.2f", PositionCommand.zController.last_error);
-//        telemetry.addData("z pose", "%.2f", robot.localizer.getPose().z);
-//        telemetry.addData("z output", "%.2f", PositionCommand.zController.current_output);
-//        telemetry.addData("y output", "%.2f", PositionCommand.yController.current_output);
-//        telemetry.addData("Baseline", 0);
-        loop_time = loop;
-        telemetry.update();
-
         robot.write();
         robot.clearBulkCache(Global.Hub.BOTH);
+
+        double loop = System.nanoTime();
+        telemetry.addData("Frequency", "%4.2fhz", 1000000000 / (loop - loop_time));
+        telemetry.addData("Voltage", robot.getVoltage());
+        telemetry.addData("Pose", robot.localizer.getPose().toString());
+        telemetry.addData("Runtime:", "%.2f", end_time == 0 ? timer.seconds() : end_time);
+        loop_time = loop;
+        telemetry.update();
     }
 
     @Override
