@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.common.controllers.Feedforward;
+import org.firstinspires.ftc.teamcode.common.controllers.MotionProfile;
 import org.firstinspires.ftc.teamcode.common.controllers.PIDF;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
@@ -30,8 +31,9 @@ public class Arm implements WSubsystem {
     public static double kD = 0.0002;
     public static double kF = 0.65;
 
-    public static PIDF arm_controller = new PIDF(kP, kI, kD, kF, 2000.0, 10.0);
+    public static PIDF arm_controller = new PIDF(kP, kI, kD, kF, 2000.0, 0);
     public static Feedforward arm_support = new Feedforward(0.1);
+    public static MotionProfile arm_profile = new MotionProfile(3, 1, 3);
 
     public Arm() {
 
@@ -62,7 +64,7 @@ public class Arm implements WSubsystem {
                     target_position = (double) Global.TETRIX_MOTOR_TPR + increment;
             }
 
-            power = arm_controller.calculate(robot.arm_actuator.getCurrentPosition(), target_position) +
+            power = arm_controller.calculate(arm_profile.update(robot.arm_actuator.getCurrentPosition(), target_position, 10.0)) +
                     (arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1));
         }
 
