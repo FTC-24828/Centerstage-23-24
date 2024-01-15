@@ -15,15 +15,15 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class IntermediateSequence extends ParallelCommandGroup {
-    public IntermediateSequence(WRobot robot) {
+    public IntermediateSequence() {
         super(
                 new InstantCommand(() -> Global.setState(Global.State.INTERMEDIATE)),
-                new ArmSetStateCommand(robot, Arm.ArmState.FLAT),
-                new ArmResetIncrementCommand(robot),
-                new WristCommand(robot, Intake.WristState.FOLD),
+                new ArmSetStateCommand(Arm.ArmState.FLAT),
+                new ArmResetIncrementCommand(),
+                new WristCommand(Intake.WristState.FOLD),
                 new SequentialCommandGroup(
                         new WaitCommand(300),
-                        new ClawCommand(robot, Intake.ClawSide.BOTH, Intake.ClawState.CLOSED)
+                        new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED)
                 )
         );
     }

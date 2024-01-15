@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.LynxConstants;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import javax.annotation.concurrent.GuardedBy;
 
@@ -66,7 +68,6 @@ public class WRobot {
 
     //drone
     public WServo trigger;
-    public WActuator trigger_actuator;
 
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
@@ -74,7 +75,10 @@ public class WRobot {
     public Thread imu_thread;
     public double imu_offset = 0;
     private volatile double yaw = 0;
+
     public List<LynxModule> hubs;
+    public LynxModule control_hub;
+    public LynxModule expansion_hub;
 
     public VisionPortal vision_portal;
     public PropPipeline pipeline;
@@ -86,7 +90,7 @@ public class WRobot {
     private Telemetry telemetry;
 
     //subsystems
-    private ArrayList<WSubsystem> subsystems;
+    private List<WSubsystem> subsystems;
     public Drivetrain drivetrain;
     public Arm arm;
     public Intake intake;
@@ -172,16 +176,22 @@ public class WRobot {
             //drone
             if (drone != null) {
                 trigger = new WServo(hardware_map.get(Servo.class, "trigger"));
-                trigger_actuator = new WActuator(trigger::getPosition, trigger);
                 drone.init(trigger);
             }
 
             //hang
+            if (hang != null) {
+
+            }
         }
         //lynx hubs
         hubs = hardware_map.getAll(LynxModule.class);
-        hubs.get(0).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        hubs.get(1).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        for (LynxModule module : hubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+            if (module.isParent() && LynxConstants.isRevControlHub() && control_hub == null)
+                control_hub = module;
+            else expansion_hub = module;
+        }
 
         voltage = hardware_map.voltageSensor.iterator().next().getVoltage();
     }
@@ -256,10 +266,10 @@ public class WRobot {
         return voltage;
     }
 
-    public void startIMUThread(LinearOpMode op_mode) {
+    public void startIMUThread(BooleanSupplier predicate) {
         if (Global.USING_IMU) {
             imu_thread = new Thread(() -> {
-                while (!op_mode.isStopRequested() && op_mode.opModeIsActive()) {
+                while (predicate.getAsBoolean()) {
                     synchronized (imu_lock) {
                         yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
                     }
@@ -267,6 +277,10 @@ public class WRobot {
             });
             imu_thread.start();
         }
+    }
+
+    public void updateYaw() {
+        yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
     }
 
     public void resetYaw() {
@@ -280,16 +294,16 @@ public class WRobot {
     public void clearBulkCache(@NonNull Global.Hub hub) {
         switch (hub) {
             case CONTROL_HUB:
-                hubs.get(0).clearBulkCache();
+                control_hub.clearBulkCache();
                 break;
 
             case EXPANSION_HUB:
-                hubs.get(1).clearBulkCache();
+                expansion_hub.clearBulkCache();
                 break;
 
             case BOTH:
-                hubs.get(0).clearBulkCache();
-                hubs.get(1).clearBulkCache();
+                control_hub.clearBulkCache();
+                expansion_hub.clearBulkCache();
                 break;
         }
     }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
@@ -20,12 +21,13 @@ public class Intake implements WSubsystem {
 
     public enum ClawSide {LEFT, RIGHT, BOTH}
 
-    public enum WristState {SCORING, FOLD, FLAT}
+    public enum WristState {SCORING, FOLD, FLAT, MANUAL}
+    double target_position = 0.0;
     public DoubleSupplier wrist_angle;
     public double increment = 0;
     private double angle_offset;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
     public WristState wrist_state = WristState.FOLD;
-    public double arm_angle;
+    public double arm_target_angle;
 
     public Intake() {
     }
@@ -44,19 +46,21 @@ public class Intake implements WSubsystem {
     }
 
     public void periodic() {
-        //check pivot state and calculate pivot angle
-        double target_position;
+        //check pivot state and calculate target
         switch (wrist_state) {
             case FLAT:
                 target_position = angle_offset;
                 break;
 
             case FOLD:
-                target_position = 1.4;
+                target_position = 1;
                 break;
 
             case SCORING:
-                target_position = (WMath.twoPI / 3 - arm_angle) + increment;
+                target_position = (WMath.twoPI / 3 - arm_target_angle) + increment;
+                break;
+
+            case MANUAL:
                 break;
 
             default:
@@ -67,7 +71,7 @@ public class Intake implements WSubsystem {
 
     public void read() {
         robot.wrist_actuator.read();
-        this.arm_angle = robot.arm.arm_angle.getAsDouble();
+        arm_target_angle = robot.arm.target_position / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI ;
     }
 
     public void write() {
@@ -121,5 +125,10 @@ public class Intake implements WSubsystem {
 
     public void setWristState(@NonNull WristState state) {
         this.wrist_state = state;
+    }
+
+    public void setWristPosition(double position) {
+        wrist_state = WristState.MANUAL;
+        target_position = position;
     }
 }

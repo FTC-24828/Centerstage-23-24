@@ -5,9 +5,9 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
 public class WristSetIncrement extends InstantCommand {
-    public WristSetIncrement(WRobot robot, double i) {
+    public WristSetIncrement(double i) {
         super(
-                () -> robot.intake.increment = i
+                () -> WRobot.getInstance().intake.increment = i
         );
     }
 }

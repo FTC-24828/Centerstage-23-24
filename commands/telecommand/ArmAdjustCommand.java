@@ -5,9 +5,9 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
 public class ArmAdjustCommand extends InstantCommand {
-    public ArmAdjustCommand(WRobot robot, int increment) {
+    public ArmAdjustCommand(int increment) {
         super(
-                () -> robot.arm.incrementHeight(increment)
+                () -> WRobot.getInstance().arm.incrementHeight(increment)
         );
     }
 }

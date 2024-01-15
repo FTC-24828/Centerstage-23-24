@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 
 public class ArmSetStateCommand extends InstantCommand {
-    public ArmSetStateCommand(WRobot robot, Arm.ArmState state) {
+    public ArmSetStateCommand(Arm.ArmState state) {
         super (
-                () -> robot.arm.setArmState(state)
+                () -> WRobot.getInstance().arm.setArmState(state)
         );
     }
 }

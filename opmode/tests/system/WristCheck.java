@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.sample;
+package org.firstinspires.ftc.teamcode.opmode.tests.system;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -7,15 +7,15 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristPositionCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
-@Disabled //remove this to activate opmode
-@TeleOp(name = "tele opmode name")
-public class TeleopSample extends CommandOpMode {
+@TeleOp(name = "wrist test", group = "Utilities")
+public class WristCheck extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
     private final WRobot robot = WRobot.getInstance();
 
@@ -40,10 +40,17 @@ public class TeleopSample extends CommandOpMode {
 
         //initialize controller buttons mappings here (during initialize())
         //maps right bumper to a command
-        controller.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(
-                        // -> your command here <-
-                ));
+        controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new WristPositionCommand(robot, 0.2));
+
+        controller.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new WristPositionCommand(robot, -0.2));
+
+        controller.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new WristPositionCommand(robot, 0));
+
+        controller.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whenPressed(new WristPositionCommand(robot, -1));
 
         //display that initialization is complete
         while (opModeInInit()) {
@@ -58,20 +65,6 @@ public class TeleopSample extends CommandOpMode {
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled in initialize()
 
-        //set the drivetrain's motor speed according to controller stick input
-        robot.drivetrain.move(controller.getLeftX(), controller.getLeftY(), controller.getRightX());
-
-        if (controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
-            super.schedule(
-                    // command(s) to be run when left trigger is pressed more than halfway
-            );
-        }
-        else if (controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5) {
-            super.schedule(
-                    // command(s) to be run when left trigger is pressed more than halfway
-            );
-        }
-
         robot.periodic(); //calculations/writing data to actuators
 
         robot.write(); //write power to actuators (setting power to motors/servos)
@@ -79,6 +72,7 @@ public class TeleopSample extends CommandOpMode {
 
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.update();
+
     }
 
     //reset function, called when the opmode is stopped

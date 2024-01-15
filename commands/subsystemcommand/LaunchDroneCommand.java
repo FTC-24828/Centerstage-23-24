@@ -5,9 +5,9 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
 public class LaunchDroneCommand extends InstantCommand {
-    public LaunchDroneCommand(WRobot robot) {
+    public LaunchDroneCommand() {
         super (
-                robot.drone::launchDrone
+                WRobot.getInstance().drone::launchDrone
         );
     }
 }

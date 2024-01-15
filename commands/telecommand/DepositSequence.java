@@ -13,15 +13,11 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class DepositSequence extends ParallelCommandGroup {
-    public DepositSequence(WRobot robot) {
+    public DepositSequence() {
         super(
                 new InstantCommand(() -> Global.setState(Global.State.SCORING)),
-                new ArmSetStateCommand(robot, Arm.ArmState.SCORING),
-                new SequentialCommandGroup(
-//                        new WristCommand(robot, Intake.WristState.FLAT),
-//                        new WaitCommand(1000),
-                        new WristCommand(robot, Intake.WristState.SCORING)
-                )
+                new ArmSetStateCommand(Arm.ArmState.SCORING),
+                new WristCommand(Intake.WristState.SCORING)
         );
     }
 }

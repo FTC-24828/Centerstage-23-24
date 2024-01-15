@@ -15,25 +15,26 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class YellowPixelSequence extends SequentialCommandGroup {
-    public YellowPixelSequence(WRobot robot) {
+    public YellowPixelSequence() {
         super(
-                new ArmSetStateCommand(robot, Arm.ArmState.SCORING),
-                new ArmSetTargetCommand(robot, (double) Global.TETRIX_MOTOR_TPR)
-                        .alongWith(new WristCommand(robot, Intake.WristState.SCORING)),
-//                        .alongWith(new WristCommand(robot, Intake.WristState.FLAT))
-//                        .alongWith(new WristSetIncrement(robot, -1)),
-                 new ArmSetTargetCommand(robot, (double) 3 * Global.TETRIX_MOTOR_TPR / 2),
-                new WaitCommand(1000),
-                new WristSetIncrement(robot, -0.3),
-                new WaitCommand(1000),
-                new ClawCommand(robot, Intake.ClawSide.LEFT, Intake.ClawState.OPEN),
+                new ArmSetStateCommand(Arm.ArmState.SCORING),
+                new ArmSetTargetCommand((double) Global.TETRIX_MOTOR_TPR)
+                        .alongWith(new WristCommand(Intake.WristState.SCORING)),
+
+                 new ArmSetTargetCommand((double) 9 * Global.TETRIX_MOTOR_TPR / 6)
+                         .alongWith(new WristSetIncrement(-0.3)),
+                new WaitCommand(2000),
+
+                new ClawCommand(Intake.ClawSide.LEFT, Intake.ClawState.OPEN),
                 new WaitCommand(500),
-                new ArmSetTargetCommand(robot, (double) 4 * Global.TETRIX_MOTOR_TPR / 3 - 400),
+
+                new ArmSetTargetCommand((double) 4 * Global.TETRIX_MOTOR_TPR / 3 - 400),
                 new WaitCommand(1000),
-                new ClawCommand(robot, Intake.ClawSide.BOTH, Intake.ClawState.CLOSED),
-                new WristSetIncrement(robot, 0),
-                new ArmSetStateCommand(robot, Arm.ArmState.FLAT)
-                        .alongWith(new WristCommand(robot, Intake.WristState.FOLD)),
+
+                new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED),
+
+                new ArmSetStateCommand( Arm.ArmState.FLAT)
+                        .alongWith(new WristCommand(Intake.WristState.FOLD)),
                 new WaitCommand(500)
         );
     }

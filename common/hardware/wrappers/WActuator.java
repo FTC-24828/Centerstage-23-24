@@ -74,7 +74,7 @@ public class WActuator {
     }
 
     public void write() {
-        if (Math.abs(power - prev_power) > 0.005 || Math.abs(target_position - prev_target) > 0.005) {
+        if (Math.abs(power - prev_power) > 0.01 || Math.abs(target_position - prev_target) > 0.01) {
             for (HardwareDevice device : devices.values()) {
                 if (device instanceof DcMotor) {
                     double correction = 1.0;

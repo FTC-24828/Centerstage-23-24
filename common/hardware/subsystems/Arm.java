@@ -25,8 +25,13 @@ public class Arm implements WSubsystem {
     public double power = 0.0;
 
     //controllers
-    public static PIDF arm_controller = new PIDF(0.0008, 0.0001, 0.0002, 0.65, 2000.0, 10.0);
-    public static Feedforward arm_support = new Feedforward(0.07);
+    public static double kP = 0.0008;
+    public static double kI = 0.0001;
+    public static double kD = 0.0002;
+    public static double kF = 0.65;
+
+    public static PIDF arm_controller = new PIDF(kP, kI, kD, kF, 2000.0, 10.0);
+    public static Feedforward arm_support = new Feedforward(0.1);
 
     public Arm() {
 

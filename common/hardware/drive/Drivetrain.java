@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.common.hardware.drive;
 
+import com.arcrobotics.ftclib.drivebase.RobotDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -52,32 +53,25 @@ public class Drivetrain implements WSubsystem {
     }
 
     public void read() {
-        if (Global.IS_AUTO) {
-        }
     }
 
     public void write() {
-        if (Math.abs(wheel_speed[0] - prev_speed[0]) > 0.005) {
+        if (Math.abs(wheel_speed[0] - prev_speed[0]) > 0.01) {
             robot.motor[0].setPower(wheel_speed[0]);
             prev_speed[0] = wheel_speed[0];
         }
-        if (Math.abs(wheel_speed[1] - prev_speed[1]) > 0.005) {
+        if (Math.abs(wheel_speed[1] - prev_speed[1]) > 0.01) {
             robot.motor[1].setPower(wheel_speed[1]);
             prev_speed[1] = wheel_speed[1];
         }
-        if (Math.abs(wheel_speed[2] - prev_speed[2]) > 0.005) {
+        if (Math.abs(wheel_speed[2] - prev_speed[2]) > 0.01) {
             robot.motor[2].setPower(wheel_speed[2]);
             prev_speed[2] = wheel_speed[2];
         }
-        if (Math.abs(wheel_speed[3] - prev_speed[3]) > 0.005) {
+        if (Math.abs(wheel_speed[3] - prev_speed[3]) > 0.01) {
             robot.motor[3].setPower(wheel_speed[3]);
             prev_speed[3] = wheel_speed[3];
         }
-
-//        robot.motor[0].setPower(wheel_speed[0]);
-//        robot.motor[1].setPower(wheel_speed[1]);
-//        robot.motor[2].setPower(wheel_speed[2]);
-//        robot.motor[3].setPower(wheel_speed[3]);
     }
 
     public void reset() {
@@ -105,19 +99,29 @@ public class Drivetrain implements WSubsystem {
                 power * cos / max,
         };
 
-
-        wheel_speed[0] = (WMath.clamp(speed[0] - z, -1.0, 1.0));
-        wheel_speed[1] = (WMath.clamp(speed[1] - z, -1.0, 1.0));
-        wheel_speed[2] = (WMath.clamp(speed[0] + z, -1.0, 1.0));
-        wheel_speed[3] = (WMath.clamp(speed[1] + z, -1.0, 1.0));
+        wheel_speed[0] = speed[0] - z;
+        wheel_speed[1] = speed[1] - z;
+        wheel_speed[2] = speed[0] + z;
+        wheel_speed[3] = speed[1] + z;
 
         if (Global.IS_AUTO) {
             double correction = 12 / robot.getVoltage();
             for (int i=0; i<wheel_speed.length; i++) {
                 wheel_speed[i] = Math.abs(wheel_speed[i]) < 0.01 ?
                         wheel_speed[i] * correction :
-                        (wheel_speed[i] + Math.signum(wheel_speed[i]) * 0.03) * correction;
+                        (wheel_speed[i] + Math.signum(wheel_speed[i]) * 0.05) * correction;
             }
+        }
+
+        max = 1;
+        for (double wheelSpeed : wheel_speed) max = Math.max(max, Math.abs(wheelSpeed));
+
+
+        if (max > 1) {
+            wheel_speed[0] /= max;
+            wheel_speed[1] /= max;
+            wheel_speed[2] /= max;
+            wheel_speed[3] /= max;
         }
     }
 

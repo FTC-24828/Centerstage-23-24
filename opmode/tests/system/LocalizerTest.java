@@ -66,18 +66,21 @@ public class LocalizerTest extends CommandOpMode {
     public void run() {
         if (timer == null) {
             timer = new ElapsedTime();
-            robot.startIMUThread(this);
+            robot.startIMUThread(() -> this.isStarted() && this.isStopRequested());
         }
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled above
 
         //set the drivetrain's motor speed according to controller stick input
-        Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), robot.getYaw() - offset);
-        local_vector.scale(0.5);
+        Vector2D local_vector = new Vector2D(controller.getLeftX(), controller.getLeftY(), WMath.wrapAngle(robot.getYaw() - offset));
+        local_vector.scale(0.4);
 
         robot.periodic(); //calculations/writing data to actuators
 
-        robot.drivetrain.move(local_vector, controller.getRightX() * 0.5);
+        robot.drivetrain.move(local_vector, controller.getRightX() * 0.4);
+
+        robot.write(); //write power to actuators (setting power to motors/servos)
+        robot.clearBulkCache(Global.Hub.BOTH); //clear cache accordingly to get new read() values
 
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
@@ -85,12 +88,7 @@ public class LocalizerTest extends CommandOpMode {
         telemetry.addData("delta distance", "%.2f, %.2f, %.2f, %.2f",
                 robot.localizer.d_tr, robot.localizer.d_tl, robot.localizer.d_br, robot.localizer.d_bl);
         telemetry.addData("powers:", robot.drivetrain.toString());
-
-
         telemetry.update();
-
-        robot.write(); //write power to actuators (setting power to motors/servos)
-        robot.clearBulkCache(Global.Hub.BOTH); //clear cache accordingly to get new read() values
     }
 
     //reset function, called when the opmode is stopped

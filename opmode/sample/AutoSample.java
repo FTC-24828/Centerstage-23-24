@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
-@Disabled
+@Disabled //remove this to activate opmode
 @Autonomous(name = "auto opmode name")
 public class AutoSample extends CommandOpMode {
     private final WRobot robot = WRobot.getInstance();
@@ -65,14 +65,15 @@ public class AutoSample extends CommandOpMode {
     public void run() {
         robot.read(); //read values from encodes/sensors
         super.run(); //runs commands scheduled in initialize()
+
         robot.periodic(); //calculations/writing data to actuators
+
+        robot.write(); //write power to actuators (setting power to motors/servos)
+        robot.clearBulkCache(Global.Hub.BOTH); //clear cache accordingly to get new read() values
 
         //display data
         telemetry.addData("Runtime: ", end_time == 0 ? timer.seconds() : end_time);
         telemetry.update();
-
-        robot.write(); //write power to actuators (setting power to motors/servos)
-        robot.clearBulkCache(Global.Hub.BOTH); //clear cache if needed
     }
 
     //reset function, called when the opmode is stopped

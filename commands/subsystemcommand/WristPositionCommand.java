@@ -4,10 +4,10 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 
-public class DroneResetCommand extends InstantCommand {
-    public DroneResetCommand() {
-        super (
-                WRobot.getInstance().drone::resetDrone
+public class WristPositionCommand extends InstantCommand {
+    public WristPositionCommand(double position) {
+        super(
+                () -> WRobot.getInstance().wrist.setPosition(position)
         );
     }
 }

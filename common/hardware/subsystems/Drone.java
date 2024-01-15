@@ -16,14 +16,12 @@ public class Drone implements WSubsystem {
         trigger.setDirection(Servo.Direction.FORWARD);
         trigger.scaleRange(0, 1);
 
-        robot.trigger_actuator.setTargetPosition(0);
+        robot.trigger.setPosition(0);
     }
 
     @Override
     public void periodic() {
-        if (drone_state == DroneState.LAUNCHED)
-            robot.trigger_actuator.setTargetPosition(1);
-        else robot.trigger_actuator.setTargetPosition(0);
+
 
     }
 
@@ -34,7 +32,6 @@ public class Drone implements WSubsystem {
 
     @Override
     public void write() {
-        robot.trigger_actuator.write();
     }
 
     @Override
@@ -44,9 +41,11 @@ public class Drone implements WSubsystem {
 
     public void launchDrone() {
         drone_state = DroneState.LAUNCHED;
+        robot.trigger.setPosition(1);
     }
 
     public void resetDrone() {
         drone_state = DroneState.STORED;
+        robot.trigger.setPosition(0);
     }
 }

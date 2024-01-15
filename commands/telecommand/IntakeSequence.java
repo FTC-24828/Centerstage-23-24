@@ -13,13 +13,13 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
 public class IntakeSequence extends SequentialCommandGroup {
-    public IntakeSequence(WRobot robot) {
+    public IntakeSequence() {
         super(
             new InstantCommand(() -> Global.setState(Global.State.INTAKING)),
-            new ArmSetStateCommand(robot, Arm.ArmState.FLAT),
-            new WristCommand(robot, Intake.WristState.FLAT),
+            new ArmSetStateCommand(Arm.ArmState.FLAT),
+            new WristCommand(Intake.WristState.FLAT),
             new WaitCommand(100),
-            new ClawCommand(robot, Intake.ClawSide.BOTH, Intake.ClawState.OPEN)
+            new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.OPEN)
         );
     }
 }

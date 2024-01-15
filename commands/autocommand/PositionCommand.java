@@ -30,8 +30,8 @@ public class PositionCommand extends CommandBase {
     public static double zP = 1.5;
     public static double zD = 0.2;
 
-    public static double TRANSLATIONAL_TOLERANCE = 0.3;
-    public static double YAW_TOLERANCE = 0.05;
+    public double TRANSLATIONAL_TOLERANCE = 0.3;
+    public double YAW_TOLERANCE = 0.05;
 
     public static PIDF xController = new PIDF(xP, 0.0, xD);
     public static PIDF yController = new PIDF(yP, 0.0, yD);
@@ -57,6 +57,12 @@ public class PositionCommand extends CommandBase {
         WAIT_MS = ms_timeout;
     }
 
+    public PositionCommand(Pose pose, double in_translational_tolerance, double in_yaw_tolerance) {
+        this(pose);
+        TRANSLATIONAL_TOLERANCE = in_translational_tolerance;
+        YAW_TOLERANCE = in_yaw_tolerance;
+    }
+
     @Override
     public void execute() {
         if (timer == null) timer = new ElapsedTime();
@@ -64,8 +70,7 @@ public class PositionCommand extends CommandBase {
 
         Pose robot_pose = localizer.getPose();
 
-        Pose power_matrix = calculatePower(robot_pose);
-        drivetrain.move(power_matrix);
+        drivetrain.move(calculatePower(robot_pose));
     }
 
     @Override
