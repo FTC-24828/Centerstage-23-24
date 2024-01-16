@@ -25,7 +25,7 @@ public class Intake implements WSubsystem {
     double target_position = 0.0;
     public DoubleSupplier wrist_angle;
     public double increment = 0;
-    private double angle_offset;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
+    private double angle_offset = 0.2;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
     public WristState wrist_state = WristState.FOLD;
     public double arm_target_angle;
 
@@ -49,15 +49,15 @@ public class Intake implements WSubsystem {
         //check pivot state and calculate target
         switch (wrist_state) {
             case FLAT:
-                target_position = angle_offset;
+                target_position = 0.6;
                 break;
 
             case FOLD:
-                target_position = 1;
+                target_position = 2;
                 break;
 
             case SCORING:
-                target_position = (WMath.twoPI / 3 - arm_target_angle) + increment;
+                target_position = (WMath.twoPI / 3 - arm_target_angle) + angle_offset;
                 break;
 
             case MANUAL:

@@ -25,7 +25,6 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Pose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Config
 @Autonomous(name = "Blue Auto")
 public class BlueAuto extends CommandOpMode {
 

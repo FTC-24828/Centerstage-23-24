@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.opmode.tests.dashboard.PIDConstants;
 
 public class PIDF {
-    private ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
 
     public double Kp, Ki, Kd, Kf, intLim, tolerance;
 

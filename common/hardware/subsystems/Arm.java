@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.common.hardware.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.common.util.WMath;
 
 import java.util.function.DoubleSupplier;
 
+@Config
 public class Arm implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();
 
@@ -25,15 +27,17 @@ public class Arm implements WSubsystem {
     public double increment = 0;
     public double power = 0.0;
 
+    public final double ARM_LENGTH = 17;
+
     //controllers
-    public static double kP = 0.0008;
-    public static double kI = 0.0001;
-    public static double kD = 0.0002;
+    public static double kP = 0.05;
+    public static double kI = 0;
+    public static double kD = 0;
     public static double kF = 0.65;
 
     public static PIDF arm_controller = new PIDF(kP, kI, kD, kF, 2000.0, 0);
     public static Feedforward arm_support = new Feedforward(0.1);
-    public static MotionProfile arm_profile = new MotionProfile(3, 1, 3);
+    public static MotionProfile arm_profile = new MotionProfile(10, 2, 5);
 
     public Arm() {
 
@@ -64,7 +68,9 @@ public class Arm implements WSubsystem {
                     target_position = (double) Global.TETRIX_MOTOR_TPR + increment;
             }
 
-            power = arm_controller.calculate(arm_profile.update(robot.arm_actuator.getCurrentPosition(), target_position, 10.0)) +
+            power = arm_controller.calculate(arm_profile.update(
+                    WMath.getArcLength(arm_angle.getAsDouble(), ARM_LENGTH),
+                    WMath.getArcLength(target_position / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI, ARM_LENGTH), 1)) * 0.5 +
                     (arm_support.calculate(Math.cos(arm_angle.getAsDouble())) * ((arm_state == ArmState.FLAT) ? 0 : 1));
         }
 

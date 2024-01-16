@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.motors.TetrixMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,12 +48,17 @@ public class Main extends CommandOpMode {
         super.reset();
 
         Global.IS_AUTO = false;
-        Global.USING_DASHBOARD = false;
+        Global.USING_DASHBOARD = true;
         Global.USING_IMU = true;
         Global.USING_WEBCAM = false;
 
         robot.addSubsystem(new Drivetrain(), new Intake(), new Arm(), new Drone());
         robot.init(hardwareMap, telemetry);
+
+        if (Global.USING_DASHBOARD) {
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+            FtcDashboard.getInstance().startCameraStream(robot.pipeline, 0);
+        }
 
         robot.arm.setArmState(Arm.ArmState.FLAT);
         robot.intake.setWristState(Intake.WristState.FOLD);
@@ -109,10 +117,10 @@ public class Main extends CommandOpMode {
                 .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw()));
 
         controller1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw() - Math.PI / 2));
+                .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw() + Math.PI / 2));
 
         controller1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw() + Math.PI / 2));
+                .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw() - Math.PI / 2));
 
         controller1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> INITIAL_YAW = robot.getYaw() - Math.PI));
@@ -154,9 +162,13 @@ public class Main extends CommandOpMode {
         telemetry.addData("Frequency", "%.2fhz", 1000000000 / (loop - loop_time));
         telemetry.addData("Voltage", "%.2f", robot.getVoltage());
         telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
-        telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-        telemetry.addData("yaw", "%.2f", WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
-        telemetry.addData("control hub", robot.control_hub.getDeviceName());
+//        telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
+//        telemetry.addData("yaw", "%.2f", WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
+        telemetry.addData("control hub", robot.control_hub.isParent());
+        telemetry.addData("arm power", robot.arm.power);
+        telemetry.addData("arm velocity", Arm.arm_profile.velocity);
+        telemetry.addData("arm error", Arm.arm_controller.last_error);
+        telemetry.addData("arm state", Arm.arm_profile.state);
         telemetry.addData("State", Global.STATE);
         telemetry.update();
         loop_time = loop;

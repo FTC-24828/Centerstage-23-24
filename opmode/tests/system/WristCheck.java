@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
-@TeleOp(name = "wrist test", group = "Utilities")
+@TeleOp(name = "wrist test", group = "Utility")
 public class WristCheck extends CommandOpMode {
     //initialize and getting the robot instance (singleton)
     private final WRobot robot = WRobot.getInstance();
@@ -41,16 +41,16 @@ public class WristCheck extends CommandOpMode {
         //initialize controller buttons mappings here (during initialize())
         //maps right bumper to a command
         controller.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new WristPositionCommand(robot, 0.2));
+                .whenPressed(new WristPositionCommand(0.3));
 
         controller.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new WristPositionCommand(robot, -0.2));
+                .whenPressed(new WristPositionCommand(1));
 
         controller.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new WristPositionCommand(robot, 0));
+                .whenPressed(new WristPositionCommand(0));
 
         controller.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new WristPositionCommand(robot, -1));
+                .whenPressed(new WristPositionCommand(-1));
 
         //display that initialization is complete
         while (opModeInInit()) {

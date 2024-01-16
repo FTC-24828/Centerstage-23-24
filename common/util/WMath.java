@@ -18,9 +18,9 @@ public class WMath {
         return theta;
     }
 
-//    public static double wrapShort(double current, double target) {
-//        return Math.min(target - current)
-//    }
+    public static double getArcLength(double theta, double radius) {
+        return theta * radius;
+    }
 
     public static double max(double a, double b, double c) {
         return Math.max(Math.max(a, b), c);

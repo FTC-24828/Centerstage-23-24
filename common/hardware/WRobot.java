@@ -188,8 +188,8 @@ public class WRobot {
         hubs = hardware_map.getAll(LynxModule.class);
         for (LynxModule module : hubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-            if (module.isParent() && LynxConstants.isRevControlHub() && control_hub == null)
-                control_hub = module;
+            if (module.isParent() && LynxConstants.isEmbeddedSerialNumber(module.getSerialNumber()))
+                    control_hub = module;
             else expansion_hub = module;
         }
 

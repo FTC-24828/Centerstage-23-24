@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 
-@Config
 @Autonomous(name = "Red Auto")
 public class RedAuto extends CommandOpMode {
 
