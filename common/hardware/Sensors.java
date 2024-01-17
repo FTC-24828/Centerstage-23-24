@@ -7,6 +7,7 @@ public class Sensors {
         RIGHT_FRONT,
         LEFT_REAR,
         RIGHT_REAR,
+        HANG_ENCODER
 //        POD_LEFT,
 //        POD_FRONT,
 //        POD_RIGHT

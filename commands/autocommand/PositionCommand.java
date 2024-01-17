@@ -21,11 +21,11 @@ public class PositionCommand extends CommandBase {
     private final Localizer localizer = robot.localizer;
     private final Pose target_pose;
 
-    public static double xP = 0.5;
-    public static double xD = 0.1;
+    public static double xP = 0.3;
+    public static double xD = 0.05;
 
-    public static double yP = 0.5;
-    public static double yD = 0.1;
+    public static double yP = 0.3;
+    public static double yD = 0.05;
 
     public static double zP = 1.5;
     public static double zD = 0.2;
@@ -41,7 +41,7 @@ public class PositionCommand extends CommandBase {
     private ElapsedTime stable;
 
     private double WAIT_MS;
-    public static double STABLE_MS = 100;
+    public static double STABLE_MS = 150;
 
     public PositionCommand(Pose pose) {
         target_pose = pose;
@@ -91,7 +91,7 @@ public class PositionCommand extends CommandBase {
         double zPower = zController.calculate(WMath.wrapAngle(robot_pose.z - target_pose.z));
 
         Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.7, 0.7);
-        zPower = WMath.clamp(zPower, -0.7, 0.7); //TODO: tune this
+        zPower = WMath.clamp(zPower, -0.6, 0.6); //TODO: tune this
 
         return new Pose(translation_vector, zPower);
     }

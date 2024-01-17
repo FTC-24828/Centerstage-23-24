@@ -20,7 +20,7 @@ public class Localizer {
 
     public static double WHEEL_RADIUS = 3.96;
     public static double WHEEL_TOE = 0.7784;
-    public static double TRACK_WIDTH = 6.4;
+    public static double TRACK_WIDTH = 6.67;
 
     private DoubleSupplier p_tr, p_tl, p_br, p_bl;
     private double _tr, _tl, _br, _bl;

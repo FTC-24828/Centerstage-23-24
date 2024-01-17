@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.commands.telecommand;
 
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.intake.ClawCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 

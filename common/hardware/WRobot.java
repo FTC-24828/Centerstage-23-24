@@ -69,6 +69,12 @@ public class WRobot {
     //drone
     public WServo trigger;
 
+    //hang
+    public DcMotorEx hang_motor;
+    public WEncoder hang_encoder;
+    public WActuator hang_actuator;
+    public WServo hook;
+
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
     private BNO055IMU imu;
@@ -181,7 +187,12 @@ public class WRobot {
 
             //hang
             if (hang != null) {
-
+                hang_motor = hardware_map.get(DcMotorEx.class, "hang");
+                hang_encoder = new WEncoder(new MotorEx(hardware_map, "hang").encoder);
+                encoder_readings.put(Sensors.Encoder.HANG_ENCODER, 0);
+                hang_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.HANG_ENCODER), hang_motor);
+                hook = new WServo(hardware_map.get(Servo.class, "hook"));
+                hang.init(hang_motor, hook);
             }
         }
         //lynx hubs
@@ -231,6 +242,7 @@ public class WRobot {
     //read encoder values
     public void read () {
         if (arm != null) encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
+        if (hang != null) encoder_readings.put(Sensors.Encoder.HANG_ENCODER, hang_encoder.getPosition());
 
         if (Global.IS_AUTO) {
             encoder_readings.put(Sensors.Encoder.LEFT_FRONT, motor_encoder[0].getPosition());

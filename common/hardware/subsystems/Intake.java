@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
 
+import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
 public class Intake implements WSubsystem {
@@ -21,16 +22,14 @@ public class Intake implements WSubsystem {
 
     public enum ClawSide {LEFT, RIGHT, BOTH}
 
-    public enum WristState {SCORING, FOLD, FLAT, MANUAL}
-    double target_position = 0.0;
+    public enum WristState {SCORING, FOLD, FLAT, LAUNCHING, MANUAL}
+    public double target_position = 0.0;
     public DoubleSupplier wrist_angle;
     public double increment = 0;
     private double angle_offset = 0.2;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
     public WristState wrist_state = WristState.FOLD;
     public double arm_target_angle;
 
-    public Intake() {
-    }
 
     public void init(WServo wrist, WServo claw0, WServo claw1) {
         wrist.setDirection(Servo.Direction.FORWARD);
@@ -57,7 +56,15 @@ public class Intake implements WSubsystem {
                 break;
 
             case SCORING:
-                target_position = (WMath.twoPI / 3 - arm_target_angle) + angle_offset;
+                if (Global.IS_AUTO)
+                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 4 * angle_offset;
+
+                else
+                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 3 * angle_offset;
+                break;
+
+            case LAUNCHING:
+                target_position = -1;
                 break;
 
             case MANUAL:

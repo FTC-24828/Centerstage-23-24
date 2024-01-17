@@ -1,22 +1,17 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackSetup;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmResetPosition;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
@@ -76,24 +71,29 @@ public class BlueAuto extends CommandOpMode {
 
         Pose purple_pose;
         Pose yellow_pose;
+        Pose right_spike = new Pose();
 
         switch (robot.pipeline.getPropLocation()) {
             case LEFT:
                 purple_pose = new Pose(-21, 25, -Math.PI / 2);
-                yellow_pose = new Pose(-28, 25, -Math.PI / 2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-26.5, 25, -Math.PI / 2);
                 break;
             case CENTER:
                 purple_pose = new Pose(-14, 37, -Math.PI / 2);
-                yellow_pose = new Pose(-28, 28.5, -Math.PI / 2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-26.5, 32.5, -Math.PI / 2);
                 break;
             default:
-                purple_pose = new Pose(2, 28, -Math.PI / 2);
-                yellow_pose = new Pose(-28, 37, -Math.PI / 2);
+                purple_pose = new Pose(-3, 25, -Math.PI / 2);
+                right_spike = new Pose(1, 25, -Math.PI / 2);
+                yellow_pose = new Pose(-26.5, 37, -Math.PI / 2);
+
                 break;
         }
 
-        Pose first_stack_pose = new Pose(80, 57, -Math.PI / 2);
-        Pose first_stack_deposit = new Pose();
+        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
+        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -101,21 +101,27 @@ public class BlueAuto extends CommandOpMode {
 
                         //purple deposit
                         new PositionCommand(purple_pose)
+                                .andThen(new PositionCommand(right_spike))
                                 .andThen(new PurplePixelSequence()),
 
                         //yellow deposit
                         new PositionCommand(yellow_pose)
                                 .andThen(new YellowPixelSequence()),
 
-                        //go to first stack
-                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2, 0.05),
-                        new PositionCommand(first_stack_pose)
-                                .alongWith(new FirstStackSetup()),
+//                        //go to first stack
+//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2, 0.05),
+//                        new PositionCommand(first_stack_pose)
+//                                .alongWith(new FirstStackSetup()),
 //
 //                        new FirstStackGrabCommand(),
-
+//                        new WaitCommand(500),
+//
+//                        new PositionCommand(new Pose(-20, 60, -Math.PI / 2)),
+//
 //                        new PositionCommand(first_stack_deposit)
-//                                .andThen(FirstStackDeposit()),
+//                                .andThen(new FirstStackDeposit()),
+
+                        new PositionCommand(new Pose(-35, 3, -Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
@@ -140,6 +146,11 @@ public class BlueAuto extends CommandOpMode {
         telemetry.addData("Voltage", robot.getVoltage());
         telemetry.addData("Pose", robot.localizer.getPose().toString());
         telemetry.addData("Runtime:", "%.2f", end_time == 0 ? timer.seconds() : end_time);
+
+        telemetry.addData("state", robot.intake.wrist_state);
+        telemetry.addData("pos", robot.intake.target_position);
+        telemetry.addData("actu", robot.wrist_actuator.getCurrentPosition());
+
         loop_time = loop;
         telemetry.update();
     }

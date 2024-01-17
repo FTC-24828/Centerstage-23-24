@@ -5,12 +5,11 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmResetIncrementCommand;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ArmSetStateCommand;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.ClawCommand;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.WristCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.arm.ArmResetIncrementCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.arm.ArmSetStateCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.intake.ClawCommand;
+import org.firstinspires.ftc.teamcode.commands.subsystemcommand.intake.WristCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
-import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 

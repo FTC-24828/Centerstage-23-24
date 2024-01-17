@@ -12,16 +12,16 @@ import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 
-public class YellowPixelSequence extends SequentialCommandGroup {
-    public YellowPixelSequence() {
+public class FirstStackDeposit extends SequentialCommandGroup {
+    public FirstStackDeposit() {
         super(
                 new ArmSetStateCommand(Arm.ArmState.SCORING),
                 new ArmSetTargetCommand(Global.TETRIX_MOTOR_TPR)
                         .alongWith(new WristCommand(Intake.WristState.SCORING)),
 
-                 new ArmSetTargetCommand(3.0 * Global.TETRIX_MOTOR_TPR / 2)
-                         .alongWith(new WristSetIncrement(-0.3)),
-                new WaitCommand(2500),
+                new ArmSetTargetCommand(4.0 * Global.TETRIX_MOTOR_TPR / 3)
+                        .alongWith(new WristSetIncrement(-0.3)),
+                new WaitCommand(2000),
 
                 new ClawCommand(Intake.ClawSide.LEFT, Intake.ClawState.OPEN),
                 new WaitCommand(400),

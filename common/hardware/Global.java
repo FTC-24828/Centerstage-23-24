@@ -4,7 +4,7 @@ public class Global {
     public enum Hub {CONTROL_HUB, EXPANSION_HUB, BOTH}
     public enum Side {BLUE, RED}
     public enum PropLocation {LEFT, RIGHT, CENTER}
-    public enum State {SCORING, INTERMEDIATE, INTAKING}
+    public enum State {SCORING, INTERMEDIATE, INTAKE, LAUNCHING}
 
     public static final int TETRIX_MOTOR_TPR = 1440;
     public static double YAW_OFFSET = 0;
