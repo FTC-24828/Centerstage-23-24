@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.common.util.WMath;
 import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class WActuator {
     public final HashMap<String, HardwareDevice> devices = new HashMap<>();

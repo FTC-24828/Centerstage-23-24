@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.common.hardware.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
@@ -16,10 +17,15 @@ public class Hang implements WSubsystem {
     public double power = 0;
     public HangState hang_state = HangState.STOPPED;
 
-    public void init(DcMotorEx winch, WServo hook) {
-        winch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        winch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    public void init(DcMotorEx winch0, DcMotorEx winch1, WServo hook) {
+        winch0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winch0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winch0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winch0.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        winch1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winch1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winch1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         hook.setDirection(Servo.Direction.FORWARD);
     }
@@ -54,5 +60,10 @@ public class Hang implements WSubsystem {
 
     public void setHookPosition(double position) {
         robot.hook.setPosition(position);
+    }
+
+    public void setPowerMotor(double power) {
+        robot.hang_motor0.setPower(power);
+        robot.hang_motor1.setPower(power);
     }
 }

@@ -48,16 +48,16 @@ public class Intake implements WSubsystem {
         //check pivot state and calculate target
         switch (wrist_state) {
             case FLAT:
-                target_position = 0.6;
+                target_position = 0.7;
                 break;
 
             case FOLD:
-                target_position = 2;
+                target_position = 3;
                 break;
 
             case SCORING:
                 if (Global.IS_AUTO)
-                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 4 * angle_offset;
+                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 5 * angle_offset;
 
                 else
                     target_position = (WMath.twoPI / 3 - arm_target_angle) + 3 * angle_offset;

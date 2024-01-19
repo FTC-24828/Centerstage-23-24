@@ -19,7 +19,7 @@ import java.util.function.DoubleSupplier;
 public class Arm implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();
 
-    public enum ArmState { SCORING, FLAT, LAUNCHING }
+    public enum ArmState { SCORING, FLAT, LAUNCHING, HANG }
     private ArmState arm_state = ArmState.FLAT;
 
     public DoubleSupplier arm_angle;
@@ -70,6 +70,10 @@ public class Arm implements WSubsystem {
 
                 case LAUNCHING:
                     target_position = (double) Global.TETRIX_MOTOR_TPR / 3;
+                    break;
+
+                case HANG:
+                    target_position = (double) 5 * Global.TETRIX_MOTOR_TPR / 9;
                     break;
             }
 

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.hardware.drive;
 
-import com.arcrobotics.ftclib.drivebase.RobotDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -8,11 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
-import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
-import org.firstinspires.ftc.teamcode.common.util.WMath;
-
-import java.util.Arrays;
 
 public class Drivetrain implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();

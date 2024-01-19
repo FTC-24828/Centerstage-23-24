@@ -157,7 +157,7 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
         bounding_box.clear();
 
         for (MatOfPoint contour : contours) {
-            if (Imgproc.contourArea(contour) > 1000) {
+            if (Imgproc.contourArea(contour) > 1500) {
                 bounding_box.add(Imgproc.boundingRect(contour));
             }
         }

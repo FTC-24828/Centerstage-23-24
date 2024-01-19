@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Blue Auto")
-public class BlueAuto extends CommandOpMode {
+@Autonomous(name = "Blue right")
+public class BlueTest extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -73,7 +73,7 @@ public class BlueAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose right_spike = new Pose();
 
-        Global.PropLocation Path = Global.PropLocation.LEFT;
+        Global.PropLocation Path = Global.PropLocation.RIGHT;
 
 //        switch (robot.pipeline.getPropLocation()) {
         switch (Path) {

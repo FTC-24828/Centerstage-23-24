@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.hardware;
 
-import android.util.Log;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -10,19 +9,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.LynxConstants;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Localizer;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
@@ -33,11 +27,10 @@ import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WActuator;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WEncoder;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WServo;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
-import org.firstinspires.ftc.teamcode.common.util.Pose;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
 import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +63,8 @@ public class WRobot {
     public WServo trigger;
 
     //hang
-    public DcMotorEx hang_motor;
+    public DcMotorEx hang_motor0;
+    public DcMotorEx hang_motor1;
     public WEncoder hang_encoder;
     public WActuator hang_actuator;
     public WServo hook;
@@ -187,12 +181,13 @@ public class WRobot {
 
             //hang
             if (hang != null) {
-                hang_motor = hardware_map.get(DcMotorEx.class, "hang");
-                hang_encoder = new WEncoder(new MotorEx(hardware_map, "hang").encoder);
+                hang_motor0 = hardware_map.get(DcMotorEx.class, "hang0");
+                hang_motor1 = hardware_map.get(DcMotorEx.class, "hang1");
+                hang_encoder = new WEncoder(new MotorEx(hardware_map, "hang0").encoder);
                 encoder_readings.put(Sensors.Encoder.HANG_ENCODER, 0);
-                hang_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.HANG_ENCODER), hang_motor);
+                hang_actuator = new WActuator(hang_motor0, hang_motor1);
                 hook = new WServo(hardware_map.get(Servo.class, "hook"));
-                hang.init(hang_motor, hook);
+                hang.init(hang_motor0, hang_motor1, hook);
             }
         }
         //lynx hubs
