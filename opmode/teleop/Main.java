@@ -60,7 +60,7 @@ public class Main extends CommandOpMode {
         Global.USING_IMU = true;
         Global.USING_WEBCAM = false;
 
-        robot.addSubsystem(new Drivetrain(), new Intake(), new Arm(), new Drone(), new Hang());
+        robot.addSubsystem(new Drivetrain(), new Intake(), new Arm(), new Drone());
         robot.init(hardwareMap, telemetry);
 
         if (Global.USING_DASHBOARD) {
@@ -139,19 +139,19 @@ public class Main extends CommandOpMode {
                         ));
 
         //hook controls
-        controller2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new ConditionalCommand(
-                        new HangSequence(),
-                        new InstantCommand(),
-                        this::isEndGame
-                ));
-
-        controller2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new ConditionalCommand(
-                        new HangRetractSequence(),
-                        new InstantCommand(),
-                        () -> isEndGame() && Global.STATE == Global.State.HANGING
-                ));
+//        controller2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+//                .whenPressed(new ConditionalCommand(
+//                        new HangSequence(),
+//                        new InstantCommand(),
+//                        this::isEndGame
+//                ));
+//
+//        controller2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+//                .whenPressed(new ConditionalCommand(
+//                        new HangRetractSequence(),
+//                        new InstantCommand(),
+//                        () -> isEndGame() && Global.STATE == Global.State.HANGING
+//                ));
 
         //yaw manual reset methods
         controller1.getGamepadButton(GamepadKeys.Button.DPAD_UP)

@@ -190,6 +190,7 @@ public class WRobot {
                 hang.init(hang_motor0, hang_motor1, hook);
             }
         }
+
         //lynx hubs
         hubs = hardware_map.getAll(LynxModule.class);
         for (LynxModule module : hubs) {

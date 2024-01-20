@@ -71,12 +71,9 @@ public class BlueAuto extends CommandOpMode {
 
         Pose purple_pose;
         Pose yellow_pose;
-        Pose right_spike = new Pose();
+        Pose right_spike;
 
-        Global.PropLocation Path = Global.PropLocation.LEFT;
-
-//        switch (robot.pipeline.getPropLocation()) {
-        switch (Path) {
+        switch (robot.pipeline.getPropLocation()) {
             case LEFT:
                 purple_pose = new Pose(-21, 25, -Math.PI / 2);
                 right_spike = purple_pose;

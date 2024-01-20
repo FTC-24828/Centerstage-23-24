@@ -57,10 +57,10 @@ public class PositionCommand extends CommandBase {
         WAIT_MS = ms_timeout;
     }
 
-    public PositionCommand(Pose pose, double in_translational_tolerance, double in_yaw_tolerance) {
-        this(pose);
+    public PositionCommand setTolerance(double in_translational_tolerance, double in_yaw_tolerance) {
         TRANSLATIONAL_TOLERANCE = in_translational_tolerance;
         YAW_TOLERANCE = in_yaw_tolerance;
+        return this;
     }
 
     @Override
@@ -90,8 +90,8 @@ public class PositionCommand extends CommandBase {
         double yPower = yController.calculate(robot_pose.y, target_pose.y);
         double zPower = zController.calculate(WMath.wrapAngle(robot_pose.z - target_pose.z));
 
-        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.7, 0.7);
-        zPower = WMath.clamp(zPower, -0.6, 0.6); //TODO: tune this
+        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.8, 0.8);
+        zPower = WMath.clamp(zPower, -0.7, 0.7); //TODO: tune this
 
         return new Pose(translation_vector, zPower);
     }
