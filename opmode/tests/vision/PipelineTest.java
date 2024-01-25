@@ -60,8 +60,6 @@ public class PipelineTest extends LinearOpMode {
             telemetry.addData("centerZone", prop_pipeline.center_white);
             telemetry.addData("threshold", prop_pipeline.threshold);
             telemetry.addData("FPS", vision_portal.getFps());
-//            telemetry.addData("leftZone", prop_pipeline.leftColor);
-//            telemetry.addData("centerZone", prop_pipeline.centerColor);
             telemetry.update();
         }
 

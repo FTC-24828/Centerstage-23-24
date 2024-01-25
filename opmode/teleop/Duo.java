@@ -10,34 +10,22 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.drone.DroneResetCommand;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.drone.LaunchDroneCommand;
-import org.firstinspires.ftc.teamcode.commands.subsystemcommand.hang.HookCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.ArmAdjustCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.ClawToggleCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.DepositSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.DroneLaunchCommand;
-import org.firstinspires.ftc.teamcode.commands.telecommand.DroneLaunchSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.DroneResetSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.HangCommand;
-import org.firstinspires.ftc.teamcode.commands.telecommand.HangRetractSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.HangSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.HangStopCommand;
 import org.firstinspires.ftc.teamcode.commands.telecommand.IntakeSequence;
 import org.firstinspires.ftc.teamcode.commands.telecommand.IntermediateSequence;
-import org.firstinspires.ftc.teamcode.commands.telecommand.HangRetractCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Drone;
-import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Hang;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
 import org.firstinspires.ftc.teamcode.common.util.WMath;
 
-@TeleOp (name = "MainTeleOp")
-public class Main extends CommandOpMode {
+@TeleOp (name = "MainTeleOp - duo")
+public class Duo extends CommandOpMode {
     private final WRobot robot = WRobot.getInstance();
 
     private GamepadEx controller1;
@@ -46,7 +34,8 @@ public class Main extends CommandOpMode {
     private double loop_time = 0.0;
 
     private double INITIAL_YAW = Global.YAW_OFFSET;  //TODO LINK BETWEEN THE TWO PROGRAMS
-    private boolean SLOW_MODE = false;
+    private boolean SLOW_MODE_P1 = false;
+    private boolean SLOW_MODE_P2 = false;
 
     private ElapsedTime timer;
 
@@ -76,67 +65,78 @@ public class Main extends CommandOpMode {
         controller2 = new GamepadEx(gamepad2);
 
         //toggle claw states
-        controller1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+        controller2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.BOTH));
 
-        controller1.getGamepadButton(GamepadKeys.Button.X)
+        controller2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.LEFT));
 
-        controller1.getGamepadButton(GamepadKeys.Button.B)
+        controller2.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new ClawToggleCommand(Intake.ClawSide.RIGHT));
 
-        //arm controls
+        //p1 intake controls
         controller1.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new ConditionalCommand(
-                        new ConditionalCommand(
-                                new IntakeSequence(),
-                                new IntermediateSequence(),
-                                () -> Global.STATE == Global.State.INTERMEDIATE
-                        ),
+                        new IntakeSequence(),
                         new InstantCommand(),
-                        () -> Global.STATE != Global.State.INTAKE
+                        () -> Global.STATE == Global.State.INTERMEDIATE
                 ));
 
         controller1.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ConditionalCommand(
-                        new ConditionalCommand(
-                                new DepositSequence(),
-                                new IntermediateSequence(),
-                                () -> Global.STATE == Global.State.INTERMEDIATE
-                        ),
+                        new IntermediateSequence(),
                         new InstantCommand(),
-                        () -> Global.STATE != Global.State.SCORING
+                        () -> Global.STATE == Global.State.INTAKE
                 ));
 
-        //slow mode
-        controller1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> SLOW_MODE = true))
-                .whenReleased(new InstantCommand(() -> SLOW_MODE = false));
-
-        //drone controls
+        //p2 deposit controls
         controller2.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ConditionalCommand(
-                        new DroneLaunchSequence(),
+                        new DepositSequence(),
                         new InstantCommand(),
-                        this::isEndGame
+                        () -> Global.STATE == Global.State.INTERMEDIATE
                 ));
 
         controller2.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new ConditionalCommand(
-                        new DroneResetSequence(),
+                        new IntermediateSequence(),
                         new InstantCommand(),
-                        this::isEndGame
+                        () -> Global.STATE == Global.State.SCORING
                 ));
 
-        controller2.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new DroneResetCommand());
+        //slow mode
+        controller1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(() -> SLOW_MODE_P1 = true))
+                .whenReleased(new InstantCommand(() -> SLOW_MODE_P1 = false));
 
-        controller2.getGamepadButton(GamepadKeys.Button.B)
-                        .whenPressed(new ConditionalCommand(
-                                new DroneLaunchCommand(),
-                                new InstantCommand(),
-                                () -> Global.STATE == Global.State.LAUNCHING && isEndGame()
-                        ));
+        controller2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(() -> SLOW_MODE_P2 = true))
+                .whenReleased(new InstantCommand(() -> SLOW_MODE_P2 = false));
+
+        //drone controls
+//        controller2.getGamepadButton(GamepadKeys.Button.Y)
+//                .whenPressed(new ConditionalCommand(
+//                        new DroneLaunchSequence(),
+//                        new InstantCommand(),
+//                        this::isEndGame
+//                ));
+//
+//        controller2.getGamepadButton(GamepadKeys.Button.A)
+//                .whenPressed(new ConditionalCommand(
+//                        new DroneResetSequence(),
+//                        new InstantCommand(),
+//                        this::isEndGame
+//                ));
+//
+//        controller2.getGamepadButton(GamepadKeys.Button.X)
+//                .whenPressed(new DroneResetCommand());
+//
+//        controller2.getGamepadButton(GamepadKeys.Button.B)
+//                .whenPressed(new ConditionalCommand(
+//                        new DroneLaunchCommand(),
+//                        new InstantCommand(),
+//                        () -> Global.STATE == Global.State.LAUNCHING && isEndGame()
+//                ));
 
         //hook controls
 //        controller2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
@@ -183,14 +183,14 @@ public class Main extends CommandOpMode {
 
         Vector2D local_vector = new Vector2D(controller1.getLeftX(), controller1.getLeftY(),
                 WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
-        if (SLOW_MODE) local_vector.scale(0.5);
+        if (SLOW_MODE_P1) local_vector.scale(0.5);
 
         //left trigger gets precedent
-        if (controller1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(SLOW_MODE ? -3 : -5));
+        if (controller2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
+            super.schedule(new ArmAdjustCommand(SLOW_MODE_P2 ? -3 : -5));
         }
-        else if (controller1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
-            super.schedule(new ArmAdjustCommand(SLOW_MODE ? 3 : 5));
+        else if (controller2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
+            super.schedule(new ArmAdjustCommand(SLOW_MODE_P2 ? 3 : 5));
         }
 
         //hang controls
@@ -207,7 +207,7 @@ public class Main extends CommandOpMode {
         super.run();
         robot.periodic();
 
-        robot.drivetrain.move(local_vector, controller1.getRightX() * (SLOW_MODE ? 0.5 : 1));
+        robot.drivetrain.move(local_vector, controller1.getRightX() * (SLOW_MODE_P1 ? 0.5 : 1));
         robot.write();
         robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
 
