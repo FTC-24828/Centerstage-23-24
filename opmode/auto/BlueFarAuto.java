@@ -15,13 +15,13 @@ import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Blue right")
-public class BlueTest extends CommandOpMode {
+@Autonomous(name = "Blue Far Auto")
+public class BlueFarAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -71,12 +71,9 @@ public class BlueTest extends CommandOpMode {
 
         Pose purple_pose;
         Pose yellow_pose;
-        Pose right_spike = new Pose();
+        Pose right_spike;
 
-        Global.PropLocation Path = Global.PropLocation.RIGHT;
-
-//        switch (robot.pipeline.getPropLocation()) {
-        switch (Path) {
+        switch (robot.pipeline.getPropLocation()) {
             case LEFT:
                 purple_pose = new Pose(-21, 25, -Math.PI / 2);
                 right_spike = purple_pose;

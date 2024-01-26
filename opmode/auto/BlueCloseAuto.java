@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Blue Auto")
-public class BlueAuto extends CommandOpMode {
+@Autonomous(name = "Blue Close Auto")
+public class BlueCloseAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 

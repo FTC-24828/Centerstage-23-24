@@ -24,7 +24,7 @@ public class PipelineTest extends LinearOpMode {
         PropPipeline prop_pipeline;
         VisionPortal vision_portal;
 
-        Global.SIDE = Global.Side.BLUE;
+        Global.SIDE = Global.Side.RED;
         Global.USING_DASHBOARD = true;
         Global.DEBUG = true;
 

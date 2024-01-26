@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackSetup;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
@@ -19,10 +18,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
-import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Red Auto")
-public class RedAuto extends CommandOpMode {
+@Autonomous(name = "Red Close Auto")
+public class RedCloseAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -57,10 +55,10 @@ public class RedAuto extends CommandOpMode {
 
         robot.read();
 
-        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
-            telemetry.addLine("Autonomous initializing...");
-            telemetry.update();
-        }
+//        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
+//            telemetry.addLine("Autonomous initializing...");
+//            telemetry.update();
+//        }
 
         while (!isStarted()) {
             telemetry.addData("Path:", robot.pipeline.getPropLocation());
@@ -74,21 +72,23 @@ public class RedAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose left_spike = new Pose();
 
-        switch (robot.pipeline.getPropLocation()) {
+        Global.PropLocation chosen = Global.PropLocation.CENTER;
+
+        switch (chosen) {
             case LEFT:
-                purple_pose = new Pose(3, 25, Math.PI / 2);
-                left_spike = new Pose(-1, 25, Math.PI / 2);
-                yellow_pose = new Pose(6, 37, Math.PI / 2);
+                purple_pose = new Pose(4.5, 28, Math.PI / 2);
+                left_spike = new Pose(-1.5, 28, Math.PI / 2);
+                yellow_pose = new Pose(29.5, 30, Math.PI / 2);
                 break;
             case CENTER:
-                purple_pose = new Pose(14, 37, Math.PI / 2);
+                purple_pose = new Pose(14.5, 42, Math.PI / 2);
                 left_spike = purple_pose;
-                yellow_pose = new Pose(26, 32.5, Math.PI / 2);
+                yellow_pose = new Pose(27, 26, Math.PI / 2);
                 break;
             default:
                 purple_pose = new Pose(21, 25, Math.PI / 2);
                 left_spike = purple_pose;
-                yellow_pose = new Pose(26, 25, Math.PI / 2);
+                yellow_pose = new Pose(29.5, 22, Math.PI / 2);
 
                 break;
         }
