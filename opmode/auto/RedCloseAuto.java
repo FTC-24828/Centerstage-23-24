@@ -80,10 +80,10 @@ public class RedCloseAuto extends CommandOpMode {
                 left_spike = new Pose(-1.5, 28, Math.PI / 2);
                 yellow_pose = new Pose(29.5, 30, Math.PI / 2);
                 break;
-            case CENTER:
-                purple_pose = new Pose(14.5, 42, Math.PI / 2);
+            case  CENTER:
+                purple_pose = new Pose(14.5, 41, Math.PI / 2);
                 left_spike = purple_pose;
-                yellow_pose = new Pose(27, 26, Math.PI / 2);
+                yellow_pose = new Pose(27, 24, Math.PI / 2);
                 break;
             default:
                 purple_pose = new Pose(21, 25, Math.PI / 2);
@@ -122,7 +122,9 @@ public class RedCloseAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        new PositionCommand(new Pose(35, 3, Math.PI / 2)),
+                        //new PositionCommand(new Pose(35, 3, Math.PI / 2)),
+                        //temporary recall because I got too lazy
+                        new PositionCommand(new Pose(0, 0, Math.PI / -2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
