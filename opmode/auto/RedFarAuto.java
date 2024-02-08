@@ -15,12 +15,12 @@ import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 
-@Autonomous(name = "Red Close Auto")
-public class RedCloseAuto extends CommandOpMode {
+@Autonomous(name = "Red Far Auto")
+public class RedFarAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -72,23 +72,24 @@ public class RedCloseAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose left_spike = new Pose();
 
-        Global.PropLocation chosen = Global.PropLocation.RIGHT;
+        Global.PropLocation chosen = Global.PropLocation.CENTER;
 
         switch (chosen) {
             case LEFT:
                 purple_pose = new Pose(4.5, 28, Math.PI / 2);
                 left_spike = new Pose(-1.5, 28, Math.PI / 2);
-                yellow_pose = new Pose(27, 30, Math.PI / 2);
+                yellow_pose = new Pose(59.5, 30, Math.PI / 2);
                 break;
             case  CENTER:
-                purple_pose = new Pose(14.5, 41, Math.PI / 2);
+                purple_pose = new Pose(10, 41, Math.PI / 2);
                 left_spike = purple_pose;
-                yellow_pose = new Pose(27, 24.5, Math.PI / 2);
+                yellow_pose = new Pose(57, 25, Math.PI / 2);
                 break;
             default:
-                purple_pose = new Pose(22, 10, Math.PI / 2);
-                left_spike = new Pose(20.5, 41, Math.PI / 2);
-                yellow_pose = new Pose(27, 20.5, Math.PI / 2);
+                purple_pose = new Pose(21, 25, Math.PI / -2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(59.5, 22, Math.PI / 2);
+
                 break;
         }
 
@@ -121,9 +122,8 @@ public class RedCloseAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        //new PositionCommand(new Pose(35, 3, Math.PI / 2)),
-                        //temporary recall because I got too lazy
-                        new PositionCommand(new Pose(0, 0, Math.PI / -1)),
+                        //Side Park
+                        new PositionCommand(new Pose(35, 60, Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 

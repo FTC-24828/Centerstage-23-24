@@ -56,10 +56,10 @@ public class BlueCloseAuto extends CommandOpMode {
 
         robot.read();
 
-        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
-            telemetry.addLine("Autonomous initializing...");
-            telemetry.update();
-        }
+//        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
+//            telemetry.addLine("Autonomous initializing...");
+//            telemetry.update();
+//       }
 
         while (!isStarted()) {
             telemetry.addData("Path:", robot.pipeline.getPropLocation());
@@ -73,7 +73,9 @@ public class BlueCloseAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose right_spike;
 
-        switch (robot.pipeline.getPropLocation()) {
+        Global.PropLocation chosen = Global.PropLocation.RIGHT;
+
+        switch (chosen) {
             case LEFT:
                 purple_pose = new Pose(-21, 25, -Math.PI / 2);
                 right_spike = purple_pose;
