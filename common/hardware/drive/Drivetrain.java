@@ -9,11 +9,14 @@ import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.wrappers.WSubsystem;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.util.Vector2D;
+import org.firstinspires.ftc.teamcode.common.util.WMath;
 
 public class Drivetrain implements WSubsystem {
     private final WRobot robot = WRobot.getInstance();
     public double[] wheel_speed = new double[4];
-    private double[] prev_speed = new double[4];
+    private final double[] prev_speed = new double[4];
+
+    private final double rate = 0.25;
 
     public void init (DcMotorEx[] motor) {
 //      set drivetrain properties
@@ -52,21 +55,19 @@ public class Drivetrain implements WSubsystem {
     }
 
     public void write() {
-        if (Math.abs(wheel_speed[0] - prev_speed[0]) > 0.01) {
-            robot.motor[0].setPower(wheel_speed[0]);
-            prev_speed[0] = wheel_speed[0];
-        }
-        if (Math.abs(wheel_speed[1] - prev_speed[1]) > 0.01) {
-            robot.motor[1].setPower(wheel_speed[1]);
-            prev_speed[1] = wheel_speed[1];
-        }
-        if (Math.abs(wheel_speed[2] - prev_speed[2]) > 0.01) {
-            robot.motor[2].setPower(wheel_speed[2]);
-            prev_speed[2] = wheel_speed[2];
-        }
-        if (Math.abs(wheel_speed[3] - prev_speed[3]) > 0.01) {
-            robot.motor[3].setPower(wheel_speed[3]);
-            prev_speed[3] = wheel_speed[3];
+        for (int i=0; i<4; i++) {
+//            if (rate < Math.abs(wheel_speed[i] - prev_speed[i])) {
+//                if (wheel_speed[i] < prev_speed[i]) {
+//                    wheel_speed[i] =  prev_speed[i] - rate;
+//                }
+//                if (wheel_speed[i] > prev_speed[i]) {
+//                    wheel_speed[i] =  prev_speed[i] + rate;
+//                }
+//            }
+            if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.01) {
+                robot.motor[i].setPower(WMath.clamp(wheel_speed[i], -1, 1));
+                prev_speed[i] = wheel_speed[i];
+            }
         }
     }
 

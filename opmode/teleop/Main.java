@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
+import android.os.Build;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -181,9 +183,9 @@ public class Main extends CommandOpMode {
         }
         robot.read();
 
-        Vector2D local_vector = new Vector2D(controller1.getLeftX(), controller1.getLeftY(),
+        Vector2D input_vector = new Vector2D(controller1.getLeftX(), controller1.getLeftY(),
                 WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
-        if (SLOW_MODE) local_vector.scale(0.5);
+        if (SLOW_MODE) input_vector.scale(0.5);
 
         //left trigger gets precedent
         if (controller1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -207,7 +209,7 @@ public class Main extends CommandOpMode {
         super.run();
         robot.periodic();
 
-        robot.drivetrain.move(local_vector, controller1.getRightX() * (SLOW_MODE ? 0.5 : 1));
+        robot.drivetrain.move(input_vector, controller1.getRightX() * (SLOW_MODE ? 0.5 : 1));
         robot.write();
         robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
 
