@@ -44,7 +44,7 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     public Global.PropLocation location;
 
     public int[] blue_range =  {0, 50, 120, 25, 200, 255};
-    public int[] red_range = {106, 52, 0, 128, 255, 255};
+    public int[] red_range = {115, 50, 80, 140, 255, 255};
     public static int[] filter_range = new int[6];
 
     public double red_threshold = 1.8;

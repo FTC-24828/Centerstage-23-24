@@ -7,6 +7,7 @@ public class Global {
     public enum State {SCORING, INTERMEDIATE, INTAKE, LAUNCHING, HANGING}
 
     public static final int TETRIX_MOTOR_TPR = 1440;
+    public static final int GOBILDA_ENCODER_TPR = 2000;
     public static double YAW_OFFSET = 0;
 
     public static boolean USING_DASHBOARD;

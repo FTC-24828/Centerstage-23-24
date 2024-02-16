@@ -21,16 +21,16 @@ public class PositionCommand extends CommandBase {
     private final Localizer localizer = robot.localizer;
     private final Pose target_pose;
 
-    public static double xP = 0.3;
-    public static double xD = 0.05;
+    public static double xP = 0.15;
+    public static double xD = 0.03;
 
-    public static double yP = 0.3;
-    public static double yD = 0.05;
+    public static double yP = 0.15;
+    public static double yD = 0.03;
 
     public static double zP = 1.5;
     public static double zD = 0.2;
 
-    public double TRANSLATIONAL_TOLERANCE = 0.3;
+    public double TRANSLATIONAL_TOLERANCE = 0.5;
     public double YAW_TOLERANCE = 0.05;
 
     public static PIDF xController = new PIDF(xP, 0.0, xD);
@@ -90,8 +90,8 @@ public class PositionCommand extends CommandBase {
         double yPower = yController.calculate(robot_pose.y, target_pose.y);
         double zPower = zController.calculate(WMath.wrapAngle(robot_pose.z - target_pose.z));
 
-        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.8, 0.8);
-        zPower = WMath.clamp(zPower, -0.7, 0.7); //TODO: tune this
+        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.5, 0.5);
+        zPower = WMath.clamp(zPower, -0.6, 0.6); //TODO: tune this
 
         return new Pose(translation_vector, zPower);
     }

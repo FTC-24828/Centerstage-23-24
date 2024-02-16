@@ -38,5 +38,4 @@ public class Vector2D {
                 this.y = WMath.clamp(y, min, max);
                 return this;
         }
-
 }

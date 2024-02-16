@@ -170,7 +170,7 @@ public class BlueTest extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        robot.updateYaw();
+//        robot.updateYaw();
         Global.YAW_OFFSET = robot.getYaw();
     }
 }
