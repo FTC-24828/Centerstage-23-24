@@ -18,16 +18,15 @@ import org.opencv.core.Scalar;
 
 @TeleOp(name = "PipelineTest", group = "Utility")
 public class PipelineTest extends LinearOpMode {
+    public static int side = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
         PropPipeline prop_pipeline;
         VisionPortal vision_portal;
-
-        Global.SIDE = Global.Side.RED;
+        
         Global.USING_DASHBOARD = true;
         Global.DEBUG = true;
-
 
         prop_pipeline = new PropPipeline();
         vision_portal = new VisionPortal.Builder()
@@ -45,6 +44,12 @@ public class PipelineTest extends LinearOpMode {
         }
 
         while (opModeInInit()) {
+            if (side == 1) {
+                Global.SIDE = Global.Side.BLUE;
+            } else if (side == 0) {
+                Global.SIDE = Global.Side.RED;
+            }
+
             telemetry.addData("Side", Global.SIDE);
             if (PropPipeline.filter_range != null) {
                 telemetry.addData("filter", PropPipeline.filter_range[0] + "," +

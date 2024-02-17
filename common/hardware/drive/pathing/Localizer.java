@@ -17,17 +17,14 @@ public class Localizer {
     private Pose start;
     private Pose pose;
 
-    public static double WHEEL_RADIUS = 3.96;
-    public static double WHEEL_TOE = 0.7784;
-    public static double TRACK_WIDTH = 6.67;
+    public static double WHEEL_RADIUS = 0.9252;
+    public static double TRACK_WIDTH = 2.1646;
+    public static double MIDDLE_OFFSET = 3.85331;
 
-    private DoubleSupplier p_tr, p_tl, p_br, p_bl;
-    private double _tr, _tl, _br, _bl;
+    private DoubleSupplier left, middle, right;
+    private double _left, _middle, _right, _theta = 0.0;
 
-    public double d_tr;
-    public double d_tl;
-    public double d_br;
-    public double d_bl;
+    public double d_left, d_middle, d_right, d_theta;
 
     double local_dx, local_dy;
 
@@ -37,38 +34,40 @@ public class Localizer {
     }
 
     public void init() {
-        p_tr = () -> robot.doubleSubscriber(Sensors.Encoder.RIGHT_FRONT);
-        p_tl = () -> robot.doubleSubscriber(Sensors.Encoder.LEFT_FRONT);
-        p_br = () -> robot.doubleSubscriber(Sensors.Encoder.RIGHT_REAR);
-        p_bl = () -> robot.doubleSubscriber(Sensors.Encoder.LEFT_REAR);
+        left = () -> robot.doubleSubscriber(Sensors.Encoder.POD_LEFT);
+        middle = () -> robot.doubleSubscriber(Sensors.Encoder.POD_MIDDLE);
+        right = () -> robot.doubleSubscriber(Sensors.Encoder.POD_RIGHT);
         read();
     }
 
     public void read() {
-        _tr = p_tr.getAsDouble();
-        _tl = p_tl.getAsDouble();
-        _br = p_br.getAsDouble();
-        _bl = p_bl.getAsDouble();
+        _left = left.getAsDouble();
+        _middle = middle.getAsDouble();
+        _right = right.getAsDouble();
+        _theta = pose.z;
     }
 
     public void update() {
-         d_tr = ticksToInches(p_tr.getAsDouble() - _tr);
-         d_tl = ticksToInches(p_tl.getAsDouble() - _tl);
-         d_br = ticksToInches(p_br.getAsDouble() - _br);
-         d_bl = ticksToInches(p_bl.getAsDouble() - _bl);
+         d_left = ticksToInches(left.getAsDouble() - _left);
+         d_middle = ticksToInches(middle.getAsDouble() - _middle);
+         d_right = ticksToInches(right.getAsDouble() - _right);
 
-        this.pose.z = WMath.wrapAngle(pose.z + (d_tr + d_tl - d_br - d_bl) / (4.0 * Math.PI * TRACK_WIDTH));
-        local_dx = Math.sin(WHEEL_TOE) * (d_tr - d_tl + d_br - d_bl) / 4.0;
-        local_dy = Math.cos(WHEEL_TOE) * (d_tr + d_tl + d_br + d_bl) / 4.0;
+        pose.z = WMath.wrapAngle(pose.z + (d_left - d_right) / (Math.PI * TRACK_WIDTH));
+        d_theta = pose.z - _theta;
+        if (Math.abs(d_theta) > 1)
+            d_theta -= Math.signum(d_theta) * WMath.twoPI;
+
+        local_dx = d_middle - MIDDLE_OFFSET * d_theta;
+        local_dy = (d_left + d_right) * 0.5;
         Vector2D translated = new Vector2D(local_dx, local_dy, -pose.z);
+//        Vector2D translated = new Vector2D(local_dx, local_dy, 0);
         pose.x += translated.x;
         pose.y += translated.y;
-
         read();
     }
 
     private double ticksToInches(double ticks) {
-        return WHEEL_RADIUS * 2 * Math.PI * ticks / Global.TETRIX_MOTOR_TPR;
+        return WHEEL_RADIUS * 2 * Math.PI * ticks / Global.GOBILDA_ENCODER_TPR;
     }
 
     public void reset(Pose p) {

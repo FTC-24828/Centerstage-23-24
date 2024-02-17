@@ -60,11 +60,11 @@ public class RedFarAuto extends CommandOpMode {
 //            telemetry.update();
 //        }
 
-        while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
-            telemetry.addLine("Ready");
-            telemetry.update();
-        }
+//        while (!isStarted()) {
+//            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+//            telemetry.addLine("Ready");
+//            telemetry.update();
+//        }
 
         robot.resetYaw();
 
@@ -72,26 +72,29 @@ public class RedFarAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose left_spike = new Pose();
 
-        Global.PropLocation chosen = Global.PropLocation.CENTER;
 
-        switch (chosen) {
-            case LEFT:
-                purple_pose = new Pose(4.5, 28, Math.PI / 2);
-                left_spike = new Pose(-1.5, 28, Math.PI / 2);
-                yellow_pose = new Pose(59.5, 30, Math.PI / 2);
-                break;
-            case  CENTER:
-                purple_pose = new Pose(10, 41, Math.PI / 2);
-                left_spike = purple_pose;
-                yellow_pose = new Pose(57, 25, Math.PI / 2);
-                break;
-            default:
-                purple_pose = new Pose(21, 25, Math.PI / -2);
-                left_spike = purple_pose;
-                yellow_pose = new Pose(59.5, 22, Math.PI / 2);
+//        switch (robot.pipeline.getPropLocation()) {
+//            case LEFT:
+//                purple_pose = new Pose(3, 25, Math.PI / 2);
+//                left_spike = new Pose(-1, 25, Math.PI / 2);
+//                yellow_pose = new Pose(6, 37, Math.PI / 2);
+//                break;
+//            case CENTER:
+//                purple_pose = new Pose(14, 37, Math.PI / 2);
+//                left_spike = purple_pose;
+//                yellow_pose = new Pose(26, 32.5, Math.PI / 2);
+//                break;
+//            default:
+//                purple_pose = new Pose(21, 25, Math.PI / 2);
+//                left_spike = purple_pose;
+//                yellow_pose = new Pose(26, 25, Math.PI / 2);
+//
+//                break;
+//        }
 
-                break;
-        }
+                purple_pose = new Pose(14, 37, Math.PI / 2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(26, 32.5, Math.PI / 2);
 
 //        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
 //        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
@@ -169,7 +172,7 @@ public class RedFarAuto extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        robot.updateYaw();
+//        robot.updateYaw();
         Global.YAW_OFFSET = robot.getYaw();
     }
 }

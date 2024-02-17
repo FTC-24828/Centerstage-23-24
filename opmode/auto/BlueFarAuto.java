@@ -56,10 +56,10 @@ public class BlueFarAuto extends CommandOpMode {
 
         robot.read();
 
-        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
-            telemetry.addLine("Autonomous initializing...");
-            telemetry.update();
-        }
+//        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
+//            telemetry.addLine("Autonomous initializing...");
+//            telemetry.update();
+//        }
 
         while (!isStarted()) {
             telemetry.addData("Path:", robot.pipeline.getPropLocation());
@@ -73,24 +73,28 @@ public class BlueFarAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose right_spike;
 
-        switch (robot.pipeline.getPropLocation()) {
-            case LEFT:
-                purple_pose = new Pose(-21, 25, -Math.PI / 2);
-                right_spike = purple_pose;
-                yellow_pose = new Pose(-26, 25, -Math.PI / 2);
-                break;
-            case CENTER:
+//        switch (robot.pipeline.getPropLocation()) {
+//            case LEFT:
+//                purple_pose = new Pose(-21, 25, -Math.PI / 2);
+//                right_spike = purple_pose;
+//                yellow_pose = new Pose(-26, 25, -Math.PI / 2);
+//                break;
+//            case CENTER:
+//                purple_pose = new Pose(-14, 37, -Math.PI / 2);
+//                right_spike = purple_pose;
+//                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
+//                break;
+//            default:
+//                purple_pose = new Pose(-3, 25, -Math.PI / 2);
+//                right_spike = new Pose(1, 25, -Math.PI / 2);
+//                yellow_pose = new Pose(-26, 37, -Math.PI / 2);
+//
+//                break;
+//        }
+
                 purple_pose = new Pose(-14, 37, -Math.PI / 2);
                 right_spike = purple_pose;
                 yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
-                break;
-            default:
-                purple_pose = new Pose(-3, 25, -Math.PI / 2);
-                right_spike = new Pose(1, 25, -Math.PI / 2);
-                yellow_pose = new Pose(-26, 37, -Math.PI / 2);
-
-                break;
-        }
 
         Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
         Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
@@ -167,7 +171,7 @@ public class BlueFarAuto extends CommandOpMode {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        robot.updateYaw();
+//        robot.updateYaw();
         Global.YAW_OFFSET = robot.getYaw();
     }
 }

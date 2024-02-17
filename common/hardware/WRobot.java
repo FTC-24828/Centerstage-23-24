@@ -9,14 +9,17 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.configuration.LynxConstants;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Localizer;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
@@ -45,7 +48,9 @@ public class WRobot {
 
     //drivetrain
     public DcMotorEx[] motor = new DcMotorEx[4];
-    public WEncoder[] motor_encoder = new WEncoder[4];
+    public WEncoder pod_left;
+    public WEncoder pod_middle;
+    public WEncoder pod_right;
     public Localizer localizer;
 
     //arm
@@ -71,10 +76,10 @@ public class WRobot {
 
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
-    private BNO055IMU imu;
+    private IMU imu;
     public Thread imu_thread;
     public double imu_offset = 0;
-    private volatile double yaw = 0;
+    private double yaw = 0;
 
     public List<LynxModule> hubs;
     public LynxModule control_hub;
@@ -113,15 +118,25 @@ public class WRobot {
         this.telemetry = (Global.USING_DASHBOARD) ? new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry()) : telemetry;
 
         if (Global.USING_IMU) {
-            synchronized (imu_lock) {
-                imu = hardware_map.get(BNO055IMU.class, "imu");
-                BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-                parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-                imu.initialize(parameters);
-            }
-            //imu_thread.setDaemon(true);
-            resetYaw();
+            imu = hardware_map.get(IMU.class, "imu");
+            imu.initialize(new IMU.Parameters(
+                    new RevHubOrientationOnRobot(
+                            RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                            RevHubOrientationOnRobot.UsbFacingDirection.UP
+                    )
+            ));
+            imu.resetYaw();
         }
+//        if (Global.USING_IMU) {
+//            synchronized (imu_lock) {
+//                imu = hardware_map.get(BNO055IMU.class, "imu");
+//                BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//                parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+//                imu.initialize(parameters);
+//            }
+//            //imu_thread.setDaemon(true);
+//            resetYaw();
+//        }
 
         if (Global.USING_WEBCAM) {
             pipeline = new PropPipeline();
@@ -143,14 +158,12 @@ public class WRobot {
         motor[1] = hardware_map.get(DcMotorEx.class, "motorRearRight");
         motor[2] = hardware_map.get(DcMotorEx.class, "motorRearLeft");
         motor[3] = hardware_map.get(DcMotorEx.class, "motorFrontLeft");
-        motor_encoder[0] = new WEncoder(new MotorEx(hardware_map, "motorFrontRight").encoder);
-        motor_encoder[1] = new WEncoder(new MotorEx(hardware_map, "motorRearRight").encoder);
-        motor_encoder[2] = new WEncoder(new MotorEx(hardware_map, "motorRearLeft").encoder);
-        motor_encoder[3] = new WEncoder(new MotorEx(hardware_map, "motorFrontLeft").encoder);
-        encoder_readings.put(Sensors.Encoder.LEFT_FRONT, 0);
-        encoder_readings.put(Sensors.Encoder.RIGHT_FRONT, 0);
-        encoder_readings.put(Sensors.Encoder.LEFT_REAR, 0);
-        encoder_readings.put(Sensors.Encoder.RIGHT_REAR, 0);
+        pod_left = new WEncoder(new MotorEx(hardware_map, "motorFrontRight").encoder);
+        pod_middle = new WEncoder(new MotorEx(hardware_map, "podMiddle").encoder);
+        pod_right = new WEncoder(new MotorEx(hardware_map, "motorRearRight").encoder);
+        encoder_readings.put(Sensors.Encoder.POD_LEFT, 0.0);
+        encoder_readings.put(Sensors.Encoder.POD_MIDDLE, 0.0);
+        encoder_readings.put(Sensors.Encoder.POD_RIGHT, 0.0);
         drivetrain.init(motor);
         localizer.init();
 
@@ -241,10 +254,9 @@ public class WRobot {
         if (hang != null) encoder_readings.put(Sensors.Encoder.HANG_ENCODER, hang_encoder.getPosition());
 
         if (Global.IS_AUTO) {
-            encoder_readings.put(Sensors.Encoder.LEFT_FRONT, motor_encoder[0].getPosition());
-            encoder_readings.put(Sensors.Encoder.RIGHT_FRONT, motor_encoder[1].getPosition());
-            encoder_readings.put(Sensors.Encoder.LEFT_REAR, motor_encoder[2].getPosition());
-            encoder_readings.put(Sensors.Encoder.RIGHT_REAR, motor_encoder[3].getPosition());
+            encoder_readings.put(Sensors.Encoder.POD_LEFT, -pod_left.getPosition());
+            encoder_readings.put(Sensors.Encoder.POD_MIDDLE, -pod_middle.getPosition());
+            encoder_readings.put(Sensors.Encoder.POD_RIGHT, pod_right.getPosition());
             localizer.update();
         }
 
@@ -279,7 +291,7 @@ public class WRobot {
             imu_thread = new Thread(() -> {
                 while (predicate.getAsBoolean()) {
                     synchronized (imu_lock) {
-                        yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
+                        yaw = WMath.wrapAngle(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
                     }
                 }
             });
@@ -287,12 +299,12 @@ public class WRobot {
         }
     }
 
-    public void updateYaw() {
-        yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
-    }
+//    public void updateYaw() {
+//        yaw = WMath.wrapAngle(imu.getAngularOrientation().firstAngle - imu_offset);
+//    }
 
     public void resetYaw() {
-        if (Global.USING_IMU) imu_offset = yaw;
+        imu.resetYaw();
     }
 
     public double getYaw() {
