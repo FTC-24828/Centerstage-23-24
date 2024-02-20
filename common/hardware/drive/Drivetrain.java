@@ -16,8 +16,6 @@ public class Drivetrain implements WSubsystem {
     public double[] wheel_speed = new double[4];
     private final double[] prev_speed = new double[4];
 
-    private final double rate = 0.25;
-
     public void init (DcMotorEx[] motor) {
 //      set drivetrain properties
         motor[0].setDirection(DcMotorSimple.Direction.FORWARD);
@@ -36,6 +34,9 @@ public class Drivetrain implements WSubsystem {
 
         motor[3].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor[3].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robot.middle_port.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.middle_port.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motor[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor[1].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -56,15 +57,10 @@ public class Drivetrain implements WSubsystem {
 
     public void write() {
         for (int i=0; i<4; i++) {
-//            if (rate < Math.abs(wheel_speed[i] - prev_speed[i])) {
-//                if (wheel_speed[i] < prev_speed[i]) {
-//                    wheel_speed[i] =  prev_speed[i] - rate;
-//                }
-//                if (wheel_speed[i] > prev_speed[i]) {
-//                    wheel_speed[i] =  prev_speed[i] + rate;
-//                }
-//            }
-            if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.01) {
+            if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.05) {
+                if (!Global.IS_AUTO)
+                    wheel_speed[i] =  prev_speed[i] + 0.12 * Math.signum(wheel_speed[i] - prev_speed[i]);
+
                 robot.motor[i].setPower(WMath.clamp(wheel_speed[i], -1, 1));
                 prev_speed[i] = wheel_speed[i];
             }
@@ -72,7 +68,6 @@ public class Drivetrain implements WSubsystem {
     }
 
     public void reset() {
-
     }
 
     public void move(Pose pose) {

@@ -9,7 +9,10 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.subsystemcommand.drone.DroneResetCommand;
@@ -29,6 +32,7 @@ import org.firstinspires.ftc.teamcode.commands.telecommand.IntakeSequence;
 import org.firstinspires.ftc.teamcode.commands.telecommand.IntermediateSequence;
 import org.firstinspires.ftc.teamcode.commands.telecommand.HangRetractCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.Sensors;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
@@ -58,7 +62,7 @@ public class Main extends CommandOpMode {
 
         Global.IS_AUTO = false;
         Global.USING_DASHBOARD = false;
-        Global.DEBUG = false;
+        Global.DEBUG = true;
         Global.USING_IMU = true;
         Global.USING_WEBCAM = false;
 
@@ -185,7 +189,7 @@ public class Main extends CommandOpMode {
 
         Vector2D input_vector = new Vector2D(controller1.getLeftX(), controller1.getLeftY(),
                 WMath.wrapAngle(robot.getYaw() - INITIAL_YAW));
-        if (SLOW_MODE) input_vector.scale(0.5);
+        if (SLOW_MODE) input_vector.scale(0.4);
 
         //left trigger gets precedent
         if (controller1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
@@ -209,9 +213,9 @@ public class Main extends CommandOpMode {
         super.run();
         robot.periodic();
 
-        robot.drivetrain.move(input_vector, controller1.getRightX() * (SLOW_MODE ? 0.5 : 1));
+        robot.drivetrain.move(input_vector, controller1.getRightX() * (SLOW_MODE ? 0.4 : 1));
         robot.write();
-        robot.clearBulkCache(Global.Hub.EXPANSION_HUB);
+        robot.clearBulkCache(Global.Hub.CONTROL_HUB);
 
         double loop = System.nanoTime();
         telemetry.addData("Timer", "%.0f", timer.seconds());
@@ -228,20 +232,20 @@ public class Main extends CommandOpMode {
             telemetry.addData("arm power", robot.arm.power);
             telemetry.addData("arm state", robot.arm.getArmState());
             telemetry.addData("arm angle", "%.2f", Math.toDegrees(robot.arm.arm_angle.getAsDouble()));
-
+            telemetry.addData("arm encoder reading", "%.2f", robot.encoder_readings.get(Sensors.Encoder.ARM_ENCODER));
 
             telemetry.addLine("---------------------------");
             telemetry.addData("wrist target", robot.intake.target_position);
             telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
 
-            telemetry.addLine("---------------------------");
-            telemetry.addData("hang state", robot.hang.hang_state);
-            telemetry.addData("hang power", robot.hang.power);
-            telemetry.addData("hook position", robot.hook.getPosition());
-
-            telemetry.addLine("---------------------------");
-            telemetry.addData("drone state", robot.drone.drone_state);
-            telemetry.addData("drone state", robot.trigger.getPosition());
+//            telemetry.addLine("---------------------------");
+//            telemetry.addData("hang state", robot.hang.hang_state);
+//            telemetry.addData("hang power", robot.hang.power);
+//            telemetry.addData("hook position", robot.hook.getPosition());
+//
+//            telemetry.addLine("---------------------------");
+//            telemetry.addData("drone state", robot.drone.drone_state);
+//            telemetry.addData("drone state", robot.trigger.getPosition());
         }
 
         telemetry.update();
