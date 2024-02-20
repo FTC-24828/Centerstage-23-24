@@ -17,9 +17,10 @@ public class Localizer {
     private Pose start;
     private Pose pose;
 
-    public static double WHEEL_RADIUS = 0.9252;
-    public static double TRACK_WIDTH = 2.1646;
-    public static double MIDDLE_OFFSET = 3.85331;
+    public static double WHEEL_RADIUS = 0.952;
+    public static double TRACK_WIDTH = 7.0;
+    public static double MIDDLE_OFFSET = 4.563;
+    public static double SIDES_OFFSET = 2;
 
     private DoubleSupplier left, middle, right;
     private double _left, _middle, _right, _theta = 0.0;
@@ -52,15 +53,12 @@ public class Localizer {
          d_middle = ticksToInches(middle.getAsDouble() - _middle);
          d_right = ticksToInches(right.getAsDouble() - _right);
 
-        pose.z = WMath.wrapAngle(pose.z + (d_left - d_right) / (Math.PI * TRACK_WIDTH));
-        d_theta = pose.z - _theta;
-        if (Math.abs(d_theta) > 1)
-            d_theta -= Math.signum(d_theta) * WMath.twoPI;
+        d_theta = (d_left - d_right) / TRACK_WIDTH;
+        pose.z = WMath.wrapAngle(pose.z + d_theta);
 
         local_dx = d_middle - MIDDLE_OFFSET * d_theta;
         local_dy = (d_left + d_right) * 0.5;
         Vector2D translated = new Vector2D(local_dx, local_dy, -pose.z);
-//        Vector2D translated = new Vector2D(local_dx, local_dy, 0);
         pose.x += translated.x;
         pose.y += translated.y;
         read();
@@ -77,6 +75,7 @@ public class Localizer {
 
     public void reset() {
         reset(new Pose());
+        robot.drivetrain.reset();
     }
 
     public void setStart(Pose pose) {
