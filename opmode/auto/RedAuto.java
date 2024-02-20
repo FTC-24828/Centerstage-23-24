@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.Sensors;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
@@ -37,8 +38,8 @@ public class RedAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = true;
         Global.USING_DASHBOARD = false;
-        Global.USING_WEBCAM = true;
-        Global.DEBUG = false;
+        Global.USING_WEBCAM = false;
+        Global.DEBUG = true;
         Global.SIDE = Global.Side.RED;
 
         robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
@@ -53,20 +54,26 @@ public class RedAuto extends CommandOpMode {
             FtcDashboard.getInstance().startCameraStream(robot.pipeline, 0);
         }
 
-        robot.localizer.reset(new Pose(0, 0, Math.PI));
-
+        robot.localizer.reset(new Pose(0, 0, -Math.PI));
         robot.read();
 
-//        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
-//            telemetry.addLine("Autonomous initializing...");
-//            telemetry.update();
-//        }
+        if (Global.USING_WEBCAM) {
+            while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
+                telemetry.addLine("Autonomous initializing...");
+                telemetry.update();
+            }
+        }
 
-//        while (!isStarted()) {
+        while (!isStarted()) {
 //            telemetry.addData("Path:", robot.pipeline.getPropLocation());
-//            telemetry.addLine("Ready");
-//            telemetry.update();
-//        }
+            telemetry.addData("Pose", robot.localizer.getPose().toString());
+            telemetry.addData("Encoder readings", "%.2f, %.2f, %.2f",
+                    robot.encoder_readings.get(Sensors.Encoder.POD_LEFT),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_MIDDLE),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_RIGHT));
+            telemetry.addLine("Ready");
+            telemetry.update();
+        }
 
         robot.resetYaw();
 
@@ -109,9 +116,9 @@ public class RedAuto extends CommandOpMode {
                                 .andThen(new PositionCommand(left_spike))
                                 .andThen(new PurplePixelSequence()),
 
-                        //yellow deposit
-                        new PositionCommand(yellow_pose)
-                                .andThen(new YellowPixelSequence()),
+//                        //yellow deposit
+//                        new PositionCommand(yellow_pose)
+//                                .andThen(new YellowPixelSequence()),
 
 //                        //go to first stack
 //                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2)),
@@ -126,15 +133,17 @@ public class RedAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        new PositionCommand(new Pose(35, 3, Math.PI / 2)),
+//                        new PositionCommand(new Pose(35, 3, Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
                 )
         );
 
-        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-        robot.vision_portal.close();
+        if (Global.USING_WEBCAM) {
+            robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+            robot.vision_portal.close();
+        }
     }
 
 
@@ -144,7 +153,7 @@ public class RedAuto extends CommandOpMode {
         super.run();
         robot.periodic();
         robot.write();
-        robot.clearBulkCache(Global.Hub.BOTH);
+        robot.clearBulkCache(Global.Hub.CONTROL_HUB);
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%3.2fhz", 1000000000 / (loop - loop_time));
@@ -153,6 +162,11 @@ public class RedAuto extends CommandOpMode {
         telemetry.addData("Runtime:", "%.2f", end_time == 0 ? timer.seconds() : end_time);
 
         if (Global.DEBUG) {
+            telemetry.addData("Encoder readings", "%.2f, %.2f, %.2f",
+                    robot.encoder_readings.get(Sensors.Encoder.POD_LEFT),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_MIDDLE),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_RIGHT));
+
             telemetry.addLine("---------------------------");
             telemetry.addData("arm target", robot.arm.target_position);
             telemetry.addData("arm power", robot.arm.power);

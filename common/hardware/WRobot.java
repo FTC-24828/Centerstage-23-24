@@ -48,6 +48,7 @@ public class WRobot {
 
     //drivetrain
     public DcMotorEx[] motor = new DcMotorEx[4];
+    public DcMotorEx middle_port;
     public WEncoder pod_left;
     public WEncoder pod_middle;
     public WEncoder pod_right;
@@ -158,6 +159,7 @@ public class WRobot {
         motor[1] = hardware_map.get(DcMotorEx.class, "motorRearRight");
         motor[2] = hardware_map.get(DcMotorEx.class, "motorRearLeft");
         motor[3] = hardware_map.get(DcMotorEx.class, "motorFrontLeft");
+        middle_port = hardware_map.get(DcMotorEx.class, "podMiddle");
         pod_left = new WEncoder(new MotorEx(hardware_map, "motorFrontRight").encoder);
         pod_middle = new WEncoder(new MotorEx(hardware_map, "podMiddle").encoder);
         pod_right = new WEncoder(new MotorEx(hardware_map, "motorRearRight").encoder);
@@ -178,9 +180,9 @@ public class WRobot {
 
 
         //intake
-        wrist = new WServo(hardware_map.get(Servo.class, "wrist")).setWritingOffset(0.2);
-        claw_right = new WServo(hardware_map.get(Servo.class, "servo0"));
-        claw_left = new WServo(hardware_map.get(Servo.class, "servo1"));
+        wrist = new WServo(hardware_map.get(Servo.class, "wrist0")).setWritingOffset(0.2);
+        claw_right = new WServo(hardware_map.get(Servo.class, "clawRight"));
+        claw_left = new WServo(hardware_map.get(Servo.class, "clawLeft"));
         wrist_actuator = new WActuator(wrist::getPosition, wrist);
         intake.init(wrist, claw_left, claw_right);
 
@@ -250,7 +252,7 @@ public class WRobot {
 
     //read encoder values
     public void read () {
-        if (arm != null) encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
+        encoder_readings.put(Sensors.Encoder.ARM_ENCODER, arm_encoder.getPosition());
         if (hang != null) encoder_readings.put(Sensors.Encoder.HANG_ENCODER, hang_encoder.getPosition());
 
         if (Global.IS_AUTO) {

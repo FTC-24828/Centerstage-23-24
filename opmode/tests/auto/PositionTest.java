@@ -56,7 +56,7 @@ public class PositionTest extends CommandOpMode {
                 new SequentialCommandGroup(
                         new InstantCommand(timer::reset),
 
-                        new PositionCommand(new Pose(20, 20, 0)),
+                        new PositionCommand(new Pose(20, 20, Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
