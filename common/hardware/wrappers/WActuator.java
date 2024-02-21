@@ -29,20 +29,20 @@ public class WActuator {
 
     private Supplier<Object> topic;
 
-    public WActuator(HardwareDevice... devices) {
+    public WActuator(HardwareDevice... d) {
         this.topic = null;
         int id = 0;
-        for (HardwareDevice device : devices) {
-            this.devices.put(device.getDeviceName() + " " + id, device);
+        for (HardwareDevice device : d) {
+            this.devices.put(device.getDeviceName() + " " + id++, device);
         }
         read();
     }
 
-    public WActuator(Supplier<Object> topic, HardwareDevice... devices) {
+    public WActuator(Supplier<Object> topic, HardwareDevice... d) {
         this.topic = topic;
         int id = 0;
-        for (HardwareDevice device : devices) {
-            this.devices.put(device.getDeviceName() + " " + id, device);
+        for (HardwareDevice device : d) {
+            this.devices.put(device.getDeviceName() + " " + id++, device);
         }
         read();
     }

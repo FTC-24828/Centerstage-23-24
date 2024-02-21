@@ -56,7 +56,8 @@ public class WRobot {
 
     //arm
     public DcMotorEx lift;
-    public WServo wrist;
+    public WServo wrist0;
+    public WServo wrist1;
     public WActuator arm_actuator;
     public WActuator wrist_actuator;
     public WEncoder arm_encoder;
@@ -69,11 +70,12 @@ public class WRobot {
     public WServo trigger;
 
     //hang
-    public DcMotorEx hang_motor0;
-    public DcMotorEx hang_motor1;
+    public DcMotorEx hang_left;
+    public DcMotorEx hang_right;
     public WEncoder hang_encoder;
     public WActuator hang_actuator;
-    public WServo hook;
+    public WServo hook_left;
+    public WServo hook_right;
 
     private final Object imu_lock = new Object();
     @GuardedBy("imu_lock")
@@ -175,16 +177,17 @@ public class WRobot {
         arm_encoder = new WEncoder(new MotorEx(hardware_map, "lift").encoder);
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, 0);
         arm_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.ARM_ENCODER), lift)
-                .setReadingOffset(-150);
+                .setReadingOffset(-165);
         arm.init(lift);
 
 
         //intake
-        wrist = new WServo(hardware_map.get(Servo.class, "wrist0")).setWritingOffset(0.2);
+        wrist0 = new WServo(hardware_map.get(Servo.class, "wrist0")).setWritingOffset(0.5);
+        wrist1 = new WServo(hardware_map.get(Servo.class, "wrist1")).setWritingOffset(0.5);
         claw_right = new WServo(hardware_map.get(Servo.class, "clawRight"));
         claw_left = new WServo(hardware_map.get(Servo.class, "clawLeft"));
-        wrist_actuator = new WActuator(wrist::getPosition, wrist);
-        intake.init(wrist, claw_left, claw_right);
+        wrist_actuator = new WActuator(wrist0::getPosition, wrist0, wrist1);
+        intake.init(wrist0, wrist1, claw_left, claw_right);
 
         //endgame subsystems
         if (!Global.IS_AUTO) {
@@ -196,13 +199,14 @@ public class WRobot {
 
             //hang
             if (hang != null) {
-                hang_motor0 = hardware_map.get(DcMotorEx.class, "hang0");
-                hang_motor1 = hardware_map.get(DcMotorEx.class, "hang1");
+                hang_left = hardware_map.get(DcMotorEx.class, "hang0");
+                hang_right = hardware_map.get(DcMotorEx.class, "podMiddle");
                 hang_encoder = new WEncoder(new MotorEx(hardware_map, "hang0").encoder);
                 encoder_readings.put(Sensors.Encoder.HANG_ENCODER, 0);
-                hang_actuator = new WActuator(hang_motor0, hang_motor1);
-                hook = new WServo(hardware_map.get(Servo.class, "hook"));
-                hang.init(hang_motor0, hang_motor1, hook);
+                hang_actuator = new WActuator(hang_left, hang_right);
+                hook_left = new WServo(hardware_map.get(Servo.class, "hook0"));
+                hook_right = new WServo(hardware_map.get(Servo.class, "hook1"));
+                hang.init(hang_left, hang_right, hook_left, hook_right);
             }
         }
 
