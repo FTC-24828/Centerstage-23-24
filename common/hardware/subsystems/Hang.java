@@ -17,17 +17,18 @@ public class Hang implements WSubsystem {
     public double power = 0;
     public HangState hang_state = HangState.STOPPED;
 
-    public void init(DcMotorEx winch0, DcMotorEx winch1, WServo hook) {
-        winch0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        winch0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winch0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winch0.setDirection(DcMotorSimple.Direction.FORWARD);
+    public void init(DcMotorEx hang_l, DcMotorEx hang_r, WServo hook_l, WServo hook_r) {
+        hang_l.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hang_l.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hang_l.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang_l.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        winch1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winch1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winch1.setDirection(DcMotorSimple.Direction.REVERSE);
+        hang_r.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hang_r.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        hang_r.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        hook.setDirection(Servo.Direction.FORWARD);
+        hook_l.setDirection(Servo.Direction.REVERSE);
+        hook_r.setDirection(Servo.Direction.FORWARD);
     }
 
     @Override
@@ -59,11 +60,7 @@ public class Hang implements WSubsystem {
     }
 
     public void setHookPosition(double position) {
-        robot.hook.setPosition(position);
-    }
-
-    public void setPowerMotor(double power) {
-        robot.hang_motor0.setPower(power);
-        robot.hang_motor1.setPower(power);
+        robot.hook_left.setPosition(position);
+        robot.hook_right.setPosition(position);
     }
 }

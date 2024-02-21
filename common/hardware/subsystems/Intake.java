@@ -26,41 +26,39 @@ public class Intake implements WSubsystem {
     public double target_position = 0.0;
     public DoubleSupplier wrist_angle;
     public double increment = 0;
-    private double angle_offset = 0.2;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
+    private double angle_offset = 0;      //NOTE: TUNE IF CLAW ANGLE IS WRONG
     public WristState wrist_state = WristState.FOLD;
     public double arm_target_angle;
 
 
-    public void init(WServo wrist, WServo claw0, WServo claw1) {
-        wrist.setDirection(Servo.Direction.FORWARD);
-        angle_offset = robot.wrist.getWritingOffset();
+    public void init(WServo wrist0, WServo wrist1, WServo claw0, WServo claw1) {
+        wrist0.setDirection(Servo.Direction.FORWARD);
+        wrist1.setDirection(Servo.Direction.REVERSE);
+        angle_offset = robot.wrist0.getWritingOffset();
 
         claw0.setDirection(Servo.Direction.REVERSE);
         claw1.setDirection(Servo.Direction.FORWARD);
 
-        claw0.scaleRange(0.7, 0.9);
-        claw1.scaleRange(0.7, 0.9);
+        claw0.scaleRange(0.5, 0.8);
+        claw1.scaleRange(0.2, 0.5);
 
-        wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI / 2 ;
+        wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI ;
     }
 
     public void periodic() {
         //check pivot state and calculate target
         switch (wrist_state) {
             case FLAT:
-                target_position = 0.7;
+                target_position = 0.2;
                 break;
 
             case FOLD:
-                target_position = 3;
+                target_position = 1;
                 break;
 
             case SCORING:
-                if (Global.IS_AUTO)
-                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 5 * angle_offset;
-
-                else
-                    target_position = (WMath.twoPI / 3 - arm_target_angle) + 3 * angle_offset;
+                arm_target_angle = robot.arm.target_position / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI ;
+                target_position = (WMath.twoPI / 3 - arm_target_angle) / 2 + 0.1;
                 break;
 
             case LAUNCHING:
@@ -71,14 +69,13 @@ public class Intake implements WSubsystem {
                 break;
 
             default:
-                target_position = robot.wrist_actuator.getCurrentPosition() - angle_offset;
+                target_position = robot.wrist_actuator.getCurrentPosition();
         }
         robot.wrist_actuator.setTargetPosition(target_position/2); //target_position should be from 1 to -1
     }
 
     public void read() {
         robot.wrist_actuator.read();
-        arm_target_angle = robot.arm.target_position / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI ;
     }
 
     public void write() {

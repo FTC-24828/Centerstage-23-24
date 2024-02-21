@@ -18,12 +18,7 @@ public class HangRetractSequence extends SequentialCommandGroup {
         super(
                 new InstantCommand(() -> Global.setState(Global.State.INTERMEDIATE)),
                 new HookCommand(0),
-                new WristCommand(Intake.WristState.FOLD),
-                new WaitCommand(2000),
-                new ArmSetStateCommand(Arm.ArmState.FLAT),
-                new ArmResetIncrementCommand(),
-                new WaitCommand(300),
-                new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED)
+                new IntermediateSequence()
         );
     }
 }

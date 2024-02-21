@@ -30,7 +30,7 @@ public class Arm implements WSubsystem {
     public final double ARM_LENGTH = 17;
 
     //controllers
-    public static double kP = 0.0008;
+    public static double kP = 0.001;
     public static double kI = 0.0001;
     public static double kD = 0.0002;
     public static double kF = 0.65;
@@ -70,10 +70,6 @@ public class Arm implements WSubsystem {
 
                 case LAUNCHING:
                     target_position = (double) Global.TETRIX_MOTOR_TPR / 3;
-                    break;
-
-                case HANG:
-                    target_position = (double) 5 * Global.TETRIX_MOTOR_TPR / 9;
                     break;
             }
 
