@@ -14,10 +14,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 public class HangSequence extends SequentialCommandGroup {
     public HangSequence() {
         super(
+                new IntermediateSequence(),
                 new InstantCommand(() -> Global.setState(Global.State.HANGING)),
-                new WristCommand(Intake.WristState.LAUNCHING),
-                new ArmSetStateCommand(Arm.ArmState.HANG),
-                new WaitCommand(1000),
+                new WaitCommand(200),
                 new HookCommand(1)
         );
     }

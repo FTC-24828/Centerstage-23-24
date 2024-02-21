@@ -231,15 +231,15 @@ public class Duo extends CommandOpMode {
             telemetry.addLine("---------------------------");
             telemetry.addData("wrist target", robot.intake.target_position);
             telemetry.addData("wrist angle", "%.2f", Math.toDegrees(robot.intake.wrist_angle.getAsDouble()));
-
-            telemetry.addLine("---------------------------");
-            telemetry.addData("hang state", robot.hang.hang_state);
-            telemetry.addData("hang power", robot.hang.power);
-            telemetry.addData("hook position", robot.hook.getPosition());
-
-            telemetry.addLine("---------------------------");
-            telemetry.addData("drone state", robot.drone.drone_state);
-            telemetry.addData("drone state", robot.trigger.getPosition());
+//
+//            telemetry.addLine("---------------------------");
+//            telemetry.addData("hang state", robot.hang.hang_state);
+//            telemetry.addData("hang power", robot.hang.power);
+//            telemetry.addData("hook position", robot.hook.getPosition());
+//
+//            telemetry.addLine("---------------------------");
+//            telemetry.addData("drone state", robot.drone.drone_state);
+//            telemetry.addData("drone state", robot.trigger.getPosition());
         }
 
         telemetry.update();
