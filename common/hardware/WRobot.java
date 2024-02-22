@@ -177,7 +177,7 @@ public class WRobot {
         arm_encoder = new WEncoder(new MotorEx(hardware_map, "lift").encoder);
         encoder_readings.put(Sensors.Encoder.ARM_ENCODER, 0);
         arm_actuator = new WActuator(() -> intSubscriber(Sensors.Encoder.ARM_ENCODER), lift)
-                .setReadingOffset(-165);
+                .setReadingOffset(0);
         arm.init(lift);
 
 

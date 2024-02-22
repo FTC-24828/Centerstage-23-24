@@ -39,8 +39,8 @@ public class Intake implements WSubsystem {
         claw0.setDirection(Servo.Direction.REVERSE);
         claw1.setDirection(Servo.Direction.FORWARD);
 
-        claw0.scaleRange(0.5, 0.8);
-        claw1.scaleRange(0.2, 0.5);
+        claw0.scaleRange(0.4, 0.8);
+        claw1.scaleRange(0.2, 0.6);
 
         wrist_angle = () -> (robot.wrist_actuator.getCurrentPosition() - angle_offset) * Math.PI ;
     }
