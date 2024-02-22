@@ -21,17 +21,17 @@ public class PositionCommand extends CommandBase {
     private final Localizer localizer = robot.localizer;
     private final Pose target_pose;
 
-    public static double xP = 0.1;
+    public static double xP = 0.2;
     public static double xD = 0.02;
 
-    public static double yP = 0.1;
+    public static double yP = 0.2;
     public static double yD = 0.02;
 
     public static double zP = 1.5;
     public static double zD = 0.2;
 
     public double TRANSLATIONAL_TOLERANCE = 0.5;
-    public double YAW_TOLERANCE = 0.02;
+    public double YAW_TOLERANCE = 0.01;
 
     public static PIDF xController = new PIDF(xP, 0.0, xD);
     public static PIDF yController = new PIDF(yP, 0.0, yD);
