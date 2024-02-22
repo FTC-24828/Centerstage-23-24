@@ -103,8 +103,8 @@ public class RedFarAuto extends CommandOpMode {
                 left_spike = purple_pose;
                 yellow_pose = new Pose(26, 32.5, Math.PI / 2);
 
-//        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
-//        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
+        Pose first_stack_pose = new Pose(79, 58, Math.PI / 2);
+        Pose first_stack_deposit = new Pose(-29, 31.5, Math.PI / 2);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -115,14 +115,14 @@ public class RedFarAuto extends CommandOpMode {
                                 .andThen(new PositionCommand(left_spike))
                                 .andThen(new PurplePixelSequence()),
 
-//                        //yellow deposit
-//                        new PositionCommand(yellow_pose)
-//                                .andThen(new YellowPixelSequence()),
+                        //yellow deposit
+                        new PositionCommand(yellow_pose)
+                                .andThen(new YellowPixelSequence()),
 
-//                        //go to first stack
-//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2)),
-//                        new PositionCommand(first_stack_pose)
-//                                .alongWith(new FirstStackSetup()),
+                        //go to first stack
+                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2)),
+                        new PositionCommand(first_stack_pose)
+                                .alongWith(new FirstStackSetup()),
 
 //                        new FirstStackGrabCommand(),
 //                        new WaitCommand(500),

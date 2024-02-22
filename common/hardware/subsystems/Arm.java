@@ -65,7 +65,7 @@ public class Arm implements WSubsystem {
                     break;
 
                 case SCORING:
-                    target_position = (double) Global.TETRIX_MOTOR_TPR + increment;
+                    target_position = (double) Global.TETRIX_MOTOR_TPR + increment + 500;
                     break;
 
                 case LAUNCHING:
