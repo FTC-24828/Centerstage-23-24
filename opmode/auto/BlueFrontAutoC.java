@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Blue Close Auto")
-public class BlueCloseAuto extends CommandOpMode {
+@Autonomous(name = "Blue Front Auto Center")
+public class BlueFrontAutoC extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -36,7 +36,7 @@ public class BlueCloseAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = true;
         Global.USING_DASHBOARD = false;
-        Global.USING_WEBCAM = true;
+        Global.USING_WEBCAM = false;
         Global.DEBUG = false;
         Global.SIDE = Global.Side.BLUE;
 
@@ -62,7 +62,7 @@ public class BlueCloseAuto extends CommandOpMode {
 //       }
 
         while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+//            telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addLine("Ready");
             telemetry.update();
         }
@@ -73,24 +73,23 @@ public class BlueCloseAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose right_spike;
 
-        Global.PropLocation chosen = Global.PropLocation.RIGHT;
+        Global.PropLocation chosen = Global.PropLocation.CENTER;
 
         switch (chosen) {
             case LEFT:
-                purple_pose = new Pose(-21, 25, -Math.PI / 2);
+                purple_pose = new Pose(-22, 25, Math.PI/2);
                 right_spike = purple_pose;
-                yellow_pose = new Pose(-26, 25, -Math.PI / 2);
+                yellow_pose = new Pose(-29, 19, Math.PI/2);
                 break;
             case CENTER:
-                purple_pose = new Pose(-14, 37, -Math.PI / 2);
+                purple_pose = new Pose(-17, 38, Math.PI/2);
                 right_spike = purple_pose;
-                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
+                yellow_pose = new Pose(-29, 27, 1.35);
                 break;
             default:
-                purple_pose = new Pose(-3, 25, -Math.PI / 2);
-                right_spike = new Pose(1, 25, -Math.PI / 2);
-                yellow_pose = new Pose(-26, 37, -Math.PI / 2);
-
+                purple_pose = new Pose(0, 27, Math.PI/2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 32, 1.4);
                 break;
         }
 
@@ -130,13 +129,13 @@ public class BlueCloseAuto extends CommandOpMode {
                 )
         );
 
-        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-        robot.vision_portal.close();
+//        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+//        robot.vision_portal.close();
     }
 
 
     @Override
-    public void run() {
+    public void reset() {
         robot.read();
         super.run();
         robot.periodic();
@@ -165,7 +164,7 @@ public class BlueCloseAuto extends CommandOpMode {
     }
 
     @Override
-    public void reset() {
+    public void run() {
         super.reset();
         robot.reset();
         Global.resetGlobals();

@@ -18,7 +18,7 @@ public class Localizer {
     private Pose pose;
 
     public static double WHEEL_RADIUS = 0.952;
-    public static double TRACK_WIDTH = 7.0;
+    public static double TRACK_WIDTH = 7.35;
     public static double MIDDLE_OFFSET = 4.563;
     public static double SIDES_OFFSET = 2;
 

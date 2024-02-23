@@ -18,9 +18,10 @@ import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
+import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Red Close Auto")
-public class RedCloseAuto extends CommandOpMode {
+@Autonomous(name = "Blue Front Auto")
+public class BlueFrontAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -35,9 +36,9 @@ public class RedCloseAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = true;
         Global.USING_DASHBOARD = false;
-        Global.USING_WEBCAM = true;
+        Global.USING_WEBCAM = false;
         Global.DEBUG = false;
-        Global.SIDE = Global.Side.RED;
+        Global.SIDE = Global.Side.BLUE;
 
         robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
@@ -58,10 +59,10 @@ public class RedCloseAuto extends CommandOpMode {
 //        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
 //            telemetry.addLine("Autonomous initializing...");
 //            telemetry.update();
-//        }
+//       }
 
         while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+//            telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addLine("Ready");
             telemetry.update();
         }
@@ -70,30 +71,30 @@ public class RedCloseAuto extends CommandOpMode {
 
         Pose purple_pose;
         Pose yellow_pose;
-        Pose left_spike = new Pose();
+        Pose right_spike;
 
         Global.PropLocation chosen = Global.PropLocation.RIGHT;
 
         switch (chosen) {
             case LEFT:
-                purple_pose = new Pose(4.5, 28, Math.PI / 2);
-                left_spike = new Pose(-1.5, 28, Math.PI / 2);
-                yellow_pose = new Pose(27, 30, Math.PI / 2);
+                purple_pose = new Pose(-22, 25, Math.PI/2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 19, Math.PI/2);
                 break;
-            case  CENTER:
-                purple_pose = new Pose(14.5, 41, Math.PI / 2);
-                left_spike = purple_pose;
-                yellow_pose = new Pose(27, 24.5, Math.PI / 2);
+            case CENTER:
+                purple_pose = new Pose(-17, 38, Math.PI/2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 27, 1.35);
                 break;
             default:
-                purple_pose = new Pose(22, 10, Math.PI / 2);
-                left_spike = new Pose(20.5, 41, Math.PI / 2);
-                yellow_pose = new Pose(27, 20.5, Math.PI / 2);
+                purple_pose = new Pose(0, 27, Math.PI/2);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 32, 1.4);
                 break;
         }
 
-//        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
-//        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
+        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
+        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -101,7 +102,7 @@ public class RedCloseAuto extends CommandOpMode {
 
                         //purple deposit
                         new PositionCommand(purple_pose)
-                                .andThen(new PositionCommand(left_spike))
+                                .andThen(new PositionCommand(right_spike))
                                 .andThen(new PurplePixelSequence()),
 
                         //yellow deposit
@@ -109,10 +110,10 @@ public class RedCloseAuto extends CommandOpMode {
                                 .andThen(new YellowPixelSequence()),
 
 //                        //go to first stack
-//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2)),
+//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2, 0.05),
 //                        new PositionCommand(first_stack_pose)
 //                                .alongWith(new FirstStackSetup()),
-
+//
 //                        new FirstStackGrabCommand(),
 //                        new WaitCommand(500),
 //
@@ -121,22 +122,20 @@ public class RedCloseAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        //new PositionCommand(new Pose(35, 3, Math.PI / 2)),
-                        //temporary recall because I got too lazy
-                        new PositionCommand(new Pose(0, 0, Math.PI / -1)),
+                        new PositionCommand(new Pose(-35, 3, -Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
                 )
         );
 
-        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-        robot.vision_portal.close();
+//        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+//        robot.vision_portal.close();
     }
 
 
     @Override
-    public void run() {
+    public void reset() {
         robot.read();
         super.run();
         robot.periodic();
@@ -165,11 +164,11 @@ public class RedCloseAuto extends CommandOpMode {
     }
 
     @Override
-    public void reset() {
+    public void run() {
         super.reset();
         robot.reset();
         Global.resetGlobals();
-        robot.updateYaw();
+//        robot.updateYaw();
         Global.YAW_OFFSET = robot.getYaw();
     }
 }

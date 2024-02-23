@@ -9,19 +9,22 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackSetup;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PositionCommand;
 import org.firstinspires.ftc.teamcode.commands.autocommand.PurplePixelSequence;
 import org.firstinspires.ftc.teamcode.commands.autocommand.YellowPixelSequence;
+import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackDeposit;
+import org.firstinspires.ftc.teamcode.commands.autocommand.FirstStackGrabCommand;
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.Sensors;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
-import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
-import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.teamcode.common.hardware.drive.pathing.Pose;
 
-@Autonomous(name = "Blue Far Auto")
-public class BlueFarAuto extends CommandOpMode {
+@Autonomous(name = "Red Front Auto")
+public class RedFrontAuto extends CommandOpMode {
 
     private final WRobot robot = WRobot.getInstance();
 
@@ -36,9 +39,9 @@ public class BlueFarAuto extends CommandOpMode {
         Global.IS_AUTO = true;
         Global.USING_IMU = true;
         Global.USING_DASHBOARD = false;
-        Global.USING_WEBCAM = true;
+        Global.USING_WEBCAM = false;
         Global.DEBUG = false;
-        Global.SIDE = Global.Side.BLUE;
+        Global.SIDE = Global.Side.RED;
 
         robot.addSubsystem(new Drivetrain(), new Arm(), new Intake());
         robot.init(hardwareMap, telemetry);
@@ -52,20 +55,21 @@ public class BlueFarAuto extends CommandOpMode {
             FtcDashboard.getInstance().startCameraStream(robot.pipeline, 0);
         }
 
-        robot.localizer.reset(new Pose(0, 0, Math.PI));
-
+        robot.localizer.reset(new Pose(0, 0, -Math.PI));
         robot.read();
 
-        if (Global.USING_WEBCAM) {
-            while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
-                telemetry.addLine("Autonomous initializing...");
-                telemetry.update();
-            }
-        }
+//        while (robot.vision_portal.getCameraState() != VisionPortal.CameraState.STREAMING && robot.pipeline.getPropLocation() == null) {
+//            telemetry.addLine("Autonomous initializing...");
+//            telemetry.update();
+//        }
 
         while (!isStarted()) {
-            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+//            telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addData("Pose", robot.localizer.getPose().toString());
+            telemetry.addData("Encoder readings", "%.2f, %.2f, %.2f",
+                    robot.encoder_readings.get(Sensors.Encoder.POD_LEFT),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_MIDDLE),
+                    robot.encoder_readings.get(Sensors.Encoder.POD_RIGHT));
             telemetry.addLine("Ready");
             telemetry.update();
         }
@@ -74,33 +78,30 @@ public class BlueFarAuto extends CommandOpMode {
 
         Pose purple_pose;
         Pose yellow_pose;
-        Pose right_spike;
+        Pose left_spike = new Pose();
 
-//        switch (robot.pipeline.getPropLocation()) {
-//            case LEFT:
-//                purple_pose = new Pose(-21, 25, -Math.PI / 2);
-//                right_spike = purple_pose;
-//                yellow_pose = new Pose(-26, 25, -Math.PI / 2);
-//                break;
-//            case CENTER:
-//                purple_pose = new Pose(-14, 37, -Math.PI / 2);
-//                right_spike = purple_pose;
-//                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
-//                break;
-//            default:
-//                purple_pose = new Pose(-3, 25, -Math.PI / 2);
-//                right_spike = new Pose(1, 25, -Math.PI / 2);
-//                yellow_pose = new Pose(-26, 37, -Math.PI / 2);
-//
-//                break;
-//        }
+        Global.PropLocation chosen = Global.PropLocation.RIGHT;
 
-                purple_pose = new Pose(-14, 37, -Math.PI / 2);
-                right_spike = purple_pose;
-                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
+        switch (chosen) {
+            case LEFT:
+                purple_pose = new Pose(0, 27, Math.PI/2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(29, 32, 1.4);
+                break;
+            case  CENTER:
+                purple_pose = new Pose(17, 38, Math.PI/2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(29, 27, 1.35);
+                break;
+            default:
+                purple_pose = new Pose(22, 25, Math.PI/2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(29, 19, Math.PI/2);
+                break;
+        }
 
-        Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
-        Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
+        Pose first_stack_pose = new Pose(-96, 49, -Math.PI / 2);
+        Pose first_stack_deposit = new Pose(27, 25, -Math.PI / 2);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -108,18 +109,18 @@ public class BlueFarAuto extends CommandOpMode {
 
                         //purple deposit
                         new PositionCommand(purple_pose)
-                                .andThen(new PositionCommand(right_spike))
+                                .andThen(new PositionCommand(left_spike))
                                 .andThen(new PurplePixelSequence()),
 
                         //yellow deposit
                         new PositionCommand(yellow_pose)
                                 .andThen(new YellowPixelSequence()),
 
-//                        //go to first stack
-//                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2), 2, 0.05),
-//                        new PositionCommand(first_stack_pose)
-//                                .alongWith(new FirstStackSetup()),
-//
+                        //go to first stack
+//                        new PositionCommand(new Pose(25, 52, -Math.PI / 2))
+//                        .andThen(new PositionCommand(first_stack_pose))
+//                        .alongWith(new FirstStackSetup()),
+
 //                        new FirstStackGrabCommand(),
 //                        new WaitCommand(500),
 //
@@ -128,17 +129,15 @@ public class BlueFarAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        new PositionCommand(new Pose(-35, 3, -Math.PI / 2)),
+                        new PositionCommand(new Pose(35, 3, Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
                 )
         );
 
-        if (Global.USING_WEBCAM) {
-            robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
-            robot.vision_portal.close();
-        }
+//        robot.vision_portal.setProcessorEnabled(robot.pipeline, false); //deallocate cpu resources
+//        robot.vision_portal.close();
     }
 
 
@@ -148,7 +147,7 @@ public class BlueFarAuto extends CommandOpMode {
         super.run();
         robot.periodic();
         robot.write();
-        robot.clearBulkCache(Global.Hub.CONTROL_HUB);
+        robot.clearBulkCache(Global.Hub.BOTH);
 
         double loop = System.nanoTime();
         telemetry.addData("Frequency", "%3.2fhz", 1000000000 / (loop - loop_time));
