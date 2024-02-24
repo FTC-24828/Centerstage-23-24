@@ -86,25 +86,25 @@ public class RedBackAuto extends CommandOpMode {
 
         switch (chosen) {
             case LEFT:
-                purple_pose = new Pose(4.5, 28, Math.PI / 2);
-                left_spike = new Pose(-1.5, 28, Math.PI / 2);
-                repose1 = new Pose( .33, -2.19, 1.44);
-                repose2 = new Pose( 55.70, .45, 1.49);
-                yellow_pose = new Pose(109.5, 30, Math.PI / 2);
+                purple_pose = new Pose(-11,27,-Math.PI*2);
+                left_spike = purple_pose;
+                repose1 = new Pose( 2,3,Math.PI*1);
+                repose2 = new Pose( 55,3.2,Math.PI*1);
+                yellow_pose = new Pose(83,32,1.4);
                 break;
             case  CENTER:
-                purple_pose = new Pose(10, 41, Math.PI / 2);
+                purple_pose = new Pose(-12, 38, -Math.PI/2);
                 left_spike = purple_pose;
-                repose1 = new Pose( .33, -2.19, 1.44);
-                repose2 = new Pose( 55.70, .45, 1.49);
-                yellow_pose = new Pose(127, 25, Math.PI / 2);
+                repose1 = new Pose(-12, 3, -Math.PI/2);
+                repose2 = new Pose(55, 3.2, -Math.PI/2);
+                yellow_pose = new Pose(80, 27, 1.35);
                 break;
             default:
-                purple_pose = new Pose(1.5, 28, -Math.PI/2);
+                purple_pose = new Pose(1.5, 25, -Math.PI/2);
                 left_spike = purple_pose;
-                repose1 = new Pose(  1.5, 2, -Math.PI/2);
-                repose2 = new Pose( 55, 3, -Math.PI/2);
-                yellow_pose = new Pose(80, 30, Math.PI/2);
+                repose1 = new Pose(  1.5, 3, -Math.PI/2);
+                repose2 = new Pose( 55, 3.2, -Math.PI/2);
+                yellow_pose = new Pose(80, 19, 1.4);
                 break;
         }
 

@@ -87,25 +87,25 @@ public class BlueBackAuto extends CommandOpMode {
 
         switch (chosen) {
             case LEFT:
-                purple_pose = new Pose(-1.5, 28, -Math.PI/2);
+                purple_pose = new Pose(1.5, 25, -Math.PI/2);
                 right_spike = purple_pose;
-                repose1 = new Pose(0, 2.5, -Math.PI/2);
-                repose2 = new Pose(-55, 3.5, -Math.PI/2);
-                yellow_pose = new Pose(-80, 28, Math.PI/2);
+                repose1 = new Pose(-1.5, 3, -Math.PI/2);
+                repose2 = new Pose(-55, 3.2, -Math.PI/2);
+                yellow_pose = new Pose(-80, 19, 1.4);
                 break;
             case  CENTER:
                 purple_pose = new Pose(12, 38, -Math.PI/2);
                 right_spike = purple_pose;
-                repose1 = new Pose(12, 2.5, -Math.PI/2);
-                repose2 = new Pose(-55, 3.5, -Math.PI/2);
-                yellow_pose = new Pose(-80, 33, Math.PI / 2);
+                repose1 = new Pose(12, 3, -Math.PI/2);
+                repose2 = new Pose(-55, 3.2, -Math.PI/2);
+                yellow_pose = new Pose(-80, 27, 1.35);
                 break;
             default:
-                purple_pose = new Pose(11,16,-Math.PI*2);
+                purple_pose = new Pose(11,27,-Math.PI*2);
                 right_spike = purple_pose;
-                repose1 = new Pose( -2,2,Math.PI/1);
-                repose2 = new Pose( -55.70,2,Math.PI/1);
-                yellow_pose = new Pose(-83,27,Math.PI / 2);
+                repose1 = new Pose( -2,3,Math.PI*1);
+                repose2 = new Pose( -55,3.2,Math.PI*1);
+                yellow_pose = new Pose(-83,32,1.4);
                 break;
         }
 
