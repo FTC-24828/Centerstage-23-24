@@ -114,17 +114,17 @@ public class Main extends CommandOpMode {
         //drone controls
         controller2.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ConditionalCommand(
-                        new DroneLaunchSequence(),
+                        new DroneLaunchCommand(),
                         new InstantCommand(),
                         this::isEndGame
                 ));
 
-        controller2.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(new ConditionalCommand(
-                        new DroneResetSequence(),
-                        new InstantCommand(),
-                        this::isEndGame
-                ));
+//        controller2.getGamepadButton(GamepadKeys.Button.A)
+//                .whenPressed(new ConditionalCommand(
+//                        new DroneLaunchCommand(),
+//                        new InstantCommand(),
+//                        this::isEndGame
+//                ));
 
         controller2.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new DroneResetCommand());
@@ -237,14 +237,14 @@ public class Main extends CommandOpMode {
             telemetry.addData("right claw", "%.2f", robot.claw_right.getPosition());
             telemetry.addData("left claw", "%.2f", robot.claw_left.getPosition());
 
-//            telemetry.addLine("---------------------------");
-//            telemetry.addData("hang state", robot.hang.hang_state);
-//            telemetry.addData("hang power", robot.hang.power);
+            telemetry.addLine("---------------------------");
+            telemetry.addData("hang state", robot.hang.hang_state);
+            telemetry.addData("hang power", robot.hang.power);
 //            telemetry.addData("hook position", robot.hook.getPosition());
-//
-//            telemetry.addLine("---------------------------");
-//            telemetry.addData("drone state", robot.drone.drone_state);
-//            telemetry.addData("drone state", robot.trigger.getPosition());
+
+            telemetry.addLine("---------------------------");
+            telemetry.addData("drone state", robot.drone.drone_state);
+            telemetry.addData("drone state", robot.trigger.getPosition());
         }
 
         telemetry.update();

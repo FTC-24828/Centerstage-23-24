@@ -58,7 +58,7 @@ public class Intake implements WSubsystem {
 
             case SCORING:
                 arm_target_angle = robot.arm.target_position / (3 * Global.TETRIX_MOTOR_TPR) * WMath.twoPI ;
-                target_position = (WMath.twoPI / 3 - arm_target_angle) / 2 + 0.1;
+                target_position = (WMath.twoPI / 3 - arm_target_angle) / 2 + 0.2;
                 break;
 
             case LAUNCHING:

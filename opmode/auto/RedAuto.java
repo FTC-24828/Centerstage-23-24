@@ -36,9 +36,9 @@ public class RedAuto extends CommandOpMode {
         CommandScheduler.getInstance().reset();
 
         Global.IS_AUTO = true;
-        Global.USING_IMU = true;
+        Global.USING_IMU = false;
         Global.USING_DASHBOARD = false;
-        Global.USING_WEBCAM = false;
+        Global.USING_WEBCAM = true;
         Global.DEBUG = true;
         Global.SIDE = Global.Side.RED;
 
@@ -65,7 +65,7 @@ public class RedAuto extends CommandOpMode {
         }
 
         while (!isStarted()) {
-//            telemetry.addData("Path:", robot.pipeline.getPropLocation());
+            telemetry.addData("Path:", robot.pipeline.getPropLocation());
             telemetry.addData("Pose", robot.localizer.getPose().toString());
             telemetry.addData("Encoder readings", "%.2f, %.2f, %.2f",
                     robot.encoder_readings.get(Sensors.Encoder.POD_LEFT),
@@ -75,36 +75,29 @@ public class RedAuto extends CommandOpMode {
             telemetry.update();
         }
 
-        robot.resetYaw();
-
         Pose purple_pose;
         Pose yellow_pose;
-        Pose left_spike = new Pose();
+        Pose left_spike;
 
-//        switch (robot.pipeline.getPropLocation()) {
-//            case LEFT:
-//                purple_pose = new Pose(3, 25, Math.PI / 2);
-//                left_spike = new Pose(-1, 25, Math.PI / 2);
-//                yellow_pose = new Pose(6, 37, Math.PI / 2);
-//                break;
-//            case CENTER:
-//                purple_pose = new Pose(14, 37, Math.PI / 2);
-//                left_spike = purple_pose;
-//                yellow_pose = new Pose(26, 32.5, Math.PI / 2);
-//                break;
-//            default:
-//                purple_pose = new Pose(21, 25, Math.PI / 2);
-//                left_spike = purple_pose;
-//                yellow_pose = new Pose(26, 25, Math.PI / 2);
-//
-//                break;
-//        }
-
-                purple_pose = new Pose(14, 37, Math.PI / 2);
+        switch (robot.pipeline.getPropLocation()) {
+            case LEFT:
+                purple_pose = new Pose(0, 27, Math.PI / 2);
                 left_spike = purple_pose;
-                yellow_pose = new Pose(26, 32.5, Math.PI / 2);
+                yellow_pose = new Pose(29, 32, 1.4);
+                break;
+            case CENTER:
+                purple_pose = new Pose(17, 38, Math.PI / 2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(29, 27, 1.35);
+                break;
+            default:
+                purple_pose = new Pose(22, 25, Math.PI / 2);
+                left_spike = purple_pose;
+                yellow_pose = new Pose(29, 19, Math.PI / 2);
+                break;
+        }
 
-        Pose first_stack_pose = new Pose(79, 58, Math.PI / 2);
+        Pose first_stack_pose = new Pose(-79, 58, Math.PI / 2);
         Pose first_stack_deposit = new Pose(-29, 31.5, Math.PI / 2);
 
         CommandScheduler.getInstance().schedule(
@@ -121,9 +114,9 @@ public class RedAuto extends CommandOpMode {
                                 .andThen(new YellowPixelSequence()),
 
                         //go to first stack
-                        new PositionCommand(new Pose(-20, 47, -Math.PI / 2)),
-                        new PositionCommand(first_stack_pose)
-                                .alongWith(new FirstStackSetup()),
+//                        new PositionCommand(new Pose(-20, 47, Math.PI / 2)),
+//                        new PositionCommand(first_stack_pose)
+//                                .alongWith(new FirstStackSetup()),
 
 //                        new FirstStackGrabCommand(),
 //                        new WaitCommand(500),
@@ -132,8 +125,9 @@ public class RedAuto extends CommandOpMode {
 //
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
-
-//                        new PositionCommand(new Pose(35, 3, Math.PI / 2)),
+                        //Parking
+                        new PositionCommand(new Pose (29, 2, -Math.PI/2)),
+                        new PositionCommand(new Pose(40, 2, -Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 

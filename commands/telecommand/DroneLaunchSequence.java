@@ -12,9 +12,9 @@ import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Intake;
 public class DroneLaunchSequence extends SequentialCommandGroup {
     public DroneLaunchSequence() {
         super(
-                new InstantCommand(() -> Global.setState(Global.State.LAUNCHING)),
-                new ArmSetStateCommand(Arm.ArmState.LAUNCHING),
-                new WristCommand(Intake.WristState.LAUNCHING)
+                new InstantCommand(() -> Global.setState(Global.State.LAUNCHING))
+//                new ArmSetStateCommand(Arm.ArmState.LAUNCHING),
+//                new WristCommand(Intake.WristState.LAUNCHING)
         );
     }
 }

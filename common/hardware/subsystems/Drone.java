@@ -13,7 +13,7 @@ public class Drone implements WSubsystem {
     public DroneState drone_state = DroneState.STORED;
 
     public void init(WServo trigger) {
-        trigger.setDirection(Servo.Direction.FORWARD);
+        trigger.setDirection(Servo.Direction.REVERSE);
         trigger.scaleRange(0, 1);
 
         robot.trigger.setPosition(0);

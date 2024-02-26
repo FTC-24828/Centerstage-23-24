@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.tests.vision;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,10 +16,11 @@ import org.firstinspires.ftc.teamcode.common.vision.PropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.opencv.core.Scalar;
 
-
+@Config
 @TeleOp(name = "PipelineTest", group = "Utility")
 public class PipelineTest extends LinearOpMode {
     public static int side = 0;
+    public static boolean filter = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,7 +28,7 @@ public class PipelineTest extends LinearOpMode {
         VisionPortal vision_portal;
 
         Global.USING_DASHBOARD = true;
-        Global.DEBUG = true;
+        Global.DEBUG = false;
 
         prop_pipeline = new PropPipeline();
         vision_portal = new VisionPortal.Builder()

@@ -76,28 +76,24 @@ public class BlueAuto extends CommandOpMode {
         Pose yellow_pose;
         Pose right_spike;
 
-//        switch (robot.pipeline.getPropLocation()) {
-//            case LEFT:
-//                purple_pose = new Pose(-21, 25, -Math.PI / 2);
-//                right_spike = purple_pose;
-//                yellow_pose = new Pose(-26, 25, -Math.PI / 2);
-//                break;
-//            case CENTER:
-//                purple_pose = new Pose(-14, 37, -Math.PI / 2);
-//                right_spike = purple_pose;
-//                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
-//                break;
-//            default:
-//                purple_pose = new Pose(-3, 25, -Math.PI / 2);
-//                right_spike = new Pose(1, 25, -Math.PI / 2);
-//                yellow_pose = new Pose(-26, 37, -Math.PI / 2);
-//
-//                break;
-//        }
-
-                purple_pose = new Pose(-14, 37, -Math.PI / 2);
+        switch (robot.pipeline.getPropLocation()) {
+            case LEFT:
+                purple_pose = new Pose(-25, 39, -1.4);
                 right_spike = purple_pose;
-                yellow_pose = new Pose(-26, 32.5, -Math.PI / 2);
+                yellow_pose = new Pose(-29, 17, -1.6);
+                break;
+            case CENTER:
+                purple_pose = new Pose(-17, 39, -1.4);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 25, -1.4);
+                break;
+            default:
+                purple_pose = new Pose(-1, 30, -1.4);
+                right_spike = purple_pose;
+                yellow_pose = new Pose(-29, 27, -1.4);
+
+                break;
+        }
 
         Pose first_stack_pose = new Pose(79, 58, -Math.PI / 2);
         Pose first_stack_deposit = new Pose(-29, 31.5, -Math.PI / 2);
@@ -128,7 +124,9 @@ public class BlueAuto extends CommandOpMode {
 //                        new PositionCommand(first_stack_deposit)
 //                                .andThen(new FirstStackDeposit()),
 
-                        new PositionCommand(new Pose(-35, 3, -Math.PI / 2)),
+                        //Parking
+                        new PositionCommand(new Pose (-29, 1, -Math.PI/2)),
+                        new PositionCommand(new Pose(-40, 1, -Math.PI / 2)),
 
                         new InstantCommand(() -> end_time = timer.seconds())
 
@@ -177,6 +175,6 @@ public class BlueAuto extends CommandOpMode {
         robot.reset();
         Global.resetGlobals();
 //        robot.updateYaw();
-        Global.YAW_OFFSET = robot.getYaw();
+//        Global.YAW_OFFSET = robot.getYaw();
     }
 }

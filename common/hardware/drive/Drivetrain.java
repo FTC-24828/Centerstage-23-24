@@ -57,10 +57,15 @@ public class Drivetrain implements WSubsystem {
 
     public void write() {
         for (int i=0; i<4; i++) {
-            if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.05) {
-                if (!Global.IS_AUTO)
-                    wheel_speed[i] =  prev_speed[i] + 0.12 * Math.signum(wheel_speed[i] - prev_speed[i]);
-
+            if (!Global.IS_AUTO) {
+                if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.05) {
+                    if (Math.abs(wheel_speed[i] - prev_speed[i]) > 0.12)
+                        wheel_speed[i] = prev_speed[i] + 0.14 * Math.signum(wheel_speed[i] - prev_speed[i]);
+                    robot.motor[i].setPower(WMath.clamp(wheel_speed[i], -1, 1));
+                    prev_speed[i] = wheel_speed[i];
+                }
+            }
+            else {
                 robot.motor[i].setPower(WMath.clamp(wheel_speed[i], -1, 1));
                 prev_speed[i] = wheel_speed[i];
             }

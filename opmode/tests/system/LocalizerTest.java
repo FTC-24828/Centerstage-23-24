@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.hardware.Global;
+import org.firstinspires.ftc.teamcode.common.hardware.Sensors;
 import org.firstinspires.ftc.teamcode.common.hardware.WRobot;
 import org.firstinspires.ftc.teamcode.common.hardware.drive.Drivetrain;
 import org.firstinspires.ftc.teamcode.common.hardware.subsystems.Arm;
@@ -89,7 +90,10 @@ public class LocalizerTest extends CommandOpMode {
         telemetry.addData("d_theta", "%.5f", robot.localizer.d_theta);
         telemetry.addData("delta distance", "%.3f, %.3f, %.3f",
                 robot.localizer.d_left, robot.localizer.d_middle, robot.localizer.d_right);
-        telemetry.addData("powers:", robot.drivetrain.toString());
+        telemetry.addData("Encoder readings", "%.2f, %.2f, %.2f",
+                robot.encoder_readings.get(Sensors.Encoder.POD_LEFT),
+                robot.encoder_readings.get(Sensors.Encoder.POD_MIDDLE),
+                robot.encoder_readings.get(Sensors.Encoder.POD_RIGHT));
         telemetry.update();
     }
 

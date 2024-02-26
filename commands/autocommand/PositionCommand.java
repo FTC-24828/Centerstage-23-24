@@ -41,7 +41,7 @@ public class PositionCommand extends CommandBase {
     private ElapsedTime stable;
 
     private double WAIT_MS;
-    public static double STABLE_MS = 150;
+    public static double STABLE_MS = 500;
 
     public PositionCommand(Pose pose) {
         target_pose = pose;
@@ -90,7 +90,7 @@ public class PositionCommand extends CommandBase {
         double yPower = yController.calculate(robot_pose.y, target_pose.y);
         double zPower = zController.calculate(WMath.wrapAngle(robot_pose.z - target_pose.z));
 
-        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.5, 0.5);
+        Vector2D translation_vector = new Vector2D(xPower, yPower, robot_pose.z).clamp(-0.4, 0.4);
         zPower = WMath.clamp(zPower, -0.6, 0.6); //TODO: tune this
 
         return new Pose(translation_vector, zPower);
