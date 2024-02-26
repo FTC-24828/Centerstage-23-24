@@ -18,7 +18,7 @@ public class Localizer {
     private Pose pose;
 
     public static double WHEEL_RADIUS = 0.952;
-    public static double TRACK_WIDTH = 7.0;
+    public static double TRACK_WIDTH = 7.1;
     public static double MIDDLE_OFFSET = 4.563;
     public static double SIDES_OFFSET = 2;
 
@@ -49,9 +49,9 @@ public class Localizer {
     }
 
     public void update() {
-         d_left = ticksToInches(left.getAsDouble() - _left);
-         d_middle = ticksToInches(middle.getAsDouble() - _middle);
-         d_right = ticksToInches(right.getAsDouble() - _right);
+        d_left = ticksToInches(left.getAsDouble() - _left);
+        d_middle = ticksToInches(middle.getAsDouble() - _middle);
+        d_right = ticksToInches(right.getAsDouble() - _right);
 
         d_theta = (d_left - d_right) / TRACK_WIDTH;
         pose.z = WMath.wrapAngle(pose.z + d_theta);

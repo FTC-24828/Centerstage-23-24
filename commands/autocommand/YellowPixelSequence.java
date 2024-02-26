@@ -19,15 +19,12 @@ public class YellowPixelSequence extends SequentialCommandGroup {
                 new ArmSetTargetCommand(Global.TETRIX_MOTOR_TPR)
                         .alongWith(new WristCommand(Intake.WristState.SCORING)),
 
-                 new ArmSetTargetCommand(3.0 * Global.TETRIX_MOTOR_TPR / 2)
+                 new ArmSetTargetCommand(3.0 * Global.TETRIX_MOTOR_TPR / 2 + 150)
                          .alongWith(new WristSetIncrement(-0.3)),
-                new WaitCommand(3000),
+                new WaitCommand(2000),
 
                 new ClawCommand(Intake.ClawSide.LEFT, Intake.ClawState.OPEN),
                 new WaitCommand(400),
-
-                new ArmSetTargetCommand((double) 4 * Global.TETRIX_MOTOR_TPR / 3 - 500),
-                new WaitCommand(300),
 
                 new ClawCommand(Intake.ClawSide.BOTH, Intake.ClawState.CLOSED),
 

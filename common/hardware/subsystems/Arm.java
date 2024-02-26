@@ -107,7 +107,7 @@ public class Arm implements WSubsystem {
 
     public void incrementHeight(double increment) {
         this.increment -= increment;
-        this.increment = WMath.clamp(this.increment, 0, 800);
+        this.increment = WMath.clamp(this.increment, -200, 700);
     }
 
     public void resetIncrement() {
